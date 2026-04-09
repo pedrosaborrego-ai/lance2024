@@ -853,34 +853,41 @@ function verifyDoc(){
         if(msg) msg.textContent='❌ DNI/NIE no registrado. Contacta con el encargado.';
         return;
       }
-      // Verificado correctamente
+      // Guardar datos del operario
       workerName = `${data.nombre} ${data.apellidos}`;
-      workerDoc = doc;
-      workerPin = data.pin; // PIN asignado por empresa
+      workerDoc  = doc;
+      workerPin  = data.pin; // PIN de empresa — obligatorio verificar
       workerObra = data.obra||'';
       if(msg) msg.textContent='';
-      // Mostrar nombre detectado
-      showToast(`✅ Bienvenido ${data.nombre}`,'ok');
-      // Ir a crear PIN
-      changingPin = false;
-      resetSetPin(false);
-      document.getElementById('setpin-title').textContent = t('setpin_title');
-      document.getElementById('setpin-info').textContent = t('setpin_info').replace('\n',' ');
-      goTo('s-setpin');
+      showToast(`✅ Identificado: ${data.nombre}`,'ok');
+
+      // Comprobar si ya tiene PIN personal guardado
+      const savedPin = localStorage.getItem('pin_'+key);
+      if(savedPin){
+        // Ya tiene PIN personal — ir directo a login
+        myPin = savedPin;
+        setupLoginPin();
+        goTo('s-pin');
+      } else {
+        // Primera vez — pedir PIN de empresa para verificar
+        setupVerifyCompanyPin();
+        goTo('s-pin');
+      }
     })
     .catch(()=>{
-      // Sin internet — permitir entrada con nombre manual
-      if(msg) msg.textContent='⚠️ Sin conexión. Escribe tu nombre para continuar.';
-      const docInput = document.getElementById('worker-doc-input');
-      if(docInput) docInput.placeholder = 'Escribe tu nombre completo';
-      workerName = doc;
-      workerDoc = doc;
-      setTimeout(()=>{
-        changingPin = false;
-        resetSetPin(false);
-        goTo('s-setpin');
-      }, 1500);
+      if(msg) msg.textContent='⚠️ Sin conexión — no se puede verificar identidad.';
     });
+}
+
+function setupVerifyCompanyPin(){
+  // Modo verificación PIN empresa
+  pinVal='';
+  for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.remove('on');
+  document.getElementById('pin-title').textContent = '🔐 PIN de empresa';
+  document.getElementById('pin-hint').textContent  = 'Introduce el PIN que te ha dado el encargado';
+  document.getElementById('pin-err').textContent   = '';
+  // Flag para saber que estamos verificando PIN empresa
+  window._verifyingCompanyPin = true;
 }
 
 function goToSetPin(){
@@ -908,6 +915,9 @@ function spp(d){
   if(setPinVal.length===4){
     setTimeout(()=>{
       myPin = setPinVal;
+      // Guardar PIN personal en localStorage vinculado al DNI/NIE
+      const key = workerDoc.replace(/[^A-Z0-9]/g,'');
+      if(key) localStorage.setItem('pin_'+key, myPin);
       showToast(t('toast_pin'),'ok');
       if(changingPin){ goTo('s-app'); }
       else { setupLoginPin(); goTo('s-pin'); }
@@ -941,20 +951,42 @@ function pkDel(){
   document.getElementById('pin-err').textContent='';
 }
 function checkPin(){
-  // Acepta PIN personal creado por el operario O PIN de empresa asignado
-  if(pinVal===myPin || (workerPin && pinVal===workerPin)){
-    document.getElementById('worker-badge').textContent = '👷 '+workerName;
-    goTo('s-app');
-    applyAppLang();
-    renderTasks();
-    startClock();
-    startGPS();
+  const key = workerDoc.replace(/[^A-Z0-9]/g,'');
+
+  if(window._verifyingCompanyPin){
+    // Verificando PIN de empresa — primera vez
+    if(pinVal === workerPin){
+      window._verifyingCompanyPin = false;
+      // PIN correcto — ahora crear PIN personal
+      showToast('✅ PIN correcto — crea tu PIN personal','ok');
+      changingPin = false;
+      resetSetPin(false);
+      document.getElementById('setpin-title').textContent = t('setpin_title');
+      document.getElementById('setpin-info').textContent = 'Crea tu PIN personal de 4 dígitos fácil de recordar';
+      goTo('s-setpin');
+    } else {
+      document.getElementById('pin-err').textContent = '❌ PIN incorrecto. Contacta con el encargado.';
+      document.getElementById('login-pad').classList.add('shake');
+      setTimeout(()=>document.getElementById('login-pad').classList.remove('shake'),450);
+      pinVal='';
+      for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.remove('on');
+    }
   } else {
-    document.getElementById('pin-err').textContent = t('pin_err');
-    document.getElementById('login-pad').classList.add('shake');
-    setTimeout(()=>document.getElementById('login-pad').classList.remove('shake'),450);
-    pinVal='';
-    for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.remove('on');
+    // Login normal con PIN personal
+    if(pinVal === myPin){
+      document.getElementById('worker-badge').textContent = '👷 '+workerName;
+      goTo('s-app');
+      applyAppLang();
+      renderTasks();
+      startClock();
+      startGPS();
+    } else {
+      document.getElementById('pin-err').textContent = t('pin_err');
+      document.getElementById('login-pad').classList.add('shake');
+      setTimeout(()=>document.getElementById('login-pad').classList.remove('shake'),450);
+      pinVal='';
+      for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.remove('on');
+    }
   }
 }
 
