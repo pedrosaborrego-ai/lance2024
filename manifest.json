@@ -1,24 +1,22 @@
 {
-  "name": "ObraControl GPS - Construcciones Lance 2024",
+  "name": "ObraControl GPS",
   "short_name": "Lance GPS",
-  "description": "App de fichaje GPS para operarios",
-  "start_url": "/lance2024/lance-operario-v3.html",
+  "description": "Control de presencia en obra - Construcciones Lance 2024 SL",
+  "start_url": "./lance-operario-v3.html",
   "display": "standalone",
   "background_color": "#0A1628",
   "theme_color": "#1B4F8C",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
