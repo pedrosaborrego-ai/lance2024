@@ -1016,6 +1016,8 @@ function checkPin(){
   } else {
     // Login normal con PIN personal
     if(pinVal === myPin){
+      // Guardar sesión completa
+      saveSession();
       document.getElementById('worker-badge').textContent = '👷 '+workerName;
       goTo('s-app');
       applyAppLang();
@@ -1030,6 +1032,43 @@ function checkPin(){
       for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.remove('on');
     }
   }
+}
+
+// ─────────────────────────────────────
+// SESIÓN PERSISTENTE
+// ─────────────────────────────────────
+function saveSession(){
+  try{
+    const session = {
+      workerName, workerDoc, workerPin, workerObra, myPin, lang, isIn,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('lance_session', JSON.stringify(session));
+  }catch(e){}
+}
+
+function restoreSession(){
+  try{
+    const s = JSON.parse(localStorage.getItem('lance_session'));
+    if(!s || !s.workerDoc || !s.myPin) return false;
+    // Sesión caduca después de 24 horas
+    if(Date.now() - s.timestamp > 24*60*60*1000){
+      localStorage.removeItem('lance_session');
+      return false;
+    }
+    workerName = s.workerName;
+    workerDoc = s.workerDoc;
+    workerPin = s.workerPin||'';
+    workerObra = s.workerObra||'';
+    myPin = s.myPin;
+    lang = s.lang||'es';
+    isIn = s.isIn||false;
+    return true;
+  }catch(e){ return false; }
+}
+
+function clearSession(){
+  localStorage.removeItem('lance_session');
 }
 
 // ─────────────────────────────────────
@@ -1328,11 +1367,11 @@ function fbSaveCheckin(type){
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify(data)
   }).catch(e=>console.log('Firebase error:',e));
-  // Actualizar estado actual
+  // Actualizar estado actual — incluir DNI para emparejamiento con consola
   fetch(`${FB_URL}/operarios_activos/${key}.json`, {
     method: 'PUT',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({...data, activo: type==='entrada'})
+    body: JSON.stringify({...data, activo: type==='entrada', doc: workerDoc||''})
   }).catch(e=>console.log('Firebase error:',e));
 }
 
@@ -1390,6 +1429,8 @@ function toggleCheckin(){
   }
 
   if(navigator.vibrate) navigator.vibrate([60,30,60]);
+  // Guardar estado de sesión
+  saveSession();
 }
 
 // ─────────────────────────────────────
@@ -1436,11 +1477,14 @@ function shareWA(){
 // ─────────────────────────────────────
 function logout(){
   isIn=false; pinVal=''; workerName=''; myPin=''; setPinVal='';
+  workerDoc=''; workerPin=''; workerObra='';
   myLat=null; myLng=null;
+  clearSession();
   if(gpsWatch) navigator.geolocation.clearWatch(gpsWatch);
   document.getElementById('checkin-btn').classList.remove('in');
   document.getElementById('checkin-status').textContent='';
-  document.getElementById('worker-name-input').value='';
+  const docInput = document.getElementById('worker-doc-input');
+  if(docInput) docInput.value='';
   goTo('s-lang');
 }
 
@@ -1450,6 +1494,25 @@ window.addEventListener('load',()=>{
   setTimeout(()=>{
     const splash=document.getElementById('s-splash');
     if(splash){ splash.classList.add('fade-out'); setTimeout(()=>splash.style.display='none',650); }
+    // Intentar restaurar sesión guardada
+    if(restoreSession()){
+      // Sesión restaurada — ir directo a la app
+      document.getElementById('worker-badge').textContent = '👷 '+workerName;
+      if(isIn){
+        const btn=document.getElementById('checkin-btn');
+        btn.classList.add('in');
+        btn.style.borderColor='var(--red)';
+        btn.style.background='rgba(255,71,87,.07)';
+        document.getElementById('cb-label').innerHTML=t('checkout').replace('\n','<br>');
+        document.getElementById('cb-icon').textContent='🔴';
+      }
+      goTo('s-app');
+      applyAppLang();
+      renderTasks();
+      startClock();
+      startGPS();
+      showToast(`👋 Bienvenido ${workerName.split(' ')[0]}`,'ok');
+    }
   },2800);
 });
 
