@@ -640,6 +640,18 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
               </div>
             </div>
 
+            <div class="form-g">
+              <label class="form-lbl">📱 Sistema operativo del móvil</label>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="so-android" onclick="selectSO('android')" style="flex:1;padding:12px;background:rgba(56,224,123,.08);border:2px solid var(--green);border-radius:10px;cursor:pointer;text-align:center;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--green);">
+                  🤖 Android
+                </button>
+                <button type="button" id="so-iphone" onclick="selectSO('iphone')" style="flex:1;padding:12px;background:var(--card);border:2px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--text3);">
+                  🍎 iPhone
+                </button>
+              </div>
+            </div>
+
             <div style="background:var(--blue-light);border:1px solid var(--border2);border-radius:10px;padding:12px;margin-bottom:14px;font-size:11px;color:var(--blue2);">
               💡 El operario puede cambiar su PIN por uno personal en la app cuando inicie sesión por primera vez.
             </div>
@@ -1327,9 +1339,68 @@ function generarPinUnico(){
 const APP_URL = 'https://obracontrolgps.net/lance-operario-v3.html';
 let lastWorkerAdded = null;
 
+let selectedSO = 'android';
+
+function selectSO(so){
+  selectedSO = so;
+  const btnAndroid = document.getElementById('so-android');
+  const btnIphone = document.getElementById('so-iphone');
+  if(so==='android'){
+    btnAndroid.style.borderColor='var(--green)';
+    btnAndroid.style.background='rgba(56,224,123,.08)';
+    btnAndroid.style.color='var(--green)';
+    btnIphone.style.borderColor='var(--border)';
+    btnIphone.style.background='var(--card)';
+    btnIphone.style.color='var(--text3)';
+  } else {
+    btnIphone.style.borderColor='var(--text)';
+    btnIphone.style.background='rgba(0,0,0,.05)';
+    btnIphone.style.color='var(--text)';
+    btnAndroid.style.borderColor='var(--border)';
+    btnAndroid.style.background='var(--card)';
+    btnAndroid.style.color='var(--text3)';
+  }
+}
+
 function generarMsgWA(w){
   const doc = w.dni || w.nie || '';
-  return `🏗️ *CONSTRUCCIONES LANCE 2024 SL*\n\nHola ${w.nombre} ${w.apellidos} 👋\n\nTe enviamos tu acceso a *ObraControl GPS*:\n\n📱 Enlace de la app:\n👉 ${APP_URL}\n\n📄 Tu DNI/NIE: *${doc}*\n🔐 Tu PIN inicial: *${w.pin}*\n_(Podrás cambiarlo por uno personal al entrar)_\n\n📋 Pasos:\n1️⃣ Abre el enlace\n2️⃣ Elige tu idioma\n3️⃣ Introduce tu DNI o NIE\n4️⃣ Introduce el PIN que te hemos dado\n5️⃣ Crea tu PIN personal\n6️⃣ ¡Ficha tu entrada!\n\n📍 Obra asignada:\n${w.obra||'Consulta con el encargado'}\n\n_ObraControl GPS · Construcciones Lance 2024 SL_`;
+  const so = selectedSO || 'android';
+  
+  let instrucciones = '';
+  if(so === 'iphone'){
+    instrucciones = `📲 *INSTALAR EN IPHONE:*\n` +
+      `1️⃣ Abre el enlace en *Safari* (importante: NO usar Chrome)\n` +
+      `2️⃣ Pulsa el botón *Compartir* ⬆️ (cuadrado con flecha)\n` +
+      `3️⃣ Baja y pulsa *"Añadir a pantalla de inicio"*\n` +
+      `4️⃣ Pulsa *"Añadir"*\n` +
+      `5️⃣ Ya tienes el icono de Lance en tu pantalla`;
+  } else {
+    instrucciones = `📲 *INSTALAR EN ANDROID:*\n` +
+      `1️⃣ Abre el enlace en Chrome\n` +
+      `2️⃣ Pulsa los *3 puntos* ⋮ (arriba a la derecha)\n` +
+      `3️⃣ Pulsa *"Añadir a pantalla de inicio"*\n` +
+      `4️⃣ Pulsa *"Añadir"*\n` +
+      `5️⃣ Ya tienes el icono de Lance en tu pantalla`;
+  }
+
+  return `🏗️ *CONSTRUCCIONES LANCE 2024 SL*\n\n` +
+    `Hola ${w.nombre} ${w.apellidos} 👋\n\n` +
+    `Te enviamos tu acceso a *ObraControl GPS*:\n\n` +
+    `📱 Enlace de la app:\n👉 ${APP_URL}\n\n` +
+    `📄 Tu DNI/NIE: *${doc}*\n` +
+    `🔐 Tu PIN inicial: *${w.pin}*\n` +
+    `_(Podrás cambiarlo por uno personal al entrar)_\n\n` +
+    `📋 *PASOS PARA FICHAR:*\n` +
+    `1️⃣ Abre el enlace\n` +
+    `2️⃣ Elige tu idioma\n` +
+    `3️⃣ Acepta el consentimiento\n` +
+    `4️⃣ Introduce tu DNI o NIE\n` +
+    `5️⃣ Introduce el PIN que te hemos dado\n` +
+    `6️⃣ Crea tu PIN personal\n` +
+    `7️⃣ ¡Ficha tu entrada!\n\n` +
+    `${instrucciones}\n\n` +
+    `📍 Obra asignada:\n${w.obra||'Consulta con el encargado'}\n\n` +
+    `_ObraControl GPS · Construcciones Lance 2024 SL_`;
 }
 
 function sendWaAlta(){
