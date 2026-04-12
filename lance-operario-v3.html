@@ -1338,7 +1338,7 @@ function clearIncPhoto(){
 function enviarIncidencia(){
   const tipo = document.getElementById('inc-tipo').value;
   const desc = document.getElementById('inc-desc').value.trim();
-  if(!desc && !incPhotoBase64){ showToast('Escribe una descripción o saca una foto','err'); return; }
+  // Se puede enviar con solo seleccionar el tipo — descripción y foto son opcionales
 
   const now = new Date();
   const dateStr = now.toISOString().split('T')[0];
