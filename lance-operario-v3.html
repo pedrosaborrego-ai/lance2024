@@ -786,6 +786,7 @@ let myPin = '';
 let setPinVal = '';
 let pinVal = '';
 let isIn = false;
+let entryTime = localStorage.getItem('lance_entry_time') || null;
 let gpsWatch = null;
 let myLat = null, myLng = null;
 let changingPin = false;
@@ -1142,6 +1143,7 @@ function fbSaveCheckin(type){
     nombre: workerName,
     tipo: type, // 'entrada' o 'salida'
     hora: timeStr,
+    hora_entrada: type==='entrada' ? timeStr : (entryTime||null),
     fecha: dateStr,
     ciudad: myCity||'',
     provincia: myProvince||'',
@@ -1150,6 +1152,8 @@ function fbSaveCheckin(type){
     lng: myLng||0,
     timestamp: now.getTime()
   };
+  if(type==='entrada'){ entryTime=timeStr; localStorage.setItem('lance_entry_time',timeStr); }
+  if(type==='salida'){ entryTime=null; localStorage.removeItem('lance_entry_time'); }
   const key = workerName.replace(/\s+/g,'_').toLowerCase();
   // Guardar fichaje
   fetch(`${FB_URL}/fichajes/${dateStr}/${key}.json`, {
