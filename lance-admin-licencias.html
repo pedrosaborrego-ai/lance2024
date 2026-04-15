@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ObraControl GPS — Admin Licencias</title>
+<style>
+:root{
+  --blue:#1B4F8C;--blue2:#2563AE;--blue3:#3B82C4;
+  --blue-light:#E8F1FB;--bg:#F4F7FC;--white:#fff;
+  --border:#E2EAF4;--text:#1A2840;--text2:#4A6080;--text3:#8FA5C0;
+  --green:#16A34A;--green-l:#DCFCE7;
+  --red:#DC2626;--red-l:#FEE2E2;
+  --orange:#E8621A;--orange-l:#FFF3EC;
+  --amber:#D97706;--amber-l:#FEF3C7;
+  --shadow:0 2px 8px rgba(27,79,140,.1);
+  --shadow-lg:0 8px 32px rgba(27,79,140,.15);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#0A1628 0%,#1B3A6B 50%,#0A1628 100%);display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-card{background:rgba(255,255,255,.97);border-radius:20px;padding:36px 32px;width:100%;max-width:360px;box-shadow:0 32px 80px rgba(0,0,0,.4);text-align:center;}
+.login-icon{font-size:48px;margin-bottom:12px;}
+.login-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.login-sub{font-size:12px;color:var(--text3);margin-bottom:24px;}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:20px;}
+.pdot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .15s;}
+.pdot.on{background:var(--orange);border-color:var(--orange);transform:scale(1.15);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto;}
+.pk{height:52px;border-radius:10px;background:var(--bg);border:1.5px solid var(--border);font-size:20px;font-weight:700;color:var(--text);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;}
+.pk:hover{background:var(--blue-light);border-color:var(--blue2);}
+.pk:active{background:var(--orange);color:#fff;transform:scale(.93);}
+.pk.del{font-size:14px;color:var(--text3);}
+.pk.zero{grid-column:2;}
+.pin-err{height:18px;text-align:center;font-size:11px;font-weight:700;color:var(--red);margin-top:8px;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .4s ease;}
+
+/* ── APP ── */
+#app{display:none;}
+.topbar{background:var(--blue);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.topbar-title{font-size:16px;font-weight:800;color:#fff;letter-spacing:.5px;}
+.topbar-badge{background:var(--orange);color:#fff;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;letter-spacing:1px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.btn-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-logout:hover{background:rgba(255,71,87,.3);}
+
+.main{padding:24px;max-width:1100px;margin:0 auto;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+.sc-blue::after{background:linear-gradient(90deg,var(--blue),var(--blue3));}
+.sc-green::after{background:linear-gradient(90deg,var(--green),#4ADE80);}
+.sc-red::after{background:linear-gradient(90deg,var(--red),#F87171);}
+.sc-orange::after{background:linear-gradient(90deg,var(--orange),#FF7A35);}
+.stat-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:8px;}
+.stat-val{font-size:36px;font-weight:900;line-height:1;}
+.sc-blue .stat-val{color:var(--blue2);}
+.sc-green .stat-val{color:var(--green);}
+.sc-red .stat-val{color:var(--red);}
+.sc-orange .stat-val{color:var(--orange);}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-inp{width:100%;padding:9px 12px 9px 36px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;color:var(--text);background:var(--white);outline:none;transition:border-color .2s;}
+.search-inp:focus{border-color:var(--blue2);}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;}
+.btn-new{background:var(--orange);color:#fff;border:none;padding:9px 18px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;white-space:nowrap;}
+.btn-new:hover{background:var(--blue);}
+.btn-sync{background:var(--blue-light);color:var(--blue2);border:1px solid var(--border);padding:9px 14px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-sync:hover{background:var(--blue2);color:#fff;}
+
+/* TABLE */
+.card{background:var(--white);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;}
+.card-hdr{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text2);}
+table{width:100%;border-collapse:collapse;}
+thead th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:10px 16px;border-bottom:1px solid var(--border);text-align:left;background:var(--bg);}
+tbody td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--blue-light);}
+
+/* TOGGLE */
+.toggle{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;border-radius:24px;background:#CBD5E1;transition:all .25s;box-shadow:inset 0 1px 3px rgba(0,0,0,.1);}
+.toggle-slider::before{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+input:checked + .toggle-slider{background:var(--green);}
+input:checked + .toggle-slider::before{transform:translateX(20px);}
+.toggle-wrap{display:flex;align-items:center;gap:8px;}
+.toggle-label{font-size:11px;font-weight:700;min-width:60px;}
+.tl-on{color:var(--green);}
+.tl-off{color:var(--red);}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px;}
+.p-activa{background:var(--green-l);color:var(--green);}
+.p-bloqueada{background:var(--red-l);color:var(--red);}
+.p-caducada{background:var(--amber-l);color:var(--amber);}
+.p-prueba{background:var(--orange-l);color:var(--orange);}
+.p-interna{background:var(--blue-light);color:var(--blue2);}
+
+/* PLAN PILLS */
+.plan-pill{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.5px;}
+.plan-basico{background:var(--blue-light);color:var(--blue2);}
+.plan-profesional{background:var(--amber-l);color:var(--amber);}
+.plan-empresa{background:var(--green-l);color:var(--green);}
+.plan-interna{background:#EDE9FE;color:#7C3AED;}
+
+/* BTNs */
+.btn-copy{padding:4px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:10px;cursor:pointer;color:var(--text2);transition:all .12s;}
+.btn-copy:hover{background:var(--blue-light);color:var(--blue2);}
+.btn-del{padding:4px 8px;background:var(--red-l);border:1px solid rgba(220,38,38,.2);border-radius:6px;font-size:10px;cursor:pointer;color:var(--red);transition:all .12s;}
+.btn-del:hover{background:var(--red);color:#fff;}
+.btn-edit2{padding:4px 10px;background:var(--blue-light);border:1px solid var(--border);border-radius:6px;font-size:10px;cursor:pointer;color:var(--blue2);transition:all .12s;}
+.btn-edit2:hover{background:var(--blue2);color:#fff;}
+.btn-renew{padding:4px 10px;background:var(--amber-l);border:1px solid rgba(217,119,6,.2);border-radius:6px;font-size:10px;cursor:pointer;color:var(--amber);transition:all .12s;}
+.btn-renew:hover{background:var(--amber);color:#fff;}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(10,22,40,.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.overlay.show{display:flex;}
+.modal{background:var(--white);border-radius:16px;width:480px;max-width:95vw;overflow:hidden;box-shadow:var(--shadow-lg);}
+.modal-hdr{background:linear-gradient(135deg,var(--blue),var(--blue2));padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:14px;font-weight:800;color:#fff;letter-spacing:.5px;}
+.modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:20px;}
+.form-g{margin-bottom:14px;}
+.form-lbl{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:6px;}
+.form-ctrl{width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;outline:none;transition:border-color .2s;}
+.form-ctrl:focus{border-color:var(--blue2);background:var(--white);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn-guardar{width:100%;padding:11px;background:var(--blue2);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:6px;}
+.btn-guardar:hover{background:var(--blue);}
+.btn-cancelar{width:100%;padding:10px;background:transparent;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);cursor:pointer;margin-top:8px;transition:all .15s;}
+.btn-cancelar:hover{border-color:var(--red);color:var(--red);}
+
+/* GENERATED CODE */
+.gen-code{background:linear-gradient(135deg,#0A1628,#1B3A6B);border-radius:12px;padding:16px;text-align:center;margin:12px 0;}
+.gen-code-val{font-size:28px;font-weight:900;color:var(--orange);letter-spacing:6px;font-family:monospace;}
+.gen-code-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;padding:11px 16px;border-radius:10px;font-size:12px;font-weight:600;display:none;z-index:500;animation:tIn .3s ease;box-shadow:var(--shadow-lg);}
+.toast.show{display:flex;align-items:center;gap:8px;}
+.toast.ok{background:var(--green-l);border:1px solid rgba(22,163,74,.3);color:var(--green);}
+.toast.err{background:var(--red-l);border:1px solid rgba(220,38,38,.3);color:var(--red);}
+.toast.inf{background:var(--blue-light);border:1px solid var(--border);color:var(--blue2);}
+@keyframes tIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* LOG */
+.log-item{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;font-size:11px;}
+.log-item:last-child{border-bottom:none;}
+.log-time{color:var(--text3);flex-shrink:0;width:45px;}
+.log-msg{color:var(--text2);}
+.log-ok{color:var(--green);}
+.log-err{color:var(--red);}
+
+@media(max-width:700px){.stats-grid{grid-template-columns:1fr 1fr;}.form-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-icon">🔐</div>
+    <div class="login-title">Panel Administrador</div>
+    <div class="login-sub">ObraControl GPS · Gestión de Licencias</div>
+    <div class="pin-dots">
+      <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
+      <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
+    </div>
+    <div class="pin-pad" id="pin-pad">
+      <div class="pk" onclick="pk('1')">1</div><div class="pk" onclick="pk('2')">2</div><div class="pk" onclick="pk('3')">3</div>
+      <div class="pk" onclick="pk('4')">4</div><div class="pk" onclick="pk('5')">5</div><div class="pk" onclick="pk('6')">6</div>
+      <div class="pk" onclick="pk('7')">7</div><div class="pk" onclick="pk('8')">8</div><div class="pk" onclick="pk('9')">9</div>
+      <div class="pk del" onclick="pkDel()">⌫</div><div class="pk zero" onclick="pk('0')">0</div>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">🔐 ObraControl GPS</div>
+      <div class="topbar-badge">ADMIN · LICENCIAS</div>
+    </div>
+    <div class="topbar-right">
+      <span id="clock" style="color:rgba(255,255,255,.7);font-size:12px;font-weight:600;"></span>
+      <button class="btn-logout" onclick="logout()">↩ Salir</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card sc-blue">
+        <div class="stat-label">Total licencias</div>
+        <div class="stat-val" id="s-total">0</div>
+        <div class="stat-sub">Registradas en sistema</div>
+      </div>
+      <div class="stat-card sc-green">
+        <div class="stat-label">Activas</div>
+        <div class="stat-val" id="s-activas">0</div>
+        <div class="stat-sub">Clientes operativos</div>
+      </div>
+      <div class="stat-card sc-red">
+        <div class="stat-label">Bloqueadas</div>
+        <div class="stat-val" id="s-bloq">0</div>
+        <div class="stat-sub">Acceso denegado</div>
+      </div>
+      <div class="stat-card sc-orange">
+        <div class="stat-label">Ingresos/mes</div>
+        <div class="stat-val" id="s-ingresos">0€</div>
+        <div class="stat-sub">Estimado actual</div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-inp" id="search" placeholder="Buscar empresa, código o plan..." oninput="renderTable()">
+      </div>
+      <button class="btn-sync" onclick="loadLicencias()">🔄 Sincronizar</button>
+      <button class="btn-new" onclick="openModal()">+ Nueva licencia</button>
+    </div>
+
+    <!-- TABLA LICENCIAS -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-hdr">
+        <div class="card-title">📋 Licencias registradas</div>
+        <span id="tbl-count" style="font-size:10px;color:var(--text3)"></span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa / Cliente</th>
+              <th>Código</th>
+              <th>Plan</th>
+              <th>Caducidad</th>
+              <th>Estado</th>
+              <th>ON / OFF</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LOG DE ACTIVIDAD -->
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">📜 Registro de actividad</div>
+        <button onclick="clearLog()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">🗑 Limpiar</button>
+      </div>
+      <div id="activity-log" style="max-height:200px;overflow-y:auto;">
+        <div class="log-item"><span class="log-time">--:--</span><span class="log-msg">Sistema iniciado. Listo.</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL NUEVA/EDITAR LICENCIA -->
+<div class="overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-title">➕ Nueva licencia</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-key">
+
+      <div class="form-g">
+        <label class="form-lbl">Empresa / Cliente</label>
+        <input class="form-ctrl" id="f-empresa" placeholder="Ej: Construcciones García SL">
+      </div>
+
+      <div class="form-g">
+        <label class="form-lbl">Código de licencia</label>
+        <div style="display:flex;gap:8px;">
+          <input class="form-ctrl" id="f-codigo" placeholder="Ej: LANCE2024" style="text-transform:uppercase;font-weight:700;letter-spacing:2px;flex:1;">
+          <button onclick="generarCodigo()" style="padding:9px 12px;background:var(--blue-light);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;" title="Generar código">🔄</button>
+        </div>
+        <div class="gen-code" id="gen-code-box" style="display:none;">
+          <div class="gen-code-val" id="gen-code-val"></div>
+          <div class="gen-code-sub">Código generado automáticamente</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-lbl">Plan</label>
+          <select class="form-ctrl" id="f-plan" onchange="updatePrecio()">
+            <option value="basico">Básico — 29€/mes</option>
+            <option value="profesional">Profesional — 59€/mes</option>
+            <option value="empresa">Empresa — 99€/mes</option>
+            <option value="interna">Uso interno Lance</option>
+          </select>
+        </div>
+        <div class="form-g">
+          <label class="form-lbl">Caducidad</label>
+          <input class="form-ctrl" id="f-caducidad" type="date">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-g">
+          <label class="form-lbl">Teléfono cliente</label>
+          <input class="form-ctrl" id="f-tel" placeholder="+34 612 345 678" type="tel">
+        </div>
+        <div class="form-g">
+          <label class="form-lbl">Email cliente</label>
+          <input class="form-ctrl" id="f-email" placeholder="cliente@empresa.com" type="email">
+        </div>
+      </div>
+
+      <div class="form-g">
+        <label class="form-lbl">Estado inicial</label>
+        <div style="display:flex;gap:10px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600;">
+            <input type="radio" name="f-estado" value="true" checked> ✅ Activa
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;font-weight:600;">
+            <input type="radio" name="f-estado" value="false"> 🔒 Bloqueada
+          </label>
+        </div>
+      </div>
+
+      <div class="form-g">
+        <label class="form-lbl">Notas (opcional)</label>
+        <input class="form-ctrl" id="f-notas" placeholder="Primer mes gratis, cliente referido...">
+      </div>
+
+      <button class="btn-guardar" onclick="guardarLicencia()">💾 Guardar licencia</button>
+      <button class="btn-cancelar" onclick="closeModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const ADMIN_PIN = '2342';
+const FB_URL = 'https://lance-a99b4-default-rtdb.europe-west1.firebasedatabase.app';
+const PRECIOS = {basico:29, profesional:59, empresa:99, interna:0};
+
+// ── PIN LOGIN ──
+let pinVal = '';
+function pk(d){ if(pinVal.length>=4)return; pinVal+=d; updDots(); if(pinVal.length===4) setTimeout(checkPin,200); }
+function pkDel(){ pinVal=pinVal.slice(0,-1); updDots(); document.getElementById('pin-err').textContent=''; }
+function updDots(){ for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.toggle('on',i<pinVal.length); }
+function checkPin(){
+  if(pinVal===ADMIN_PIN){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    initApp();
+  } else {
+    document.getElementById('pin-err').textContent='PIN incorrecto.';
+    document.getElementById('pin-pad').classList.add('shake');
+    setTimeout(()=>document.getElementById('pin-pad').classList.remove('shake'),450);
+    pinVal=''; updDots();
+  }
+}
+function logout(){
+  pinVal=''; updDots();
+  document.getElementById('pin-err').textContent='';
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+// ── CLOCK ──
+function tick(){ document.getElementById('clock').textContent = new Date().toLocaleTimeString('es-ES'); }
+setInterval(tick,1000); tick();
+
+// ── LICENCIAS DATA ──
+let licencias = {}; // { CODIGO: { empresa, activa, plan, caducidad, tel, email, notas, creada } }
+
+function initApp(){
+  loadLicencias();
+}
+
+function loadLicencias(){
+  addLog('🔄 Cargando licencias desde Firebase...','inf');
+  fetch(`${FB_URL}/licencias.json`)
+    .then(r=>r.json())
+    .then(data=>{
+      licencias = data || {};
+      // Si no hay ninguna, crear la licencia interna de Lance
+      if(!Object.keys(licencias).length){
+        licencias['LANCE2024'] = {
+          empresa: 'Construcciones Lance 2024 SL',
+          activa: true,
+          plan: 'interna',
+          caducidad: '2099-12-31',
+          tel: '+34 609 321 585',
+          email: 'info@obracontrolgps.net',
+          notas: 'Licencia interna — uso propio',
+          creada: new Date().toISOString().split('T')[0]
+        };
+        saveLicenciaToFB('LANCE2024', licencias['LANCE2024']);
+      }
+      updateStats();
+      renderTable();
+      addLog(`✅ ${Object.keys(licencias).length} licencias cargadas`,'ok');
+    })
+    .catch(e=>{
+      addLog('⚠️ Error al cargar Firebase. Usando datos locales.','err');
+      try{ const s=localStorage.getItem('obracontrol_licencias'); if(s) licencias=JSON.parse(s); }catch(e){}
+      updateStats(); renderTable();
+    });
+}
+
+function saveLicenciaToFB(codigo, datos){
+  return fetch(`${FB_URL}/licencias/${codigo}.json`,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(datos)
+  });
+}
+
+function saveAllLocal(){
+  try{ localStorage.setItem('obracontrol_licencias', JSON.stringify(licencias)); }catch(e){}
+}
+
+// ── STATS ──
+function updateStats(){
+  const keys = Object.keys(licencias);
+  const activas = keys.filter(k=>licencias[k].activa).length;
+  const bloq = keys.filter(k=>!licencias[k].activa).length;
+  const ingresos = keys.filter(k=>licencias[k].activa).reduce((a,k)=>a+(PRECIOS[licencias[k].plan]||0),0);
+  document.getElementById('s-total').textContent = keys.length;
+  document.getElementById('s-activas').textContent = activas;
+  document.getElementById('s-bloq').textContent = bloq;
+  document.getElementById('s-ingresos').textContent = ingresos+'€';
+}
+
+// ── TABLE ──
+function renderTable(){
+  const tbody = document.getElementById('tbl-body');
+  const q = (document.getElementById('search').value||'').toLowerCase();
+  const keys = Object.keys(licencias).filter(k=>{
+    const l = licencias[k];
+    return !q || (l.empresa||'').toLowerCase().includes(q) || k.toLowerCase().includes(q) || (l.plan||'').toLowerCase().includes(q);
+  });
+  document.getElementById('tbl-count').textContent = keys.length + ' licencias';
+
+  if(!keys.length){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text3);">Sin licencias registradas. Pulsa "Nueva licencia".</td></tr>`;
+    return;
+  }
+
+  const hoy = new Date().toISOString().split('T')[0];
+  tbody.innerHTML = keys.map(codigo=>{
+    const l = licencias[codigo];
+    const caducada = l.caducidad && hoy > l.caducidad;
+    let estadoPill;
+    if(caducada) estadoPill = `<span class="pill p-caducada">⏰ CADUCADA</span>`;
+    else if(!l.activa) estadoPill = `<span class="pill p-bloqueada">🔒 BLOQUEADA</span>`;
+    else if(l.plan==='interna') estadoPill = `<span class="pill p-interna">🏢 INTERNA</span>`;
+    else estadoPill = `<span class="pill p-activa">✅ ACTIVA</span>`;
+
+    const planPill = {
+      basico:`<span class="plan-pill plan-basico">BÁSICO</span>`,
+      profesional:`<span class="plan-pill plan-profesional">PROFESIONAL</span>`,
+      empresa:`<span class="plan-pill plan-empresa">EMPRESA</span>`,
+      interna:`<span class="plan-pill plan-interna">INTERNA</span>`,
+    }[l.plan||'basico'] || '';
+
+    const checked = l.activa && !caducada ? 'checked' : '';
+    const toggleDisabled = caducada ? 'disabled title="Licencia caducada — renueva primero"' : '';
+
+    const cadLabel = l.caducidad
+      ? `<span style="font-size:10px;color:${caducada?'var(--red)':'var(--text3)'}">${caducada?'❌ ':''}${l.caducidad}</span>`
+      : '<span style="color:var(--text3);font-size:10px;">Sin límite</span>';
+
+    return `<tr>
+      <td>
+        <div style="font-weight:600;font-size:13px;">${l.empresa||'—'}</div>
+        <div style="font-size:10px;color:var(--text3);">${l.email||''} ${l.tel?'· '+l.tel:''}</div>
+        ${l.notas?`<div style="font-size:9px;color:var(--amber);margin-top:2px;">📝 ${l.notas}</div>`:''}
+      </td>
+      <td>
+        <span style="font-family:monospace;font-size:14px;font-weight:900;color:var(--blue2);letter-spacing:2px;">${codigo}</span>
+        <button class="btn-copy" onclick="copiarCodigo('${codigo}')" style="margin-left:6px;">📋</button>
+      </td>
+      <td>${planPill}<div style="font-size:10px;color:var(--text3);margin-top:2px;">${PRECIOS[l.plan]||0}€/mes</div></td>
+      <td>${cadLabel}</td>
+      <td>${estadoPill}</td>
+      <td>
+        <div class="toggle-wrap">
+          <label class="toggle" ${toggleDisabled}>
+            <input type="checkbox" ${checked} ${toggleDisabled} onchange="toggleLicencia('${codigo}',this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label ${l.activa&&!caducada?'tl-on':'tl-off'}" id="tl-${codigo}">
+            ${l.activa&&!caducada?'ACTIVA':'BLOQ.'}
+          </span>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <button class="btn-edit2" onclick="editLicencia('${codigo}')">✏️</button>
+          <button class="btn-renew" onclick="renewLicencia('${codigo}')">+1 mes</button>
+          <button class="btn-del" onclick="deleteLicencia('${codigo}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── TOGGLE ON/OFF ──
+function toggleLicencia(codigo, activa){
+  if(!licencias[codigo]) return;
+  licencias[codigo].activa = activa;
+  const label = document.getElementById('tl-'+codigo);
+  if(label){
+    label.textContent = activa ? 'ACTIVA' : 'BLOQ.';
+    label.className = 'toggle-label ' + (activa ? 'tl-on' : 'tl-off');
+  }
+  saveLicenciaToFB(codigo, licencias[codigo])
+    .then(()=>{
+      saveAllLocal();
+      updateStats();
+      addLog(`${activa?'✅ Licencia ACTIVADA':'🔒 Licencia BLOQUEADA'}: ${codigo} (${licencias[codigo].empresa||''})`, activa?'ok':'err');
+      showToast(activa ? `✅ ${licencias[codigo].empresa||codigo} ACTIVADA` : `🔒 ${licencias[codigo].empresa||codigo} BLOQUEADA`, activa?'ok':'err');
+    })
+    .catch(()=>showToast('⚠️ Error al guardar en Firebase','err'));
+}
+
+// ── RENOVAR +1 MES ──
+function renewLicencia(codigo){
+  const l = licencias[codigo]; if(!l) return;
+  const base = l.caducidad && l.caducidad > new Date().toISOString().split('T')[0] ? new Date(l.caducidad) : new Date();
+  base.setMonth(base.getMonth()+1);
+  l.caducidad = base.toISOString().split('T')[0];
+  l.activa = true;
+  saveLicenciaToFB(codigo, l).then(()=>{
+    saveAllLocal(); updateStats(); renderTable();
+    addLog(`🔄 Renovada +1 mes: ${codigo} → hasta ${l.caducidad}`,'ok');
+    showToast(`✅ Renovada hasta ${l.caducidad}`,'ok');
+  }).catch(()=>showToast('⚠️ Error Firebase','err'));
+}
+
+// ── COPIAR CÓDIGO ──
+function copiarCodigo(codigo){
+  navigator.clipboard.writeText(codigo).then(()=>showToast(`📋 Código ${codigo} copiado`,'inf')).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = codigo;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(`📋 Código ${codigo} copiado`,'inf');
+  });
+}
+
+// ── MODAL ──
+function openModal(codigo){
+  document.getElementById('edit-key').value = '';
+  document.getElementById('modal-title').textContent = '➕ Nueva licencia';
+  document.getElementById('f-empresa').value = '';
+  document.getElementById('f-codigo').value = '';
+  document.getElementById('f-plan').value = 'basico';
+  document.getElementById('f-tel').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-notas').value = '';
+  document.getElementById('gen-code-box').style.display = 'none';
+  // Caducidad por defecto: 1 mes desde hoy
+  const d = new Date(); d.setMonth(d.getMonth()+1);
+  document.getElementById('f-caducidad').value = d.toISOString().split('T')[0];
+  document.querySelector('input[name="f-estado"][value="true"]').checked = true;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function editLicencia(codigo){
+  const l = licencias[codigo]; if(!l) return;
+  document.getElementById('edit-key').value = codigo;
+  document.getElementById('modal-title').textContent = '✏️ Editar licencia';
+  document.getElementById('f-empresa').value = l.empresa||'';
+  document.getElementById('f-codigo').value = codigo;
+  document.getElementById('f-plan').value = l.plan||'basico';
+  document.getElementById('f-caducidad').value = l.caducidad||'';
+  document.getElementById('f-tel').value = l.tel||'';
+  document.getElementById('f-email').value = l.email||'';
+  document.getElementById('f-notas').value = l.notas||'';
+  document.getElementById('gen-code-box').style.display = 'none';
+  document.querySelector(`input[name="f-estado"][value="${l.activa?'true':'false'}"]`).checked = true;
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('show'); }
+
+function generarCodigo(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0;i<8;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  document.getElementById('f-codigo').value = code;
+  document.getElementById('gen-code-val').textContent = code;
+  document.getElementById('gen-code-box').style.display = 'block';
+}
+
+function updatePrecio(){}
+
+function guardarLicencia(){
+  const editKey = document.getElementById('edit-key').value;
+  const empresa = document.getElementById('f-empresa').value.trim();
+  const codigo = (document.getElementById('f-codigo').value||'').trim().toUpperCase().replace(/\s+/g,'');
+  const plan = document.getElementById('f-plan').value;
+  const caducidad = document.getElementById('f-caducidad').value;
+  const tel = document.getElementById('f-tel').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const notas = document.getElementById('f-notas').value.trim();
+  const activa = document.querySelector('input[name="f-estado"]:checked').value === 'true';
+
+  if(!empresa){ showToast('Escribe el nombre de la empresa','err'); return; }
+  if(!codigo||codigo.length<4){ showToast('El código debe tener al menos 4 caracteres','err'); return; }
+
+  // Si es nueva, verificar duplicado
+  if(!editKey && licencias[codigo]){
+    showToast(`❌ El código ${codigo} ya existe`,'err'); return;
+  }
+
+  const datos = {
+    empresa, activa, plan,
+    caducidad: caducidad||null,
+    tel: tel||null,
+    email: email||null,
+    notas: notas||null,
+    creada: licencias[codigo]?.creada || new Date().toISOString().split('T')[0],
+    modificada: new Date().toISOString().split('T')[0]
+  };
+
+  // Si se cambió el código (edición), borrar el anterior
+  if(editKey && editKey !== codigo){
+    fetch(`${FB_URL}/licencias/${editKey}.json`,{method:'DELETE'}).catch(()=>{});
+    delete licencias[editKey];
+  }
+
+  licencias[codigo] = datos;
+  saveLicenciaToFB(codigo, datos)
+    .then(()=>{
+      saveAllLocal(); updateStats(); renderTable(); closeModal();
+      addLog(`${editKey?'✏️ Editada':'➕ Creada'} licencia: ${codigo} (${empresa})`,'ok');
+      showToast(`✅ Licencia ${editKey?'actualizada':'creada'}: ${codigo}`,'ok');
+    })
+    .catch(()=>showToast('⚠️ Error al guardar en Firebase','err'));
+}
+
+function deleteLicencia(codigo){
+  const l = licencias[codigo];
+  if(!confirm(`¿Eliminar la licencia "${codigo}" de ${l?.empresa||'?'}?\n\nEsta acción bloqueará el acceso inmediatamente.`)) return;
+  fetch(`${FB_URL}/licencias/${codigo}.json`,{method:'DELETE'})
+    .then(()=>{
+      delete licencias[codigo];
+      saveAllLocal(); updateStats(); renderTable();
+      addLog(`🗑️ Eliminada licencia: ${codigo} (${l?.empresa||''})`,'err');
+      showToast(`🗑️ Licencia ${codigo} eliminada`,'err');
+    }).catch(()=>showToast('⚠️ Error Firebase','err'));
+}
+
+// ── LOG ──
+const logItems = [];
+function addLog(msg, tipo){
+  const time = new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  logItems.unshift({msg,tipo,time});
+  if(logItems.length>50) logItems.pop();
+  const log = document.getElementById('activity-log');
+  if(log){
+    const cls = tipo==='ok'?'log-ok':tipo==='err'?'log-err':'';
+    log.innerHTML = logItems.map(i=>`<div class="log-item">
+      <span class="log-time">${i.time}</span>
+      <span class="log-msg ${i.tipo==='ok'?'log-ok':i.tipo==='err'?'log-err':''}">${i.msg}</span>
+    </div>`).join('');
+  }
+}
+function clearLog(){ logItems.length=0; document.getElementById('activity-log').innerHTML=''; }
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg,tipo){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast show ${tipo}`;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
