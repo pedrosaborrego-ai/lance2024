@@ -1271,6 +1271,12 @@ function showLogin(){
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  // ?reset=1 borra idioma y RGPD para volver a mostrarlos
+  if(new URLSearchParams(window.location.search).get('reset')==='1'){
+    localStorage.removeItem('ocp_lang');
+    localStorage.removeItem('ocp_rgpd');
+    history.replaceState(null,'',window.location.pathname);
+  }
   checkRGPD();
 });
 document.getElementById('l-pin').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
