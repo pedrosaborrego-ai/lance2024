@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ObraControl GPS PRO — Panel de Oficina</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde:#1B4F8C;--verde2:#2563AE;--verde3:#3B82C4;
+  --verde-light:#E8F1FB;--bg:#F4F7FC;--white:#fff;
+  --border:#E2EAF4;--border2:#D0DDF0;
+  --text:#1A2840;--text2:#4A6080;--text3:#8FA5C0;
+  --oro:#E8621A;--oro2:#FF7A35;--oro-l:#FFF3EC;
+  --red:#C0392B;--red-l:#FDEDEC;
+  --amber:#B7770D;--amber-l:#FEF9E7;
+  --blue:#1B4F8C;--blue-l:#E8F1FB;
+  --purple:#6B21A8;--purple-l:#F3E8FF;
+  --gold:linear-gradient(135deg,#E8621A,#FF7A35,#E8621A);
+  --shadow:0 2px 8px rgba(27,79,140,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;z-index:100;background:linear-gradient(160deg,#0A1628,#0A3D2E,#0A1628);display:flex;align-items:center;justify-content:center;padding:24px;}
+.lcard{background:rgba(255,255,255,.05);border:1px solid rgba(232,98,26,.2);border-radius:20px;padding:32px 28px;width:100%;max-width:340px;text-align:center;backdrop-filter:blur(20px);}
+.llogo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:var(--oro2);margin-bottom:4px;}
+.lsub{font-size:10px;letter-spacing:2px;color:rgba(255,255,255,.3);margin-bottom:24px;}
+.pdots{display:flex;gap:12px;justify-content:center;margin-bottom:20px;}
+.pdot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(232,98,26,.3);transition:all .15s;}
+.pdot.on{background:var(--oro2);border-color:var(--oro2);}
+.ppad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto;}
+.pk{height:52px;border-radius:10px;background:rgba(255,255,255,.05);border:1.5px solid rgba(232,98,26,.15);font-size:20px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.pk:hover{background:rgba(232,98,26,.1);border-color:var(--oro2);}
+.pk:active{background:var(--gold);color:var(--verde);transform:scale(.92);}
+.pk.del{font-size:14px;color:rgba(255,255,255,.4);}
+.pk.zero{grid-column:2;}
+.perr{height:18px;font-size:11px;font-weight:700;color:#F1948A;margin-top:8px;}
+.pdemo{font-size:11px;color:rgba(255,255,255,.2);margin-top:6px;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.shake{animation:shake .4s;}
+
+/* APP */
+#app{display:none;min-height:100vh;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--verde);display:flex;flex-direction:column;z-index:50;}
+.sb-head{padding:20px 16px;border-bottom:1px solid rgba(232,98,26,.1);}
+.sb-brand{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--oro2);}
+.sb-sub{font-size:9px;letter-spacing:2px;color:rgba(255,255,255,.3);}
+.sb-nav{flex:1;padding:12px 8px;overflow-y:auto;}
+.sb-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(232,98,26,.3);padding:0 8px;margin:12px 0 4px;}
+.ni{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;color:rgba(255,255,255,.55);margin-bottom:1px;transition:all .15s;}
+.ni:hover{background:rgba(255,255,255,.08);color:#fff;}
+.ni.active{background:rgba(232,98,26,.15);color:var(--oro2);font-weight:700;}
+.ni svg{width:14px;height:14px;flex-shrink:0;}
+.sb-foot{padding:12px 8px;border-top:1px solid rgba(232,98,26,.1);}
+.sb-user{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.05);}
+.sb-av{width:30px;height:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--verde);}
+.sb-name{font-size:11px;font-weight:700;color:#fff;}
+.sb-role{font-size:9px;color:rgba(255,255,255,.4);}
+.sb-out{margin-top:6px;width:100%;padding:7px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;}
+.sb-out:hover{background:rgba(192,57,43,.2);color:#F1948A;}
+
+.main{margin-left:220px;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
+.tb-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:var(--verde);}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.live{display:flex;align-items:center;gap:5px;background:var(--verde-light);border:1px solid rgba(30,122,85,.2);padding:4px 10px;border-radius:20px;font-size:9px;font-weight:700;color:var(--verde3);letter-spacing:1px;}
+.livedot{width:6px;height:6px;border-radius:50%;background:var(--verde3);animation:lp 2s infinite;}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+.clock{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--verde2);}
+
+.page{padding:20px 22px;display:none;}
+.page.active{display:block;}
+
+/* KPIs */
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+.kcard{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s;}
+.kcard:hover{transform:translateY(-2px);}
+.kcard::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.k-gold::after{background:var(--gold);}
+.k-verde::after{background:linear-gradient(90deg,var(--verde2),var(--verde3));}
+.k-red::after{background:linear-gradient(90deg,var(--red),#F87171);}
+.k-purple::after{background:linear-gradient(90deg,var(--purple),#A855F7);}
+.klbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:10px;}
+.kval{font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;}
+.k-gold .kval{color:var(--oro);}
+.k-verde .kval{color:var(--verde3);}
+.k-red .kval{color:var(--red);}
+.k-purple .kval{color:var(--purple);}
+.ksub{font-size:10px;color:var(--text3);margin-top:3px;}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
+.chdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ctitle{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1.5px;color:var(--verde);}
+.cbody{padding:16px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.row3{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:16px;}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border);text-align:left;background:var(--bg);}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:var(--verde-light);}
+.pill{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;}
+.p-in{background:var(--verde-light);color:var(--verde3);}
+.p-out{background:var(--red-l);color:var(--red);}
+.p-pend{background:var(--amber-l);color:var(--amber);}
+
+/* FORM */
+.flbl{display:block;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:5px;}
+.fctrl{width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);padding:9px 11px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.fctrl:focus{border-color:var(--verde3);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg{margin-bottom:12px;}
+.btn-p{width:100%;padding:11px;background:linear-gradient(135deg,var(--verde2),var(--verde3));color:#fff;border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;}
+.btn-s{width:100%;padding:10px;background:transparent;border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--text2);cursor:pointer;margin-top:6px;}
+.btn-e{padding:5px 10px;background:var(--verde-light);border:1px solid var(--border2);color:var(--verde3);border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;}
+.btn-d{padding:5px 10px;background:var(--red-l);border:1px solid rgba(192,57,43,.2);color:var(--red);border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;}
+.srch{position:relative;margin-bottom:12px;}
+.srch input{width:100%;padding:8px 12px 8px 32px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none;}
+.srch input:focus{border-color:var(--verde3);}
+.srch span{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;}
+
+/* WA box */
+.wabox{display:none;background:var(--verde-light);border:1px solid rgba(30,122,85,.2);border-radius:10px;padding:12px;margin-top:12px;}
+.waprev{font-size:11px;color:var(--text2);white-space:pre-wrap;background:var(--white);border-radius:7px;padding:10px;margin-bottom:8px;border:1px solid var(--border);}
+.btn-wa{width:100%;padding:10px;background:#25d366;border:none;border-radius:8px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;cursor:pointer;}
+
+/* CHAT */
+.cmsg-bot{background:var(--verde-light);border-radius:12px 12px 12px 0;padding:10px 14px;margin-bottom:8px;max-width:88%;font-size:13px;}
+.cmsg-user{background:var(--verde2);color:#fff;border-radius:12px 12px 0 12px;padding:10px 14px;margin-bottom:8px;max-width:88%;margin-left:auto;font-size:13px;}
+.qbtn{padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);}
+.qbtn:hover{border-color:var(--verde3);color:var(--verde3);}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;right:18px;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;display:none;z-index:500;}
+.toast.show{display:flex;align-items:center;gap:6px;}
+.toast.ok{background:var(--verde-light);border:1px solid rgba(30,122,85,.3);color:var(--verde2);}
+.toast.err{background:var(--red-l);border:1px solid rgba(192,57,43,.3);color:var(--red);}
+.toast.inf{background:var(--oro-l);border:1px solid rgba(232,98,26,.3);color:var(--amber);}
+
+/* Categoria btns */
+.catbtn{flex:1;padding:10px 4px;background:var(--white);border:2px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1px;color:var(--text3);transition:all .15s;}
+
+@media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}.kgrid,.row2,.row3{grid-template-columns:1fr 1fr;}.page{padding:12px;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="lcard">
+    <div style="font-size:36px;margin-bottom:8px;">🏗️</div>
+    <div class="llogo" style="font-size:0;line-height:0"><svg viewBox='0 0 400 280' xmlns='http://www.w3.org/2000/svg'>  <path d='M200 20 C245 20 282 57 282 102 C282 162 200 210 200 210 C200 210 118 162 118 102 C118 57 155 20 200 20Z' fill='#1B4F8C'/>  <circle cx='200' cy='96' r='56' fill='white'/>  <path d='M152 106 C152 82 172 64 200 64 C228 64 248 82 248 106 Z' fill='#1B4F8C'/>  <rect x='142' y='104' width='116' height='10' rx='5' fill='#1B4F8C'/>  <rect x='158' y='95' width='84' height='8' rx='3' fill='#FF7A35'/>  <circle cx='200' cy='82' r='7' fill='white'/>  <circle cx='200' cy='82' r='3' fill='#1B4F8C'/>  <path d='M244 55 Q262 72 244 89' fill='none' stroke='#FF7A35' stroke-width='4.5' stroke-linecap='round'/>  <path d='M258 44 Q282 72 258 100' fill='none' stroke='#FF7A35' stroke-width='4' stroke-linecap='round' opacity='0.55'/>  <text x='200' y='248' text-anchor='middle' font-family='Montserrat,Arial' font-size='36' font-weight='800' fill='white' letter-spacing='2'>OBRACONTROL</text>  <text x='200' y='265' text-anchor='middle' font-family='Montserrat,Arial' font-size='14' font-weight='300' fill='#FF7A35' letter-spacing='10'>G P S</text>  <text x='200' y='278' text-anchor='middle' font-family='Montserrat,Arial' font-size='11' font-weight='700' fill='#FF7A35' letter-spacing='8'>P R O</text></svg></div>
+    <div class="lsub">PANEL DE OFICINA</div>
+    <div class="pdots">
+      <div class="pdot" id="d0"></div>
+      <div class="pdot" id="d1"></div>
+      <div class="pdot" id="d2"></div>
+      <div class="pdot" id="d3"></div>
+    </div>
+    <div class="ppad" id="ppad">
+      <div class="pk" onclick="pk('1')">1</div>
+      <div class="pk" onclick="pk('2')">2</div>
+      <div class="pk" onclick="pk('3')">3</div>
+      <div class="pk" onclick="pk('4')">4</div>
+      <div class="pk" onclick="pk('5')">5</div>
+      <div class="pk" onclick="pk('6')">6</div>
+      <div class="pk" onclick="pk('7')">7</div>
+      <div class="pk" onclick="pk('8')">8</div>
+      <div class="pk" onclick="pk('9')">9</div>
+      <div class="pk del" onclick="pkDel()">&#9003;</div>
+      <div class="pk zero" onclick="pk('0')">0</div>
+    </div>
+    <div class="perr" id="perr"></div>
+    <div class="pdemo">PIN: <strong style="color:rgba(232,98,26,.5)">0000</strong></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sb-head"><svg viewBox="0 0 320 90" xmlns="http://www.w3.org/2000/svg">  <!-- Pin GPS pequeño -->  <path d="M38 4 C54 4 66 16 66 32 C66 54 38 70 38 70 C38 70 10 54 10 32 C10 16 22 4 38 4Z" fill="#FF7A35"/>  <circle cx="38" cy="29" r="18" fill="#1B4F8C"/>  <!-- Casco mini -->  <path d="M24 34 C24 24 30 18 38 18 C46 18 52 24 52 34 Z" fill="white"/>  <rect x="20" y="33" width="36" height="5" rx="2.5" fill="white"/>  <rect x="25" y="27" width="26" height="4" rx="2" fill="#FF7A35"/>  <!-- Texto -->  <text x="80" y="34" font-family="Montserrat,Arial" font-size="19" font-weight="800" fill="white" letter-spacing="1">OBRACONTROL</text>  <text x="80" y="54" font-family="Montserrat,Arial" font-size="12" font-weight="300" fill="#FF7A35" letter-spacing="5">G P S</text>  <text x="80" y="72" font-family="Montserrat,Arial" font-size="9" font-weight="600" fill="rgba(255,255,255,.35)" letter-spacing="3">PRO</text></svg></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-lbl">Principal</div>
+      <div class="ni active" onclick="showPage('tablero')" id="ni-tablero">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Tablero
+      </div>
+      <div class="ni" onclick="showPage('operarios')" id="ni-operarios">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        Operarios
+      </div>
+      <div class="sb-lbl">Control</div>
+      <div class="ni" onclick="showPage('jornada')" id="ni-jornada">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2m6-2v2M2 6h12"/></svg>
+        Jornada
+      </div>
+      <div class="ni" onclick="showPage('alertas')" id="ni-alertas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
+        Alertas
+      </div>
+      <div class="sb-lbl">Gestion</div>
+      <div class="ni" onclick="showPage('tareas')" id="ni-tareas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
+        Tareas
+      </div>
+      <div class="ni" onclick="showPage('alta')" id="ni-alta">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="6" cy="4" r="2.5"/><path d="M1 13c0-2.5 2.2-4.5 5-4.5"/><path d="M10 9v4m-2-2h4"/></svg>
+        Alta operarios
+      </div>
+      <div class="ni" onclick="showPage('asistente')" id="ni-asistente">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6 6.5c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.5-1.2 1.8L8 9v1"/><circle cx="8" cy="11.5" r=".5" fill="currentColor"/></svg>
+        Asistente IA
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-av">OP</div>
+        <div style="flex:1;min-width:0;">
+          <div class="sb-name">ObraControl GPS PRO</div>
+          <div style="margin-top:4px;display:flex;gap:4px;">
+            <input id="tel-responsable"
+              type="tel"
+              placeholder="+34 609321585"
+              oninput="saveTel()"
+              onblur="saveTel()"
+              onkeydown="if(event.key==='Enter'){saveTel();this.blur();}"
+              style="flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(232,98,26,.25);border-radius:6px;padding:4px 8px;font-size:10px;color:var(--oro2);outline:none;font-family:'DM Sans',sans-serif;">
+            <button onclick="probarWA()" title="Probar WhatsApp" style="background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);border-radius:6px;padding:4px 7px;cursor:pointer;font-size:13px;flex-shrink:0;">&#128172;</button>
+          </div>
+          <div style="font-size:8px;color:rgba(255,255,255,.25);margin-top:2px;letter-spacing:.5px;">Tel. que recibe alertas · pulsa &#128172; para probar</div>
+        </div>
+      </div>
+      <button class="sb-out" onclick="logout()">Cerrar sesion</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-title" id="tb-title">TABLERO</div>
+      <div class="tb-right">
+        <div class="live"><div class="livedot"></div>EN VIVO</div>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </div>
+
+    <!-- TABLERO -->
+    <div class="page active" id="page-tablero">
+      <div class="kgrid">
+        <div class="kcard k-gold" onclick="showPage('operarios')">
+          <div class="klbl">Plantilla</div>
+          <div class="kval" id="kv-total">0</div>
+          <div class="ksub">Operarios registrados</div>
+        </div>
+        <div class="kcard k-verde" onclick="showPage('jornada')">
+          <div class="klbl">En obra</div>
+          <div class="kval" id="kv-in">0</div>
+          <div class="ksub">Fichados ahora</div>
+        </div>
+        <div class="kcard k-red" onclick="showPage('alertas')">
+          <div class="klbl">Alertas</div>
+          <div class="kval" id="kv-alerts">0</div>
+          <div class="ksub">Sin resolver</div>
+        </div>
+        <div class="kcard k-purple" onclick="showPage('tareas')">
+          <div class="klbl">Tareas</div>
+          <div class="kval" id="kv-tareas">0</div>
+          <div class="ksub">Pendientes hoy</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+        <button onclick="showPage('jornada')" style="padding:14px 8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;">
+          <div style="font-size:22px;margin-bottom:4px;">&#128197;</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:1px;color:var(--verde);">JORNADA</div>
+        </button>
+        <button onclick="showPage('operarios')" style="padding:14px 8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;">
+          <div style="font-size:22px;margin-bottom:4px;">&#128119;</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:1px;color:var(--verde);">OPERARIOS</div>
+        </button>
+        <button onclick="showPage('tareas')" style="padding:14px 8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;">
+          <div style="font-size:22px;margin-bottom:4px;">&#128203;</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:1px;color:var(--verde);">TAREAS</div>
+        </button>
+        <button onclick="showPage('alta')" style="padding:14px 8px;background:var(--white);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;">
+          <div style="font-size:22px;margin-bottom:4px;">&#10133;</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:1px;color:var(--verde);">ALTA</div>
+        </button>
+      </div>
+      <div class="card">
+        <div class="chdr"><div class="ctitle">Alertas activas</div></div>
+        <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">Sin alertas activas</div>
+      </div>
+    </div>
+
+    <!-- OPERARIOS -->
+    <div class="page" id="page-operarios">
+      <div class="card">
+        <div class="chdr"><div class="ctitle">Operarios registrados</div><span id="op-cnt" style="font-size:10px;color:var(--text3)"></span></div>
+        <div style="padding:12px 14px 0;">
+          <div class="srch"><span>&#128269;</span><input id="op-srch" placeholder="Buscar..." oninput="renderOps()"></div>
+        </div>
+        <table class="tbl">
+          <thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Categoria</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Accion</th></tr></thead>
+          <tbody id="op-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- JORNADA -->
+    <div class="page" id="page-jornada">
+      <div class="card">
+        <div class="chdr"><div class="ctitle">Resumen de jornada</div><span id="jor-date" style="font-size:10px;color:var(--text3)"></span></div>
+        <table class="tbl">
+          <thead><tr><th>Operario</th><th>Categoria</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Estado</th></tr></thead>
+          <tbody id="jor-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="page" id="page-alertas">
+      <div class="card">
+        <div class="chdr"><div class="ctitle">Centro de alertas</div></div>
+        <div style="padding:32px;text-align:center;color:var(--text3);">Sin alertas activas hoy.</div>
+      </div>
+    </div>
+
+    <!-- TAREAS -->
+    <div class="page" id="page-tareas">
+      <div class="row2">
+        <div class="card">
+          <div class="chdr"><div class="ctitle">Enviar tarea</div></div>
+          <div class="cbody">
+            <div class="fg"><label class="flbl">Destinatario</label><select class="fctrl" id="task-to"><option value="all">Todos los operarios</option></select></div>
+            <div class="fg"><label class="flbl">Prioridad</label><select class="fctrl" id="task-prio"><option>Normal</option><option>Urgente</option><option>Informativa</option></select></div>
+            <div class="fg"><label class="flbl">Descripcion</label><textarea class="fctrl" id="task-msg" placeholder="Describe el trabajo..." style="min-height:80px;resize:vertical;"></textarea></div>
+            <button class="btn-p" onclick="sendTask()">ENVIAR TAREA</button>
+          </div>
+        </div>
+        <div class="card"><div class="chdr"><div class="ctitle">Tareas enviadas</div></div><div id="task-log" style="max-height:380px;overflow-y:auto;"></div></div>
+      </div>
+    </div>
+
+    <!-- ALTA OPERARIOS -->
+    <div class="page" id="page-alta">
+      <div class="row3">
+        <div class="card">
+          <div class="chdr"><div class="ctitle" id="alta-title">Alta de operario</div></div>
+          <div class="cbody">
+            <input type="hidden" id="eid">
+            <div class="frow">
+              <div class="fg"><label class="flbl">Nombre</label><input class="fctrl" id="g-nom" placeholder="Nombre"></div>
+              <div class="fg"><label class="flbl">Apellidos</label><input class="fctrl" id="g-ape" placeholder="Apellidos"></div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label class="flbl">DNI</label><input class="fctrl" id="g-dni" placeholder="12345678A" maxlength="9"></div>
+              <div class="fg"><label class="flbl">NIE</label><input class="fctrl" id="g-nie" placeholder="X1234567A" maxlength="9"></div>
+            </div>
+            <div class="frow">
+              <div class="fg"><label class="flbl">WhatsApp</label><input class="fctrl" id="g-tel" placeholder="+34 612 345 678" type="tel"></div>
+              <div class="fg"><label class="flbl">Obra asignada</label><input class="fctrl" id="g-obra" placeholder="Direccion y CP"></div>
+            </div>
+            <div class="fg">
+              <label class="flbl">Categoria profesional</label>
+              <div style="display:flex;gap:8px;">
+                <button type="button" class="catbtn" id="cb-peon" onclick="selCat('peon')">&#129522;<br>PEON</button>
+                <button type="button" class="catbtn" id="cb-oficial" onclick="selCat('oficial')">&#128295;<br>OFICIAL</button>
+                <button type="button" class="catbtn" id="cb-encargado" onclick="selCat('encargado')">&#128084;<br>ENCARGADO</button>
+              </div>
+              <input type="hidden" id="g-cat" value="peon">
+            </div>
+            <div class="fg">
+              <label class="flbl">PIN (4 digitos)</label>
+              <div style="display:flex;gap:6px;">
+                <input class="fctrl" id="g-pin" maxlength="4" placeholder="****" style="letter-spacing:4px;font-size:16px;font-weight:700;flex:1;">
+                <button onclick="genPin()" type="button" style="padding:9px 12px;background:var(--verde-light);border:1px solid var(--border2);border-radius:8px;cursor:pointer;">&#128260;</button>
+              </div>
+            </div>
+            <div class="fg">
+              <label class="flbl">Sistema operativo del movil</label>
+              <div style="display:flex;gap:8px;">
+                <button type="button" class="catbtn" id="so-android" onclick="selSO('android')" style="background:var(--verde-light);border-color:var(--verde3);color:var(--verde2);">&#129503; Android</button>
+                <button type="button" class="catbtn" id="so-iphone" onclick="selSO('iphone')">&#63743; iPhone</button>
+              </div>
+              <input type="hidden" id="g-so" value="android">
+            </div>
+            <div style="background:var(--amber-l);border:1px solid rgba(183,119,13,.2);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:9px;color:var(--amber);">
+              &#9888; El operario puede cambiar su PIN por uno personal en la app cuando inicie sesion por primera vez.
+            </div>
+            <button class="btn-p" onclick="saveWorker()" id="g-btn">+ DAR DE ALTA</button>
+            <button class="btn-s" onclick="resetForm()">Limpiar</button>
+            <div class="wabox" id="wabox">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div style="width:40px;height:40px;background:linear-gradient(135deg,#0A3D2E,#1E7A55);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">&#127959;</div>
+                <div>
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:var(--verde3);">&#10003; OPERARIO DADO DE ALTA</div>
+                  <div style="font-size:10px;color:var(--text3);">Envia las instrucciones de acceso e instalacion</div>
+                </div>
+              </div>
+              <div style="font-size:9px;color:var(--text3);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Vista previa del mensaje:</div>
+              <div class="waprev" id="waprev"></div>
+              <button class="btn-wa" onclick="sendWaAlta()" style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.535 5.845L0 24l6.31-1.658A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.925 0-3.727-.495-5.285-1.362l-.379-.224-3.927 1.032 1.048-3.826-.247-.394A9.952 9.952 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                ENVIAR POR WHATSAPP
+              </button>
+              <div style="font-size:9px;color:var(--text3);margin-top:6px;text-align:center;">&#128241; Se enviara al telefono registrado en el alta</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="chdr"><div class="ctitle">Lista operarios</div><span id="g-cnt" style="font-size:10px;color:var(--text3)"></span></div>
+          <div style="padding:10px 12px 0;">
+            <div class="srch"><span>&#128269;</span><input id="g-srch" placeholder="Buscar..." oninput="renderGestion()"></div>
+          </div>
+          <div id="g-list" style="max-height:460px;overflow-y:auto;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ASISTENTE -->
+    <div class="page" id="page-asistente">
+      <div style="max-width:720px;margin:0 auto;">
+        <div class="card">
+          <div class="chdr"><div class="ctitle">Asistente IA — ObraControl GPS PRO</div><span style="font-size:10px;color:var(--text3)">Pregunta sobre tu obra</span></div>
+          <div style="padding:14px;max-height:340px;overflow-y:auto;" id="chat-msgs">
+            <div class="cmsg-bot">
+              Hola! Soy tu asistente de obra. Puedo ayudarte con:<br><br>
+              <strong>Operarios:</strong> quien ficho, quien falta, retrasados<br>
+              <strong>Gremios:</strong> cuantos electricistas, pintores, fontaneros...<br>
+              <strong>Por obra:</strong> quien esta en cada obra asignada<br>
+              <strong>Reportes:</strong> incidencias y preguntas de operarios
+            </div>
+          </div>
+          <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;">
+            <input class="fctrl" id="chat-in" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter')sendChat()" style="flex:1;">
+            <button onclick="sendChat()" style="padding:9px 14px;background:linear-gradient(135deg,var(--verde2),var(--verde3));color:#fff;border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;">ENVIAR</button>
+          </div>
+          <!-- BOTONES RAPIDOS POR CATEGORIA -->
+          <div style="padding:10px 14px;border-top:1px solid var(--border);">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px;">Consultas rapidas:</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="qbtn" onclick="qchat('Quien no ha fichado hoy')">Sin fichar</button>
+              <button class="qbtn" onclick="qchat('Cuantos operarios estan en obra')">En obra</button>
+              <button class="qbtn" onclick="qchat('Resumen del dia')">Resumen</button>
+              <button class="qbtn" onclick="qchat('Quien llego tarde')">Retrasados</button>
+              <button class="qbtn" onclick="qchat('Ver incidencias de hoy')">Incidencias</button>
+              <button class="qbtn" style="background:rgba(37,211,102,.1);border-color:rgba(37,211,102,.3);color:#16A34A;font-weight:700;" onclick="enviarResumenWA()">&#128172; Enviar resumen a mi WA</button>
+            </div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px;">Por gremio:</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+              <button class="qbtn" style="background:rgba(232,98,26,.08);border-color:rgba(232,98,26,.3);color:var(--amber);" onclick="qchat('Cuantos albaniles hay en obra')">&#129521; Albaniles</button>
+              <button class="qbtn" style="background:rgba(232,98,26,.08);border-color:rgba(232,98,26,.3);color:var(--amber);" onclick="qchat('Cuantos electricistas hay en obra')">&#9889; Electricistas</button>
+              <button class="qbtn" style="background:rgba(232,98,26,.08);border-color:rgba(232,98,26,.3);color:var(--amber);" onclick="qchat('Cuantos pintores hay en obra')">&#127912; Pintores</button>
+              <button class="qbtn" style="background:rgba(232,98,26,.08);border-color:rgba(232,98,26,.3);color:var(--amber);" onclick="qchat('Cuantos fontaneros hay en obra')">&#128295; Fontaneros</button>
+              <button class="qbtn" style="background:rgba(232,98,26,.08);border-color:rgba(232,98,26,.3);color:var(--amber);" onclick="qchat('Cuantos cristaleros hay en obra')">&#128302; Cristaleros</button>
+              <button class="qbtn" style="background:rgba(232,98,26,.08);border-color:rgba(232,98,26,.3);color:var(--amber);" onclick="qchat('Cuantos soldadores hay en obra')">&#128293; Soldadores</button>
+              <button class="qbtn" style="background:rgba(232,98,26,.08);border-color:rgba(232,98,26,.3);color:var(--amber);" onclick="qchat('Cuantos gruistas hay en obra')">&#127981; Gruistas</button>
+              <button class="qbtn" style="background:rgba(232,98,26,.08);border-color:rgba(232,98,26,.3);color:var(--amber);" onclick="qchat('Resumen por gremios')">Todos los gremios</button>
+            </div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px;">Por obra:</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="qbtn" style="background:var(--blue-l);border-color:rgba(27,79,140,.2);color:var(--blue);" onclick="mostrarPorObra()">&#127968; Ver operarios por obra</button>
+              <button class="qbtn" style="background:var(--blue-l);border-color:rgba(27,79,140,.2);color:var(--blue);" onclick="verReportesOperarios()">&#128172; Reportes de operarios</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL REPORTES OPERARIOS -->
+        <div class="card" id="panel-reportes" style="display:none;">
+          <div class="chdr">
+            <div class="ctitle">Reportes e incidencias de operarios</div>
+            <button onclick="document.getElementById('panel-reportes').style.display='none'" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">Cerrar</button>
+          </div>
+          <div id="reportes-list" style="max-height:300px;overflow-y:auto;"></div>
+        </div>
+
+        <!-- PANEL POR OBRA -->
+        <div class="card" id="panel-obra" style="display:none;">
+          <div class="chdr">
+            <div class="ctitle">Operarios por obra</div>
+            <button onclick="document.getElementById('panel-obra').style.display='none'" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">Cerrar</button>
+          </div>
+          <div id="obra-list" style="max-height:300px;overflow-y:auto;padding:14px;"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var FB = 'https://obracontroldemo-default-rtdb.europe-west1.firebasedatabase.app';
+var CLAVE = 'BA49159567EFC254';
+var PIN = '0000';
+var APP_URL = 'https://obracontrol-tech.github.io/lance2024/ocp-operario.html';
+var WORKERS = [];
+
+// Cargar workers del localStorage
+try {
+  var sw = localStorage.getItem('ocp_workers_v2');
+  if (sw) {
+    var arr = JSON.parse(sw);
+    if (Array.isArray(arr)) WORKERS = arr;
+  }
+} catch(e) {}
+
+function saveW() {
+  try { localStorage.setItem('ocp_workers_v2', JSON.stringify(WORKERS)); } catch(e) {}
+}
+
+// PIN LOGIN
+var pinVal = '';
+function pk(d) {
+  if (pinVal.length >= 4) return;
+  pinVal += d;
+  updDots();
+  if (pinVal.length === 4) setTimeout(checkPin, 200);
+}
+function pkDel() {
+  pinVal = pinVal.slice(0, -1);
+  updDots();
+  document.getElementById('perr').textContent = '';
+}
+function updDots() {
+  for (var i = 0; i < 4; i++) {
+    var el = document.getElementById('d' + i);
+    if (el) el.className = i < pinVal.length ? 'pdot on' : 'pdot';
+  }
+}
+function checkPin() {
+  if (pinVal === PIN) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    document.getElementById('perr').textContent = 'PIN incorrecto';
+    var pp = document.getElementById('ppad');
+    pp.classList.add('shake');
+    setTimeout(function() { pp.classList.remove('shake'); }, 450);
+    pinVal = '';
+    updDots();
+  }
+}
+function logout() {
+  pinVal = '';
+  updDots();
+  document.getElementById('perr').textContent = '';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+// CLOCK
+function tick() {
+  var n = new Date();
+  var el = document.getElementById('clock');
+  if (el) el.textContent = n.toLocaleTimeString('es-ES');
+}
+setInterval(tick, 1000);
+tick();
+
+// INIT
+function initApp() {
+  loadTel();
+  animKPI('kv-total', WORKERS.length);
+  animKPI('kv-in', WORKERS.filter(function(w) { return w.status === 'in'; }).length);
+  animKPI('kv-alerts', 0);
+  document.getElementById('jor-date').textContent = new Date().toLocaleDateString('es-ES', {weekday:'long', day:'2-digit', month:'long'});
+  loadTareas();
+  selCat('peon');
+  genPin();
+  setInterval(loadFirebase, 30000);
+  loadFirebase();
+}
+
+// FIREBASE
+function loadFirebase() {
+  fetch(FB + '/operarios_activos.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data) return;
+      Object.keys(data).forEach(function(key) {
+        var op = data[key];
+        if (!op || !op.nombre) return;
+        var w = WORKERS.find(function(x) {
+          return (x.nombre + '_' + x.apellidos).toLowerCase().replace(/\s+/g,'_') === key;
+        });
+        if (!w) return;
+        w.status = op.activo ? 'in' : 'out';
+        if (op.tipo === 'entrada') w.arrival = op.hora;
+        if (op.tipo === 'salida') w.dep = op.hora;
+        if (op.hora && op.tipo === 'entrada') {
+          var parts = op.hora.split(':');
+          var eh = parseInt(parts[0]), em = parseInt(parts[1]);
+          var now = new Date();
+          var mins = (now.getHours() * 60 + now.getMinutes()) - (eh * 60 + em);
+          w.h = mins > 0 ? (mins / 60).toFixed(1) : 0;
+        }
+      });
+      animKPI('kv-total', WORKERS.length);
+      animKPI('kv-in', WORKERS.filter(function(w) { return w.status === 'in'; }).length);
+      saveW();
+      if (document.getElementById('page-operarios').classList.contains('active')) renderOps();
+      if (document.getElementById('page-jornada').classList.contains('active')) renderJornada();
+    }).catch(function() {});
+}
+
+// KPI ANIM
+function animKPI(id, target) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var start = performance.now();
+  var dur = 1000;
+  function step(now) {
+    var p = Math.min((now - start) / dur, 1);
+    var e = 1 - Math.pow(1 - p, 4);
+    el.textContent = Math.round(e * target);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// PAGES
+var TITLES = {tablero:'TABLERO', operarios:'OPERARIOS', jornada:'JORNADA', alertas:'ALERTAS', tareas:'TAREAS', alta:'ALTA OPERARIOS', asistente:'ASISTENTE IA'};
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.ni').forEach(function(n) { n.classList.remove('active'); });
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('ni-' + name).classList.add('active');
+  document.getElementById('tb-title').textContent = TITLES[name] || name;
+  if (name === 'operarios') renderOps();
+  if (name === 'jornada') renderJornada();
+  if (name === 'alta') { renderGestion(); genPin(); selCat('peon'); }
+  if (name === 'tareas') { loadTareas(); updateTaskSel(); }
+}
+
+// OPERARIOS TABLE
+function renderOps() {
+  var tb = document.getElementById('op-tbody');
+  if (!tb) return;
+  var q = (document.getElementById('op-srch') ? document.getElementById('op-srch').value : '').toLowerCase();
+  var f = WORKERS.filter(function(w) {
+    return (w.nombre + ' ' + w.apellidos + ' ' + (w.dni||'') + ' ' + (w.nie||'')).toLowerCase().indexOf(q) >= 0;
+  });
+  var cnt = document.getElementById('op-cnt');
+  if (cnt) cnt.textContent = f.length + ' operarios';
+  var catLabel = {peon:'Peon', oficial:'Oficial', encargado:'Encargado'};
+  tb.innerHTML = f.map(function(w, i) {
+    var st = w.status === 'in' ? '<span class="pill p-in">En obra</span>' : w.status === 'out' ? '<span class="pill p-out">Fuera</span>' : '<span class="pill p-pend">Sin fichar</span>';
+    return '<tr>' +
+      '<td style="font-weight:700;color:var(--text3)">' + (i+1) + '</td>' +
+      '<td><div style="font-weight:600">' + w.nombre + ' ' + w.apellidos + '</div></td>' +
+      '<td style="font-size:11px">' + (w.dni||w.nie||'--') + '</td>' +
+      '<td style="font-size:11px;color:var(--text3)">' + (catLabel[w.cat||'peon']||'Peon') + '</td>' +
+      '<td style="font-size:11px;color:var(--text3)">' + ((w.obra||'').split(',')[0]||'--') + '</td>' +
+      '<td style="font-family:monospace;font-weight:800;font-size:15px;color:var(--verde3);letter-spacing:3px">' + w.pin + '</td>' +
+      '<td>' + st + '</td>' +
+      '<td><button class="btn-e" onclick="editW(' + w.id + ')">Editar</button> <button class="btn-d" onclick="delW(' + w.id + ')">Borrar</button></td>' +
+      '</tr>';
+  }).join('');
+}
+
+// JORNADA
+function renderJornada() {
+  var tb = document.getElementById('jor-tbody');
+  if (!tb) return;
+  var catLabel = {peon:'Peon', oficial:'Oficial', encargado:'Encargado'};
+  tb.innerHTML = WORKERS.map(function(w) {
+    var st = w.status === 'in' ? '<span class="pill p-in">En obra</span>' : w.status === 'out' ? '<span class="pill p-out">Salio</span>' : '<span class="pill p-pend">Sin fichar</span>';
+    return '<tr>' +
+      '<td><div style="font-weight:600">' + w.nombre + ' ' + w.apellidos + '</div></td>' +
+      '<td style="font-size:11px;color:var(--text3)">' + (catLabel[w.cat||'peon']||'Peon') + '</td>' +
+      '<td style="font-weight:600;color:var(--verde3)">' + (w.arrival||'--') + '</td>' +
+      '<td style="color:var(--text3)">' + (w.dep||'--') + '</td>' +
+      '<td style="font-family:\'Bebas Neue\';font-size:16px;color:var(--verde2)">' + (w.h||0) + 'h</td>' +
+      '<td>' + st + '</td>' +
+      '</tr>';
+  }).join('');
+}
+
+// CATEGORIA
+function selCat(cat) {
+  document.getElementById('g-cat').value = cat;
+  var styles = {
+    peon:     {bg:'var(--verde-light)', border:'var(--verde3)',  color:'var(--verde2)'},
+    oficial:  {bg:'var(--amber-l)',     border:'var(--amber)',   color:'var(--amber)'},
+    encargado:{bg:'var(--blue-l)',      border:'var(--blue)',    color:'var(--blue)'}
+  };
+  ['peon','oficial','encargado'].forEach(function(c) {
+    var btn = document.getElementById('cb-' + c);
+    if (!btn) return;
+    if (c === cat) {
+      btn.style.background = styles[c].bg;
+      btn.style.borderColor = styles[c].border;
+      btn.style.color = styles[c].color;
+    } else {
+      btn.style.background = 'var(--white)';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'var(--text3)';
+    }
+  });
+}
+
+// ALTA OPERARIOS
+var lastAdded = null;
+
+function genPin() {
+  var used = WORKERS.map(function(w) { return w.pin; });
+  var p;
+  do { p = String(Math.floor(1000 + Math.random() * 9000)); } while (used.indexOf(p) >= 0);
+  document.getElementById('g-pin').value = p;
+}
+
+function saveWorker() {
+  var id = document.getElementById('eid').value;
+  var nom = document.getElementById('g-nom').value.trim();
+  var ape = document.getElementById('g-ape').value.trim();
+  var dni = document.getElementById('g-dni').value.trim().toUpperCase();
+  var nie = document.getElementById('g-nie').value.trim().toUpperCase();
+  var tel = document.getElementById('g-tel').value.trim();
+  var obra = document.getElementById('g-obra').value.trim();
+  var pin = document.getElementById('g-pin').value.trim();
+  var cat = document.getElementById('g-cat').value || 'peon';
+
+  if (!nom) { showToast('Escribe el nombre', 'err'); return; }
+  if (!ape) { showToast('Escribe los apellidos', 'err'); return; }
+  if (!dni && !nie) { showToast('DNI o NIE obligatorio', 'err'); return; }
+  if (pin.length !== 4 || isNaN(pin)) { showToast('PIN de 4 digitos', 'err'); return; }
+
+  if (id) {
+    var w = WORKERS.find(function(x) { return x.id == id; });
+    if (w) Object.assign(w, {nombre:nom, apellidos:ape, dni:dni, nie:nie, tel:tel, obra:obra, pin:pin, cat:cat});
+    showToast('Operario actualizado', 'ok');
+    document.getElementById('wabox').style.display = 'none';
+  } else {
+    var newId = Math.max.apply(null, [0].concat(WORKERS.map(function(w) { return w.id; }))) + 1;
+    var nw = {id:newId, nombre:nom, apellidos:ape, dni:dni, nie:nie, tel:tel, obra:obra, pin:pin, cat:cat, status:'pending', arrival:null, dep:null, h:0};
+    WORKERS.push(nw);
+    lastAdded = nw;
+    saveW(); // Guardar INMEDIATAMENTE al añadir
+    var doc = (dni||nie).replace(/[^A-Z0-9]/g,'');
+    fetch(FB + '/operarios_registro/' + doc + '.json', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({nombre:nom, apellidos:ape, dni:dni, nie:nie, tel:tel, pin:pin, obra:obra, cat:cat, activo:true})
+    }).catch(function() {});
+    document.getElementById('waprev').textContent = buildWAMsg(nw);
+    document.getElementById('wabox').style.display = 'block';
+    showToast(nom + ' ' + ape + ' dado de alta', 'ok');
+    animKPI('kv-total', WORKERS.length);
+  }
+  saveW();
+  // Solo limpiar campos si es nuevo alta — NO resetear el wabox
+  if (!id) {
+    document.getElementById('eid').value = '';
+    ['g-nom','g-ape','g-dni','g-nie','g-tel','g-obra'].forEach(function(fid) {
+      var el = document.getElementById(fid); if (el) el.value = '';
+    });
+    genPin(); selCat('peon'); selSO('android');
+    document.getElementById('g-btn').textContent = '+ DAR DE ALTA';
+    document.getElementById('alta-title').textContent = 'Alta de operario';
+  }
+  renderGestion(); renderOps(); updateTaskSel();
+}
+
+function selSO(so) {
+  document.getElementById('g-so').value = so;
+  var btnA = document.getElementById('so-android');
+  var btnI = document.getElementById('so-iphone');
+  if (so === 'android') {
+    btnA.style.background = 'var(--verde-light)'; btnA.style.borderColor = 'var(--verde3)'; btnA.style.color = 'var(--verde2)';
+    btnI.style.background = 'var(--white)'; btnI.style.borderColor = 'var(--border)'; btnI.style.color = 'var(--text3)';
+  } else {
+    btnI.style.background = 'var(--verde-light)'; btnI.style.borderColor = 'var(--verde3)'; btnI.style.color = 'var(--verde2)';
+    btnA.style.background = 'var(--white)'; btnA.style.borderColor = 'var(--border)'; btnA.style.color = 'var(--text3)';
+  }
+}
+
+function buildWAMsg(w) {
+  var n = w.nombre + ' ' + w.apellidos;
+  var doc = w.dni || w.nie || '';
+  var obra = w.obra || 'Consulta con el encargado';
+  var cat = w.cat === 'encargado' ? 'Encargado' : w.cat === 'oficial' ? 'Oficial' : 'Peon';
+  var so = document.getElementById('g-so') ? document.getElementById('g-so').value : 'android';
+  var instalar = so === 'iphone'
+    ? 'INSTALAR EN IPHONE:\nSafari > boton Compartir > Anadir a pantalla inicio'
+    : 'INSTALAR EN ANDROID:\nChrome > 3 puntos > Anadir a pantalla inicio';
+
+  var msg = 'OBRACONTROL PRO - Construcciones Lance 2024 SL\n\n';
+  msg += 'Hola ' + n + '!\n\n';
+  msg += 'Bienvenido al equipo. Aqui tienes tu acceso:\n\n';
+  msg += 'APP: ' + APP_URL + '\n\n';
+  msg += 'TUS DATOS:\n';
+  msg += 'DNI/NIE: ' + doc + '\n';
+  msg += 'PIN: ' + w.pin + '\n';
+  msg += 'Categoria: ' + cat + '\n';
+  msg += 'Obra: ' + obra + '\n\n';
+  msg += 'COMO ENTRAR:\n';
+  msg += '1. Abre el enlace de arriba\n';
+  msg += '2. Elige tu idioma\n';
+  msg += '3. Acepta los permisos\n';
+  msg += '4. Introduce tu DNI/NIE\n';
+  msg += '5. Introduce tu PIN: ' + w.pin + '\n';
+  msg += '6. Pulsa ENTRADA para fichar\n\n';
+  msg += instalar + '\n\n';
+  msg += 'Dudas: +34 ' + getTel() + '\n';
+  msg += 'ObraControl GPS PRO';
+  return msg;
+}
+
+function sendWaAlta() {
+  if (!lastAdded) return;
+  var phone = (lastAdded.tel||'').replace(/[\s\-\(\)\+]/g,'');
+  if (!phone || phone.length < 9) {
+    showToast('Este operario no tiene telefono registrado', 'err');
+    return;
+  }
+  if (/^[6789]/.test(phone) && phone.length === 9) phone = '34' + phone;
+  var msg = encodeURIComponent(buildWAMsg(lastAdded));
+  showToast('Abriendo WhatsApp...', 'ok');
+  setTimeout(function() { window.open('https://wa.me/' + phone + '?text=' + msg, '_blank'); }, 300);
+}
+
+function editW(id) {
+  var w = WORKERS.find(function(x) { return x.id === id; });
+  if (!w) return;
+  document.getElementById('eid').value = id;
+  document.getElementById('g-nom').value = w.nombre;
+  document.getElementById('g-ape').value = w.apellidos;
+  document.getElementById('g-dni').value = w.dni||'';
+  document.getElementById('g-nie').value = w.nie||'';
+  document.getElementById('g-tel').value = w.tel||'';
+  document.getElementById('g-obra').value = w.obra||'';
+  document.getElementById('g-pin').value = w.pin;
+  selCat(w.cat||'peon');
+  document.getElementById('g-btn').textContent = 'GUARDAR CAMBIOS';
+  document.getElementById('alta-title').textContent = 'Editar operario';
+  showPage('alta');
+}
+
+function delW(id) {
+  var w = WORKERS.find(function(x) { return x.id === id; });
+  if (!w) return;
+  if (!confirm('Eliminar a ' + w.nombre + ' ' + w.apellidos + '?')) return;
+  var doc = (w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (doc) fetch(FB + '/operarios_registro/' + doc + '.json', {method:'DELETE'}).catch(function() {});
+  WORKERS = WORKERS.filter(function(x) { return x.id !== id; });
+  saveW();
+  renderGestion();
+  renderOps();
+  animKPI('kv-total', WORKERS.length);
+  showToast(w.nombre + ' eliminado', 'err');
+}
+
+function resetForm() {
+  document.getElementById('eid').value = '';
+  ['g-nom','g-ape','g-dni','g-nie','g-tel','g-obra'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  genPin();
+  selCat('peon');
+  selSO('android');
+  document.getElementById('g-btn').textContent = '+ DAR DE ALTA';
+  document.getElementById('alta-title').textContent = 'Alta de operario';
+  document.getElementById('wabox').style.display = 'none';
+  lastAdded = null;
+}
+
+function renderGestion() {
+  var list = document.getElementById('g-list');
+  if (!list) return;
+  var q = (document.getElementById('g-srch') ? document.getElementById('g-srch').value : '').toLowerCase();
+  var f = WORKERS.filter(function(w) {
+    return (w.nombre + ' ' + w.apellidos + ' ' + (w.dni||'')).toLowerCase().indexOf(q) >= 0;
+  });
+  var cnt = document.getElementById('g-cnt');
+  if (cnt) cnt.textContent = WORKERS.length + ' operarios';
+  var catLabel = {peon:'Peon', oficial:'Oficial', encargado:'Encargado'};
+  list.innerHTML = f.map(function(w) {
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);">' +
+      '<div style="width:32px;height:32px;border-radius:50%;background:var(--verde-light);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:var(--verde3);flex-shrink:0;">' + (w.nombre[0]||'') + (w.apellidos[0]||'') + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-weight:600;font-size:13px">' + w.nombre + ' ' + w.apellidos + '</div>' +
+        '<div style="font-size:10px;color:var(--text3)">' + (w.dni||w.nie||'--') + ' · PIN: <strong style="color:var(--verde3)">' + w.pin + '</strong> · ' + (catLabel[w.cat||'peon']||'Peon') + '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:4px;">' +
+        '<button class="btn-e" onclick="editW(' + w.id + ')">Editar</button>' +
+        '<button class="btn-d" onclick="delW(' + w.id + ')">Borrar</button>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// TAREAS
+function loadTareas() {
+  fetch(FB + '/tareas.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var log = document.getElementById('task-log');
+      if (!log) return;
+      if (!data) { log.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin tareas.</div>'; return; }
+      var arr = Object.values(data).sort(function(a,b) { return (b.timestamp||0) - (a.timestamp||0); });
+      animKPI('kv-tareas', arr.filter(function(t) { return !t.completada; }).length);
+      log.innerHTML = arr.map(function(t) {
+        return '<div style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);">' +
+          '<div style="flex:1">' +
+            '<div style="font-size:12px;font-weight:600">' + (t.to||'Todos') + '</div>' +
+            '<div style="font-size:11px;color:var(--text3)">' + (t.msg||'').slice(0,50) + '</div>' +
+            '<div style="font-size:9px;color:' + (t.completada?'var(--verde3)':'var(--amber)') + ';margin-top:2px;">' + (t.completada?'Completada':'Pendiente') + '</div>' +
+          '</div>' +
+          '<div style="font-size:10px;color:var(--text3)">' + (t.time||'') + '</div>' +
+          '</div>';
+      }).join('');
+    }).catch(function() {});
+}
+
+function updateTaskSel() {
+  var sel = document.getElementById('task-to');
+  if (!sel) return;
+  sel.innerHTML = '<option value="all">Todos los operarios</option>';
+  WORKERS.forEach(function(w) {
+    sel.innerHTML += '<option>' + w.nombre + ' ' + w.apellidos + '</option>';
+  });
+}
+
+function sendTask() {
+  var to = document.getElementById('task-to');
+  var prio = document.getElementById('task-prio');
+  var msg = document.getElementById('task-msg').value.trim();
+  if (!msg) { showToast('Escribe la descripcion', 'err'); return; }
+  var now = new Date();
+  var data = {
+    to: to.options[to.selectedIndex].text,
+    msg: msg,
+    prioridad: prio.options[prio.selectedIndex].text,
+    time: now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}),
+    fecha: now.toISOString().split('T')[0],
+    timestamp: now.getTime(),
+    completada: false
+  };
+  fetch(FB + '/tareas/tarea_' + now.getTime() + '.json', {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  }).then(function() {
+    showToast('Tarea enviada', 'ok');
+    document.getElementById('task-msg').value = '';
+    loadTareas();
+  }).catch(function() { showToast('Error al enviar', 'err'); });
+}
+
+// CHAT IA
+var GREMIOS = {
+  albanil:     {label:'Albanil',      emoji:'&#129521;', keys:['albanil','albañil','peon','construccion']},
+  electricista:{label:'Electricista', emoji:'&#9889;',   keys:['electric']},
+  pintor:      {label:'Pintor',       emoji:'&#127912;', keys:['pintor','pintura']},
+  fontanero:   {label:'Fontanero',    emoji:'&#128295;', keys:['fontanero','fontaneria','plomero']},
+  cristalero:  {label:'Cristalero',   emoji:'&#128302;', keys:['cristalero','cristal','vidrio']},
+  soldador:    {label:'Soldador',     emoji:'&#128293;', keys:['soldador','soldadura']},
+  gruista:     {label:'Gruista',      emoji:'&#127981;', keys:['gruista','grua']},
+  carpintero:  {label:'Carpintero',   emoji:'&#128296;', keys:['carpintero','carpinteria']},
+  otros:       {label:'Otros',        emoji:'&#128119;', keys:['otro','industrial','subcontrata']}
+};
+
+function getGremioWorkers(gremioKey) {
+  var g = GREMIOS[gremioKey];
+  if (!g) return [];
+  return WORKERS.filter(function(w) {
+    var cat = (w.cat||'peon').toLowerCase();
+    var gremioW = (w.gremio||'').toLowerCase();
+    var nombre = (w.nombre + ' ' + w.apellidos).toLowerCase();
+    return g.keys.some(function(k) {
+      return cat.indexOf(k) >= 0 || gremioW.indexOf(k) >= 0;
+    });
+  });
+}
+
+function qchat(msg) { document.getElementById('chat-in').value = msg; sendChat(); }
+
+function sendChat() {
+  var inp = document.getElementById('chat-in');
+  var msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  addMsg(msg, 'user');
+  setTimeout(function() { addMsg(responder(msg), 'bot'); }, 400);
+}
+
+function addMsg(txt, who) {
+  var msgs = document.getElementById('chat-msgs');
+  if (!msgs) return;
+  var div = document.createElement('div');
+  div.className = who === 'user' ? 'cmsg-user' : 'cmsg-bot';
+  div.innerHTML = txt;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function responder(msg) {
+  var q = msg.toLowerCase()
+    .replace(/albanil/g,'albanil')
+    .replace(/albañil/g,'albanil')
+    .replace(/fontaner/g,'fontanero')
+    .replace(/electr/g,'electricista')
+    .replace(/pintur/g,'pintor')
+    .replace(/cristal/g,'cristalero')
+    .replace(/solda/g,'soldador')
+    .replace(/grui/g,'gruista')
+    .replace(/carpin/g,'carpintero');
+
+  var enObra = WORKERS.filter(function(w) { return w.status === 'in'; });
+  var sinFichar = WORKERS.filter(function(w) { return w.status === 'pending'; });
+  var tarde = WORKERS.filter(function(w) { return w.arrival && w.arrival > '08:15'; });
+
+  // Sin fichar
+  if (q.indexOf('fich') >= 0 || q.indexOf('falt') >= 0) {
+    if (!sinFichar.length) return '&#10003; Todos los operarios han fichado hoy.';
+    return '<strong>' + sinFichar.length + ' sin fichar:</strong><br>' +
+      sinFichar.map(function(w) { return '&#8226; ' + w.nombre + ' ' + w.apellidos + ' (' + (w.obra||'sin obra').split(',')[0] + ')'; }).join('<br>');
+  }
+
+  // Retrasados
+  if (q.indexOf('tard') >= 0 || q.indexOf('retra') >= 0) {
+    if (!tarde.length) return '&#10003; Nadie llego tarde hoy.';
+    return '<strong>' + tarde.length + ' con retraso:</strong><br>' +
+      tarde.map(function(w) { return '&#8226; ' + w.nombre + ' ' + w.apellidos + ' — entro a las ' + w.arrival; }).join('<br>');
+  }
+
+  // En obra
+  if (q.indexOf('obra') >= 0 && q.indexOf('cuant') >= 0 || q.indexOf('en obra') >= 0) {
+    if (!enObra.length) return 'No hay operarios fichados en este momento.';
+    return '<strong>' + enObra.length + ' en obra ahora:</strong><br>' +
+      enObra.map(function(w) { return '&#8226; ' + w.nombre + ' ' + w.apellidos; }).join('<br>');
+  }
+
+  // Gremios individuales
+  var gremioEncontrado = null;
+  Object.keys(GREMIOS).forEach(function(key) {
+    if (q.indexOf(key) >= 0) gremioEncontrado = key;
+  });
+  if (gremioEncontrado) {
+    var gw = WORKERS.filter(function(w) {
+      var cat = (w.cat||'peon').toLowerCase();
+      return cat === gremioEncontrado || (w.gremio||'').toLowerCase() === gremioEncontrado;
+    });
+    var gwEnObra = gw.filter(function(w) { return w.status === 'in'; });
+    var g = GREMIOS[gremioEncontrado];
+    if (!gw.length) return 'No hay ' + g.label + 's registrados en el sistema.';
+    return g.emoji + ' <strong>' + g.label + 's: ' + gw.length + ' registrados, ' + gwEnObra.length + ' en obra</strong><br>' +
+      gw.map(function(w) {
+        var st = w.status === 'in' ? '&#9989;' : w.status === 'out' ? '&#128308;' : '&#9200;';
+        return st + ' ' + w.nombre + ' ' + w.apellidos;
+      }).join('<br>');
+  }
+
+  // Todos los gremios
+  if (q.indexOf('gremio') >= 0 || q.indexOf('industrial') >= 0 || q.indexOf('todos') >= 0 && q.indexOf('gremio') >= 0) {
+    var resumen = '<strong>Resumen por gremios:</strong><br><br>';
+    var catCount = {};
+    WORKERS.forEach(function(w) {
+      var cat = w.cat || 'peon';
+      if (!catCount[cat]) catCount[cat] = {total:0, enObra:0};
+      catCount[cat].total++;
+      if (w.status === 'in') catCount[cat].enObra++;
+    });
+    var catLabels = {peon:'&#129521; Albanil/Peon', oficial:'&#128295; Oficial', encargado:'&#128084; Encargado'};
+    Object.keys(catCount).forEach(function(cat) {
+      resumen += (catLabels[cat]||cat) + ': <strong>' + catCount[cat].total + '</strong> (' + catCount[cat].enObra + ' en obra)<br>';
+    });
+    return resumen;
+  }
+
+  // Incidencias
+  if (q.indexOf('incidencia') >= 0 || q.indexOf('reporte') >= 0) {
+    cargarIncidencias();
+    return 'Cargando incidencias de hoy... Mira el panel que acaba de aparecer abajo.';
+  }
+
+  // Por obra
+  if (q.indexOf('obra') >= 0 && (q.indexOf('por') >= 0 || q.indexOf('cada') >= 0)) {
+    mostrarPorObra();
+    return 'Mostrando operarios agrupados por obra...';
+  }
+
+  // Resumen general
+  if (q.indexOf('resum') >= 0) {
+    var horas = WORKERS.reduce(function(a,w) { return a + parseFloat(w.h||0); }, 0).toFixed(1);
+    return '<strong>Resumen del dia:</strong><br><br>' +
+      '&#128119; Total plantilla: <strong>' + WORKERS.length + '</strong><br>' +
+      '&#9989; En obra: <strong>' + enObra.length + '</strong><br>' +
+      '&#10060; Sin fichar: <strong>' + sinFichar.length + '</strong><br>' +
+      '&#8987; Con retraso: <strong>' + tarde.length + '</strong><br>' +
+      '&#8987; Horas acumuladas: <strong>' + horas + 'h</strong>';
+  }
+
+  return 'No entiendo la pregunta. Usa los botones rapidos o pregunta por:<br>' +
+    '"albaniles en obra", "cuantos pintores", "quien no ficho", "resumen del dia"';
+}
+
+// VER INCIDENCIAS
+function cargarIncidencias() {
+  var panel = document.getElementById('panel-reportes');
+  var list = document.getElementById('reportes-list');
+  if (!panel || !list) return;
+  panel.style.display = 'block';
+  list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text3);">Cargando...</div>';
+  fetch(FB + '/incidencias.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data) { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3);">Sin incidencias registradas.</div>'; return; }
+      var hoy = new Date().toISOString().split('T')[0];
+      var items = Object.values(data)
+        .filter(function(i) { return i.fecha === hoy; })
+        .sort(function(a,b) { return (b.timestamp||0) - (a.timestamp||0); });
+      if (!items.length) { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3);">Sin incidencias hoy.</div>'; return; }
+      list.innerHTML = items.map(function(inc) {
+        var color = inc.resuelta ? 'var(--verde3)' : 'var(--amber)';
+        return '<div style="padding:12px 14px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;">' +
+          '<div style="width:3px;background:' + color + ';border-radius:2px;flex-shrink:0;align-self:stretch;"></div>' +
+          '<div style="flex:1;">' +
+            '<div style="display:flex;justify-content:space-between;margin-bottom:4px;">' +
+              '<span style="font-size:11px;font-weight:700;color:var(--amber);background:var(--amber-l);padding:2px 8px;border-radius:4px;">' + (inc.tipo||'Incidencia') + '</span>' +
+              '<span style="font-size:10px;color:var(--text3);">' + (inc.hora||'') + '</span>' +
+            '</div>' +
+            '<div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">&#128119; ' + (inc.operario||'Operario') + '</div>' +
+            '<div style="font-size:11px;color:var(--text2);">' + (inc.desc||'Sin descripcion') + '</div>' +
+            '<div style="margin-top:6px;display:flex;gap:6px;">' +
+              '<button onclick="responderOperario(\'' + (inc.operario||'') + '\')" style="padding:4px 10px;background:var(--verde-light);border:1px solid var(--border2);border-radius:6px;font-size:10px;color:var(--verde3);cursor:pointer;">&#128172; Responder</button>' +
+              (!inc.resuelta ? '<button onclick="resolverInc(this)" style="padding:4px 10px;background:var(--blue-l);border:1px solid rgba(27,79,140,.2);border-radius:6px;font-size:10px;color:var(--blue);cursor:pointer;">&#10003; Resolver</button>' : '<span style="font-size:10px;color:var(--verde3);">&#10003; Resuelta</span>') +
+            '</div>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }).catch(function() { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--red);">Error al cargar incidencias.</div>'; });
+}
+
+function responderOperario(nombre) {
+  var tel = getTel();
+  var msg = 'OBRACONTROL PRO\n\nHola ' + nombre + ', hemos recibido tu reporte.\nEstamos en ello, te respondemos pronto.\n\nObraControl GPS PRO';
+  abrirWA(tel, msg);
+}
+
+function resolverInc(btn) {
+  btn.textContent = 'Resuelta';
+  btn.style.color = 'var(--verde3)';
+  btn.style.borderColor = 'var(--border2)';
+  btn.style.background = 'var(--verde-light)';
+  showToast('Incidencia marcada como resuelta', 'ok');
+}
+
+function verReportesOperarios() {
+  cargarIncidencias();
+}
+
+// VER POR OBRA
+function mostrarPorObra() {
+  var panel = document.getElementById('panel-obra');
+  var list = document.getElementById('obra-list');
+  if (!panel || !list) return;
+  panel.style.display = 'block';
+  var obras = {};
+  WORKERS.forEach(function(w) {
+    var obra = (w.obra||'Sin obra asignada').split(',')[0].trim();
+    if (!obras[obra]) obras[obra] = [];
+    obras[obra].push(w);
+  });
+  if (!Object.keys(obras).length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--text3);">No hay operarios registrados.</div>';
+    return;
+  }
+  list.innerHTML = Object.keys(obras).map(function(obra) {
+    var ops = obras[obra];
+    var enObra = ops.filter(function(w) { return w.status === 'in'; }).length;
+    var catResumen = {};
+    ops.forEach(function(w) { var c = w.cat||'peon'; catResumen[c] = (catResumen[c]||0)+1; });
+    var catStr = Object.keys(catResumen).map(function(c) {
+      var labels = {peon:'Peon', oficial:'Oficial', encargado:'Encargado'};
+      return catResumen[c] + ' ' + (labels[c]||c);
+    }).join(', ');
+    return '<div style="margin-bottom:14px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;background:var(--verde-light);border-radius:8px;padding:10px 14px;margin-bottom:6px;">' +
+        '<div>' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:1px;color:var(--verde);">&#127968; ' + obra + '</div>' +
+          '<div style="font-size:10px;color:var(--text3);">' + catStr + '</div>' +
+        '</div>' +
+        '<div style="text-align:right;">' +
+          '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:var(--verde3);">' + ops.length + '</div>' +
+          '<div style="font-size:9px;color:var(--verde3);">' + enObra + ' en obra</div>' +
+        '</div>' +
+      '</div>' +
+      ops.map(function(w) {
+        var st = w.status === 'in' ? '&#9989;' : w.status === 'out' ? '&#128308;' : '&#9200;';
+        var catL = {peon:'Peon', oficial:'Oficial', encargado:'Encargado'};
+        return '<div style="display:flex;justify-content:space-between;padding:6px 14px;border-bottom:1px solid var(--border);font-size:12px;">' +
+          '<span>' + st + ' ' + w.nombre + ' ' + w.apellidos + '</span>' +
+          '<span style="color:var(--text3);font-size:10px;">' + (catL[w.cat||'peon']||'Peon') + '</span>' +
+          '</div>';
+      }).join('') +
+      '</div>';
+  }).join('');
+}
+
+// TELEFONO RESPONSABLE
+function saveTel() {
+  var el = document.getElementById('tel-responsable');
+  if (!el) return;
+  var tel = el.value.trim();
+  if (!tel) return;
+  localStorage.setItem('ocp_tel_responsable', tel);
+  el.style.borderColor = 'rgba(37,211,102,.6)';
+  setTimeout(function() { el.style.borderColor = 'rgba(232,98,26,.25)'; }, 1500);
+}
+
+function getTel() {
+  var tel = localStorage.getItem('ocp_tel_responsable') || '609321585';
+  tel = tel.replace(/[\s\-\(\)\+]/g, '');
+  if (/^[6789]/.test(tel) && tel.length === 9) tel = '34' + tel;
+  if (tel.length < 10) tel = '34609321585';
+  return tel;
+}
+
+function loadTel() {
+  var saved = localStorage.getItem('ocp_tel_responsable');
+  var el = document.getElementById('tel-responsable');
+  if (saved && el) el.value = saved;
+}
+
+function loadTel() {
+  var saved = localStorage.getItem('ocp_tel_responsable');
+  if (saved) {
+    var el = document.getElementById('tel-responsable');
+    if (el) el.value = saved;
+  }
+}
+function enviarResumenWA() {
+  var tel = getTel();
+  var enObra = WORKERS.filter(function(w) { return w.status === 'in'; });
+  var sinFichar = WORKERS.filter(function(w) { return w.status === 'pending'; });
+  var tarde = WORKERS.filter(function(w) { return w.arrival && w.arrival > '08:15'; });
+  var horas = WORKERS.reduce(function(a,w) { return a + parseFloat(w.h||0); }, 0).toFixed(1);
+  var hoy = new Date().toLocaleDateString('es-ES', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+
+  var msg = 'OBRACONTROL GPS PRO - RESUMEN DEL DIA\n';
+  msg += hoy + '\n\n';
+  msg += 'Total plantilla: ' + WORKERS.length + '\n';
+  msg += 'En obra ahora: ' + enObra.length + '\n';
+  msg += 'Sin fichar: ' + sinFichar.length;
+  if (sinFichar.length) {
+    msg += '\n' + sinFichar.map(function(w) { return '  - ' + w.nombre + ' ' + w.apellidos; }).join('\n');
+  }
+  msg += '\nCon retraso: ' + tarde.length + '\n';
+  msg += 'Horas acumuladas: ' + horas + 'h\n\n';
+  msg += 'ObraControl GPS PRO';
+
+  abrirWA(tel, msg);
+}
+
+function probarWA() {
+  saveTel();
+  var tel = getTel();
+  if (!tel) { showToast('Escribe un telefono primero', 'err'); return; }
+  var msg = encodeURIComponent('OBRACONTROL PRO - Prueba de conexion. Sistema funcionando correctamente.');
+  showToast('Abriendo WhatsApp...', 'ok');
+  setTimeout(function() {
+    window.open('https://wa.me/' + tel + '?text=' + msg, '_blank');
+  }, 300);
+}
+
+function abrirWA(tel, msg) {
+  var url = 'https://wa.me/' + tel + '?text=' + encodeURIComponent(msg);
+  showToast('Abriendo WhatsApp...', 'ok');
+  setTimeout(function() { window.open(url, '_blank'); }, 300);
+}
+
+var toastTimer;
+function showToast(msg, tipo) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + tipo;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+</script>
+</body>
+</html>
