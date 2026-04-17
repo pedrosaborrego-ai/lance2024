@@ -154,8 +154,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div id="login-screen">
   <div class="lcard">
     <div style="font-size:36px;margin-bottom:8px;">🏗️</div>
-    <div class="llogo" style="font-size:0;line-height:0"><svg viewBox='0 0 400 280' xmlns='http://www.w3.org/2000/svg'>  <path d='M200 20 C245 20 282 57 282 102 C282 162 200 210 200 210 C200 210 118 162 118 102 C118 57 155 20 200 20Z' fill='#1B4F8C'/>  <circle cx='200' cy='96' r='56' fill='white'/>  <path d='M152 106 C152 82 172 64 200 64 C228 64 248 82 248 106 Z' fill='#1B4F8C'/>  <rect x='142' y='104' width='116' height='10' rx='5' fill='#1B4F8C'/>  <rect x='158' y='95' width='84' height='8' rx='3' fill='#FF7A35'/>  <circle cx='200' cy='82' r='7' fill='white'/>  <circle cx='200' cy='82' r='3' fill='#1B4F8C'/>  <path d='M244 55 Q262 72 244 89' fill='none' stroke='#FF7A35' stroke-width='4.5' stroke-linecap='round'/>  <path d='M258 44 Q282 72 258 100' fill='none' stroke='#FF7A35' stroke-width='4' stroke-linecap='round' opacity='0.55'/>  <text x='200' y='248' text-anchor='middle' font-family='Montserrat,Arial' font-size='36' font-weight='800' fill='white' letter-spacing='2'>OBRACONTROL</text>  <text x='200' y='265' text-anchor='middle' font-family='Montserrat,Arial' font-size='14' font-weight='300' fill='#FF7A35' letter-spacing='10'>G P S</text>  <text x='200' y='278' text-anchor='middle' font-family='Montserrat,Arial' font-size='11' font-weight='700' fill='#FF7A35' letter-spacing='8'>P R O</text></svg></div>
-    <div class="lsub">PANEL DE OFICINA</div>
+    <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" style="width:200px;display:block;margin:0 auto 6px">
+  <path d="M160 10 C193 10 218 35 218 68 C218 112 160 145 160 145 C160 145 102 112 102 68 C102 35 127 10 160 10Z" fill="#1B4F8C"/>
+  <circle cx="160" cy="62" r="40" fill="white"/>
+  <path d="M133 74 C133 56 144 46 160 46 C176 46 187 56 187 74 Z" fill="#1B4F8C"/>
+  <rect x="126" y="72" width="68" height="8" rx="4" fill="#1B4F8C"/>
+  <rect x="136" y="63" width="48" height="6" rx="3" fill="#FF7A35"/>
+  <circle cx="160" cy="56" r="5" fill="white"/>
+  <circle cx="160" cy="56" r="2" fill="#1B4F8C"/>
+  <path d="M186 35 Q198 48 186 61" fill="none" stroke="#FF7A35" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M195 26 Q211 48 195 70" fill="none" stroke="#FF7A35" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  <text x="160" y="168" text-anchor="middle" font-family="Montserrat,Arial" font-size="22" font-weight="800" fill="white" letter-spacing="2">OBRACONTROL GPS</text>
+  <text x="160" y="178" text-anchor="middle" font-family="Montserrat,Arial" font-size="10" font-weight="700" fill="#FF7A35" letter-spacing="6">P R O</text>
+</svg>
+    <div class="lsub">PANEL DE OFICINA PRO</div>
     <div class="pdots">
       <div class="pdot" id="d0"></div>
       <div class="pdot" id="d1"></div>
@@ -183,18 +195,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <!-- APP -->
 <div id="app">
   <aside class="sidebar">
-    <div class="sb-head">
-      <svg viewBox="0 0 320 90" xmlns="http://www.w3.org/2000/svg">
-        <path d="M38 4 C54 4 66 16 66 32 C66 54 38 70 38 70 C38 70 10 54 10 32 C10 16 22 4 38 4Z" fill="#FF7A35"/>
-        <circle cx="38" cy="29" r="18" fill="#1B4F8C"/>
-        <path d="M24 34 C24 24 30 18 38 18 C46 18 52 24 52 34 Z" fill="white"/>
-        <rect x="20" y="33" width="36" height="5" rx="2.5" fill="white"/>
-        <rect x="25" y="27" width="26" height="4" rx="2" fill="#FF7A35"/>
-        <text x="80" y="34" font-family="Montserrat,Arial" font-size="19" font-weight="800" fill="white" letter-spacing="1">OBRACONTROL</text>
-        <text x="80" y="54" font-family="Montserrat,Arial" font-size="12" font-weight="300" fill="#FF7A35" letter-spacing="5">G P S</text>
-        <text x="80" y="72" font-family="Montserrat,Arial" font-size="9" font-weight="600" fill="rgba(255,255,255,.35)" letter-spacing="3">PRO</text>
-      </svg>
-    </div>
+<div style="padding:14px 12px 10px">
+  <svg viewBox="0 0 280 75" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+    <path d="M28 3 C41 3 51 13 51 26 C51 44 28 56 28 56 C28 56 5 44 5 26 C5 13 15 3 28 3Z" fill="#FF7A35"/>
+    <circle cx="28" cy="23" r="14" fill="#1B4F8C"/>
+    <path d="M18 29 C18 21 22 16 28 16 C34 16 38 21 38 29 Z" fill="white"/>
+    <rect x="15" y="28" width="26" height="4" rx="2" fill="white"/>
+    <rect x="19" y="22" width="18" height="3" rx="1.5" fill="#FF7A35"/>
+    <text x="62" y="26" font-family="Montserrat,Arial" font-size="14" font-weight="800" fill="white" letter-spacing="1">OBRACONTROL</text>
+    <text x="62" y="41" font-family="Montserrat,Arial" font-size="10" font-weight="300" fill="#FF7A35" letter-spacing="4">G P S</text>
+    <text x="62" y="54" font-family="Montserrat,Arial" font-size="8" font-weight="700" fill="rgba(255,255,255,.35)" letter-spacing="4">PRO</text>
+  </svg>
+</div>
     <nav class="sb-nav">
       <div class="sb-lbl">Principal</div>
       <div class="ni active" onclick="showPage('tablero')" id="ni-tablero">
@@ -240,9 +252,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="8" width="14" height="7" rx="1"/><path d="M4 8V5a4 4 0 018 0v3"/></svg>
         Por obra
       </div>
-      <div class="sb-lbl">Comunicación</div>
+      <div class="sb-lbl">Comunicacion</div>
       <div class="ni" onclick="showPage('whatsapp')" id="ni-whatsapp">
-        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8 1C4.1 1 1 4.1 1 8c0 1.2.3 2.4.9 3.4L1 15l3.7-.9C5.7 14.7 6.8 15 8 15c3.9 0 7-3.1 7-7S11.9 1 8 1zm3.5 9.5c-.2.5-.9.9-1.4 1-.4.1-.8.1-1.2-.1-.3-.1-.8-.3-1.4-.6-1.2-.6-2-1.6-2.1-1.7C5.3 9 5 8.4 5 7.8c0-.6.3-1 .5-1.3.2-.3.5-.3.6-.3h.4c.2 0 .3.1.4.3.2.4.5 1.2.5 1.3.1.1.1.3 0 .4-.1.1-.1.2-.2.3-.1.1-.2.3-.1.4.4.6.8 1 1.4 1.3.2.1.3 0 .4-.1.1-.1.3-.4.5-.5.1-.2.3-.2.5-.1l1 .5c.2.1.3.2.4.3.1.2 0 .7-.2 1.1z"/></svg>
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8 1C4.1 1 1 4.1 1 8c0 1.2.3 2.4.9 3.4L1 15l3.7-.9C5.7 14.7 6.8 15 8 15c3.9 0 7-3.1 7-7S11.9 1 8 1z"/></svg>
         WhatsApp
       </div>
       <div class="ni" onclick="showPage('asistente')" id="ni-asistente">
@@ -458,7 +470,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="page" id="page-asistente">
       <div style="max-width:720px;margin:0 auto;">
         <div class="card">
-          <div class="chdr"><div class="ctitle">Asistente IA — ObraControl GPS PRO</div><span style="font-size:10px;color:var(--text3)">Pregunta sobre tu obra</span></div>
+          <div class="chdr"><div class="ctitle">Asistente IA — ObraControl Pro</div><span style="font-size:10px;color:var(--text3)">Pregunta sobre tu obra</span></div>
           <div style="padding:14px;max-height:340px;overflow-y:auto;" id="chat-msgs">
             <div class="cmsg-bot">
               Hola! Soy tu asistente de obra. Puedo ayudarte con:<br><br>
@@ -523,6 +535,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       </div>
     </div>
 
+
     <!-- HORAS TRABAJADAS -->
     <div class="page" id="page-horas">
       <div class="card">
@@ -530,20 +543,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div id="horas-list" style="padding:8px 0;"></div>
         <div style="padding:14px 16px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
           <div style="background:var(--verde-light);border-radius:8px;padding:12px;text-align:center;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--verde3)" id="h-total">0h</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--verde3)" id="h-total">0h</div>
             <div style="font-size:9px;color:var(--text3);letter-spacing:1px;">TOTAL HOY</div>
           </div>
           <div style="background:var(--verde-light);border-radius:8px;padding:12px;text-align:center;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--verde3)" id="h-media">0h</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--verde3)" id="h-media">0h</div>
             <div style="font-size:9px;color:var(--text3);letter-spacing:1px;">MEDIA/OP.</div>
           </div>
           <div style="background:var(--oro-l);border-radius:8px;padding:12px;text-align:center;">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--oro)" id="h-extras">0h</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--oro)" id="h-extras">0h</div>
             <div style="font-size:9px;color:var(--text3);letter-spacing:1px;">EXTRAS</div>
           </div>
         </div>
-        <div style="padding:14px 16px;">
-          <button onclick="exportarExcel()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--verde2),var(--verde3));color:#fff;border:none;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;cursor:pointer;">⬇ EXPORTAR A EXCEL PARA NÓMINAS</button>
+        <div style="padding:0 16px 14px;">
+          <button onclick="exportarExcel()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--verde2),var(--verde3));color:#fff;border:none;border-radius:8px;font-family:Bebas Neue,sans-serif;font-size:13px;letter-spacing:2px;cursor:pointer;">EXPORTAR A EXCEL PARA NOMINAS</button>
         </div>
       </div>
     </div>
@@ -564,23 +577,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="chdr"><div class="ctitle">Informes PDF</div></div>
         <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <button onclick="generarInformeDia()" style="padding:20px 14px;background:var(--verde-light);border:1px solid var(--border2);border-radius:10px;cursor:pointer;text-align:center;">
-            <div style="font-size:28px;margin-bottom:6px;">📅</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;color:var(--verde);">INFORME DEL DÍA</div>
+            <div style="font-size:28px;margin-bottom:6px;">&#128197;</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:12px;letter-spacing:1px;color:var(--verde);">INFORME DEL DIA</div>
             <div style="font-size:10px;color:var(--text3);margin-top:3px;">Resumen jornada + horas</div>
           </button>
           <button onclick="generarInformeSemana()" style="padding:20px 14px;background:var(--verde-light);border:1px solid var(--border2);border-radius:10px;cursor:pointer;text-align:center;">
-            <div style="font-size:28px;margin-bottom:6px;">📊</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;color:var(--verde);">INFORME SEMANAL</div>
+            <div style="font-size:28px;margin-bottom:6px;">&#128202;</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:12px;letter-spacing:1px;color:var(--verde);">INFORME SEMANAL</div>
             <div style="font-size:10px;color:var(--text3);margin-top:3px;">Horas acumuladas semana</div>
           </button>
           <button onclick="generarInformeMes()" style="padding:20px 14px;background:var(--oro-l);border:1px solid rgba(232,98,26,.2);border-radius:10px;cursor:pointer;text-align:center;">
-            <div style="font-size:28px;margin-bottom:6px;">📋</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;color:var(--oro);">INFORME MENSUAL</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:3px;">Para nóminas y RRHH</div>
+            <div style="font-size:28px;margin-bottom:6px;">&#128203;</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:12px;letter-spacing:1px;color:var(--oro);">INFORME MENSUAL</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:3px;">Para nominas y RRHH</div>
           </button>
           <button onclick="generarListadoPines()" style="padding:20px 14px;background:var(--blue-l);border:1px solid rgba(27,79,140,.2);border-radius:10px;cursor:pointer;text-align:center;">
-            <div style="font-size:28px;margin-bottom:6px;">🔐</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;color:var(--blue);">LISTADO DE PINES</div>
+            <div style="font-size:28px;margin-bottom:6px;">&#128272;</div>
+            <div style="font-family:Bebas Neue,sans-serif;font-size:12px;letter-spacing:1px;color:var(--blue);">LISTADO DE PINES</div>
             <div style="font-size:10px;color:var(--text3);margin-top:3px;">Para entregar operarios</div>
           </button>
         </div>
@@ -598,13 +611,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <!-- WHATSAPP -->
     <div class="page" id="page-whatsapp">
       <div class="card">
-        <div class="chdr"><div class="ctitle">Mensajes WhatsApp</div></div>
-        <div style="padding:16px;">
-          <button onclick="enviarResumenWA()" style="width:100%;padding:13px;background:#25d366;border:none;border-radius:8px;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;margin-bottom:10px;">📱 ENVIAR RESUMEN DEL DÍA</button>
-          <button onclick="enviarAlertasTodas()" style="width:100%;padding:11px;background:var(--red-l);border:1px solid rgba(192,57,43,.2);border-radius:8px;color:var(--red);font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;">⚠️ ENVIAR ALERTAS ACTIVAS</button>
-        </div>
-        <div id="wa-log" style="max-height:400px;overflow-y:auto;border-top:1px solid var(--border);">
-          <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">Sin mensajes enviados hoy.</div>
+        <div class="chdr"><div class="ctitle">WhatsApp</div></div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:8px;">
+          <button onclick="enviarResumenWA()" style="width:100%;padding:13px;background:#25d366;border:none;border-radius:8px;color:#fff;font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:2px;cursor:pointer;">ENVIAR RESUMEN DEL DIA</button>
+          <button onclick="enviarAlertasTodas()" style="width:100%;padding:11px;background:var(--red-l);border:1px solid rgba(192,57,43,.2);border-radius:8px;color:var(--red);font-family:Bebas Neue,sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;">ENVIAR ALERTAS ACTIVAS</button>
         </div>
       </div>
     </div>
@@ -748,119 +758,18 @@ function animKPI(id, target) {
 // PAGES
 var TITLES = {tablero:'TABLERO',operarios:'OPERARIOS',jornada:'JORNADA',alertas:'ALERTAS',tareas:'TAREAS',alta:'ALTA OPERARIOS',asistente:'ASISTENTE IA',horas:'HORAS TRABAJADAS',incidencias:'INCIDENCIAS',informes:'INFORMES PDF',obras:'POR OBRA',whatsapp:'WHATSAPP'};
 function showPage(name) {
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
-  var pg=document.getElementById('page-'+name);
-  var ni=document.getElementById('ni-'+name);
-  if(pg) pg.classList.add('active');
-  if(ni) ni.classList.add('active');
-  document.getElementById('tb-title').textContent=TITLES[name]||name.toUpperCase();
-  if(name==='operarios') renderOps();
-  if(name==='jornada') renderJornada();
-  if(name==='alta'){renderGestion();genPin();selCat('peon');}
-  if(name==='tareas'){loadTareas();updateTaskSel();}
-  if(name==='horas') renderHoras();
-  if(name==='incidencias') renderIncidencias();
-  if(name==='obras') renderPorObra();
-}
-
-function renderHoras(){
-  var list=document.getElementById('horas-list'); if(!list) return;
-  if(!WORKERS.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">Sin operarios registrados.</div>';return;}
-  var totalH=0;
-  list.innerHTML=WORKERS.map(function(w){
-    var h=parseFloat(w.h||0); totalH+=h;
-    var pct=Math.min((h/9)*100,100).toFixed(0);
-    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);">'+
-      '<div style="width:130px;flex-shrink:0"><span style="font-size:13px;font-weight:600">'+w.nombre+'</span><br><small style="color:var(--text3)">'+w.apellidos+'</small></div>'+
-      '<div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg,var(--verde2),var(--verde3));border-radius:3px;"></div></div>'+
-      '<div style="width:44px;text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:18px;color:var(--verde2)">'+h+'h</div></div></div>';
-  }).join('');
-  var media=WORKERS.length?(totalH/WORKERS.length).toFixed(1):0;
-  var ht=document.getElementById('h-total'); if(ht) ht.textContent=totalH.toFixed(1)+'h';
-  var hm=document.getElementById('h-media'); if(hm) hm.textContent=media+'h';
-}
-
-function renderIncidencias(){
-  var list=document.getElementById('inc-list'); if(!list) return;
-  fetch(FB+'/incidencias.json').then(function(r){return r.json();}).then(function(data){
-    if(!data){list.innerHTML='<div style="padding:28px;text-align:center;color:var(--text3);font-size:12px;">Sin incidencias.</div>';return;}
-    var items=Object.entries(data).sort(function(a,b){return (b[1].timestamp||0)-(a[1].timestamp||0);});
-    var cnt=document.getElementById('inc-cnt'); if(cnt) cnt.textContent=items.length+' incidencias';
-    list.innerHTML=items.map(function(e){
-      var k=e[0],inc=e[1];
-      var color=inc.resuelta?'var(--verde3)':'var(--red)';
-      var badge=inc.resuelta?'<span style="background:var(--verde-light);color:var(--verde3);padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;">RESUELTA</span>':'<span style="background:var(--red-l);color:var(--red);padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;">PENDIENTE</span>';
-      return '<div style="padding:12px 16px;border-bottom:1px solid var(--border);border-left:3px solid '+color+';">'+
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-weight:700;font-size:13px">'+(inc.nombre||'Operario')+'</span>'+badge+'</div>'+
-        '<div style="font-size:12px;color:var(--text2)">'+(inc.texto||'')+'</div>'+
-        '<div style="font-size:10px;color:var(--text3);margin-top:3px">'+(inc.hora||'')+' · '+(inc.fecha||'')+'</div></div>';
-    }).join('');
-  }).catch(function(){list.innerHTML='<div style="padding:28px;text-align:center;color:var(--text3);">Sin incidencias.</div>';});
-}
-
-function renderPorObra(){
-  var list=document.getElementById('obras-list'); if(!list) return;
-  var obras={};
-  WORKERS.forEach(function(w){var o=(w.obra||'Sin obra').split(',')[0].trim(); if(!obras[o])obras[o]=[]; obras[o].push(w);});
-  if(!Object.keys(obras).length){list.innerHTML='<div style="text-align:center;color:var(--text3);padding:24px;">No hay operarios.</div>';return;}
-  list.innerHTML=Object.keys(obras).map(function(obra){
-    var ops=obras[obra]; var enObra=ops.filter(function(w){return w.status==='in';}).length;
-    return '<div style="margin-bottom:14px;">'+
-      '<div style="display:flex;justify-content:space-between;background:var(--verde-light);border-radius:8px;padding:10px 14px;margin-bottom:6px;">'+
-        '<div style="font-family:Bebas Neue,sans-serif;font-size:14px;letter-spacing:1px;color:var(--verde)">&#127968; '+obra+'</div>'+
-        '<div style="text-align:right"><div style="font-family:Bebas Neue,sans-serif;font-size:22px;color:var(--verde3)">'+ops.length+'</div><div style="font-size:9px;color:var(--verde3)">'+enObra+' en obra</div></div>'+
-      '</div>'+
-      ops.map(function(w){var st=w.status==='in'?'&#9989;':w.status==='out'?'&#128308;':'&#9200;';
-        return '<div style="display:flex;justify-content:space-between;padding:6px 14px;border-bottom:1px solid var(--border);font-size:12px;"><span>'+st+' '+w.nombre+' '+w.apellidos+'</span><span style="color:var(--text3);font-size:10px">'+(w.h||0)+'h</span></div>';
-      }).join('')+'</div>';
-  }).join('');
-}
-
-function generarInformeDia(){
-  var hoy=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  var enObra=WORKERS.filter(function(w){return w.status==='in';});
-  var sinFichar=WORKERS.filter(function(w){return w.status==='pending';});
-  var totalH=WORKERS.reduce(function(a,w){return a+parseFloat(w.h||0);},0).toFixed(1);
-  var c='OBRACONTROL GPS PRO - INFORME DEL DIA
-'+hoy+'
-
-Total: '+WORKERS.length+'
-En obra: '+enObra.length+'
-Sin fichar: '+sinFichar.length+'
-Horas: '+totalH+'h
-
-DETALLE:
-';
-  WORKERS.forEach(function(w){c+=w.nombre+' '+w.apellidos+' | '+(w.arrival||'--')+' - '+(w.dep||'--')+' | '+(w.h||0)+'h
-';});
-  var blob=new Blob([c],{type:'text/plain;charset=utf-8'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='informe_'+new Date().toISOString().split('T')[0]+'.txt';a.click();
-  showToast('Informe generado','ok');
-}
-function generarInformeSemana(){generarInformeDia();}
-function generarInformeMes(){generarInformeDia();}
-function generarListadoPines(){
-  var c='OBRACONTROL GPS PRO - LISTADO DE PINES
-
-';
-  WORKERS.forEach(function(w,i){c+=(i+1)+'. '+w.nombre+' '+w.apellidos+' | '+(w.dni||w.nie||'--')+' | PIN: '+w.pin+'
-';});
-  var blob=new Blob([c],{type:'text/plain;charset=utf-8'});
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pines.txt';a.click();
-  showToast('Listado de PINs generado','ok');
-}
-function exportarExcel(){generarInformeDia(); showToast('Exportando horas...','ok');}
-function enviarAlertasTodas(){
-  var sf=WORKERS.filter(function(w){return w.status==='pending';});
-  if(!sf.length){showToast('Sin alertas activas','ok');return;}
-  var msg='OBRACONTROL GPS PRO - ALERTAS
-
-SIN FICHAR:
-';
-  sf.forEach(function(w){msg+='- '+w.nombre+' '+w.apellidos+'
-';});
-  abrirWA(getTel(),msg);
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.ni').forEach(function(n) { n.classList.remove('active'); });
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('ni-' + name).classList.add('active');
+  document.getElementById('tb-title').textContent = TITLES[name] || name;
+  if (name === 'operarios') renderOps();
+  if (name === 'jornada') renderJornada();
+  if (name === 'alta') { renderGestion(); genPin(); selCat('peon'); }
+  if (name === 'tareas') { loadTareas(); updateTaskSel(); }
+  if (name === 'horas') renderHoras();
+  if (name === 'incidencias') renderIncidencias();
+  if (name === 'obras') renderPorObra();
 }
 
 // OPERARIOS TABLE
@@ -1032,7 +941,7 @@ function buildWAMsg(w) {
   msg += '6. Pulsa ENTRADA para fichar\n\n';
   msg += instalar + '\n\n';
   msg += 'Dudas: +34 ' + getTel() + '\n';
-  msg += 'ObraControl GPS PRO';
+  msg += 'ObraControl Pro';
   return msg;
 }
 
@@ -1364,7 +1273,7 @@ function cargarIncidencias() {
 
 function responderOperario(nombre) {
   var tel = getTel();
-  var msg = 'OBRACONTROL PRO\n\nHola ' + nombre + ', hemos recibido tu reporte.\nEstamos en ello, te respondemos pronto.\n\nObraControl GPS PRO';
+  var msg = 'OBRACONTROL PRO\n\nHola ' + nombre + ', hemos recibido tu reporte.\nEstamos en ello, te respondemos pronto.\n\nObraControl Pro';
   abrirWA(tel, msg);
 }
 
@@ -1468,7 +1377,7 @@ function enviarResumenWA() {
   var horas = WORKERS.reduce(function(a,w) { return a + parseFloat(w.h||0); }, 0).toFixed(1);
   var hoy = new Date().toLocaleDateString('es-ES', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
 
-  var msg = 'OBRACONTROL GPS PRO - RESUMEN DEL DIA\n';
+  var msg = 'OBRACONTROL PRO - RESUMEN DEL DIA\n';
   msg += hoy + '\n\n';
   msg += 'Total plantilla: ' + WORKERS.length + '\n';
   msg += 'En obra ahora: ' + enObra.length + '\n';
@@ -1478,7 +1387,7 @@ function enviarResumenWA() {
   }
   msg += '\nCon retraso: ' + tarde.length + '\n';
   msg += 'Horas acumuladas: ' + horas + 'h\n\n';
-  msg += 'ObraControl GPS PRO';
+  msg += 'ObraControl Pro';
 
   abrirWA(tel, msg);
 }
@@ -1508,6 +1417,109 @@ function showToast(msg, tipo) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
+
+
+// HORAS TRABAJADAS
+function renderHoras() {
+  var list = document.getElementById('horas-list');
+  if (!list) return;
+  if (!WORKERS.length) { list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3)">Sin operarios.</div>'; return; }
+  var totalH = 0;
+  list.innerHTML = WORKERS.map(function(w) {
+    var h = parseFloat(w.h||0); totalH += h;
+    var pct = Math.min((h/9)*100,100).toFixed(0);
+    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)">' +
+      '<div style="width:130px;flex-shrink:0"><b>' + w.nombre + ' ' + w.apellidos + '</b></div>' +
+      '<div style="flex:1;height:6px;background:var(--border);border-radius:3px"><div style="width:' + pct + '%;height:100%;background:linear-gradient(90deg,var(--verde2),var(--verde3));border-radius:3px"></div></div>' +
+      '<div style="width:44px;text-align:right;font-size:16px;font-weight:700;color:var(--verde2)">' + h + 'h</div></div>';
+  }).join('');
+  var media = WORKERS.length ? (totalH/WORKERS.length).toFixed(1) : 0;
+  var ht = document.getElementById('h-total'); if(ht) ht.textContent = totalH.toFixed(1)+'h';
+  var hm = document.getElementById('h-media'); if(hm) hm.textContent = media+'h';
+}
+
+// INCIDENCIAS
+function renderIncidencias() {
+  var list = document.getElementById('inc-list'); if(!list) return;
+  fetch(FB+'/incidencias.json').then(function(r){return r.json();}).then(function(data){
+    if(!data){list.innerHTML='<div style="padding:28px;text-align:center;color:var(--text3)">Sin incidencias.</div>';return;}
+    var items = Object.entries(data).sort(function(a,b){return (b[1].timestamp||0)-(a[1].timestamp||0);});
+    var cnt = document.getElementById('inc-cnt'); if(cnt) cnt.textContent = items.length+' incidencias';
+    list.innerHTML = items.map(function(e){
+      var inc = e[1];
+      var col = inc.resuelta ? 'var(--verde3)' : 'var(--red)';
+      var bg  = inc.resuelta ? 'var(--verde-light)' : 'var(--red-l)';
+      var lbl = inc.resuelta ? 'RESUELTA' : 'PENDIENTE';
+      return '<div style="padding:12px 16px;border-bottom:1px solid var(--border);border-left:3px solid '+col+';">' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><b>'+(inc.nombre||'Operario')+'</b>' +
+        '<span style="background:'+bg+';color:'+col+';padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700">'+lbl+'</span></div>' +
+        '<div style="font-size:12px;color:var(--text2)">'+(inc.texto||'')+'</div>' +
+        '<div style="font-size:10px;color:var(--text3);margin-top:3px">'+(inc.hora||'')+' - '+(inc.fecha||'')+'</div></div>';
+    }).join('');
+  }).catch(function(){list.innerHTML='<div style="padding:28px;text-align:center;color:var(--text3)">Sin incidencias.</div>';});
+}
+
+// POR OBRA
+function renderPorObra() {
+  var list = document.getElementById('obras-list'); if(!list) return;
+  var obras = {};
+  WORKERS.forEach(function(w){
+    var o = (w.obra||'Sin obra').split(',')[0].trim();
+    if(!obras[o]) obras[o]=[];
+    obras[o].push(w);
+  });
+  if(!Object.keys(obras).length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3)">No hay operarios.</div>';return;}
+  list.innerHTML = Object.keys(obras).map(function(obra){
+    var ops = obras[obra];
+    var enObra = ops.filter(function(w){return w.status==='in';}).length;
+    return '<div style="margin-bottom:14px;">' +
+      '<div style="display:flex;justify-content:space-between;background:var(--verde-light);border-radius:8px;padding:10px 14px;margin-bottom:6px;">' +
+        '<b style="color:var(--verde)">' + obra + '</b>' +
+        '<span style="color:var(--verde3);font-weight:700">' + ops.length + ' (' + enObra + ' en obra)</span>' +
+      '</div>' +
+      ops.map(function(w){
+        var st = w.status==='in'?'✅':w.status==='out'?'🔴':'⏳';
+        return '<div style="display:flex;justify-content:space-between;padding:6px 14px;border-bottom:1px solid var(--border);font-size:12px;">' +
+          '<span>'+st+' '+w.nombre+' '+w.apellidos+'</span>' +
+          '<span style="color:var(--text3)">'+(w.h||0)+'h</span></div>';
+      }).join('')+'</div>';
+  }).join('');
+}
+
+// INFORMES
+function generarInformeDia() {
+  var hoy = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  var enObra = WORKERS.filter(function(w){return w.status==='in';});
+  var sinF   = WORKERS.filter(function(w){return w.status==='pending';});
+  var totalH = WORKERS.reduce(function(a,w){return a+parseFloat(w.h||0);},0).toFixed(1);
+  var lineas = ['OBRACONTROL GPS PRO - INFORME DEL DIA',hoy,'',
+    'Total: '+WORKERS.length,'En obra: '+enObra.length,'Sin fichar: '+sinF.length,'Horas: '+totalH+'h','','DETALLE:'];
+  WORKERS.forEach(function(w){lineas.push(w.nombre+' '+w.apellidos+' | '+(w.arrival||'--')+' - '+(w.dep||'--')+' | '+(w.h||0)+'h');});
+  var blob = new Blob([lineas.join('\n')],{type:'text/plain;charset=utf-8'});
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'informe_'+new Date().toISOString().split('T')[0]+'.txt'; a.click();
+  showToast('Informe generado','ok');
+}
+function generarInformeSemana(){generarInformeDia();}
+function generarInformeMes(){generarInformeDia();}
+function generarListadoPines() {
+  var lineas = ['OBRACONTROL GPS PRO - LISTADO DE PINES',''];
+  WORKERS.forEach(function(w,i){lineas.push((i+1)+'. '+w.nombre+' '+w.apellidos+' | '+(w.dni||w.nie||'--')+' | PIN: '+w.pin);});
+  var blob = new Blob([lineas.join('\n')],{type:'text/plain;charset=utf-8'});
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'pines.txt'; a.click();
+  showToast('Listado de PINs generado','ok');
+}
+function exportarExcel(){generarInformeDia(); showToast('Exportando horas...','ok');}
+function enviarAlertasTodas(){
+  var sf = WORKERS.filter(function(w){return w.status==='pending';});
+  if(!sf.length){showToast('Sin alertas activas','ok');return;}
+  var lineas = ['OBRACONTROL GPS PRO - ALERTAS','','SIN FICHAR:'];
+  sf.forEach(function(w){lineas.push('- '+w.nombre+' '+w.apellidos);});
+  abrirWA(getTel(), lineas.join('\n'));
+}
+
 </script>
 </body>
 </html>
+
