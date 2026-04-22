@@ -1582,7 +1582,7 @@ function sendTask(){
   const prioText=prio.options[prio.selectedIndex].text;
   
   const tareaData = {
-    to: toName,
+    to: toDoc==='all' ? 'todos los operarios' : toDoc, toNombre: toName,
     msg: msg,
     prioridad: prioText,
     time: timeStr,
