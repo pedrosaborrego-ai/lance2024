@@ -900,6 +900,8 @@ function fbSaveCheckin(type){
     lat: myLat||0,
     lng: myLng||0,
     timestamp: now.getTime()
+    en_zona: window._enZona!==undefined?window._enZona:null,
+    dist_obra: window._distObra||null
   };
   if(type==='entrada'){ entryTime=timeStr; localStorage.setItem('lance_entry_time',timeStr); }
   if(type==='salida'){ entryTime=null; localStorage.removeItem('lance_entry_time'); }
