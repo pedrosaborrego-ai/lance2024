@@ -142,7 +142,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
     <text x="200" y="232" text-anchor="middle" font-family="Montserrat,Arial" font-size="28" font-weight="400" fill="rgba(255,255,255,.7)" letter-spacing="2">construcciones</text>
     <text x="200" y="272" text-anchor="middle" font-family="Montserrat,Arial" font-size="56" font-weight="900" fill="white" letter-spacing="4">LANCE</text>
   </svg>
-  <div class="splash-badge">\ud83d\udccd ObraControl GPS</div>
+  <div class="splash-badge">📍 ObraControl GPS</div>
   <div class="splash-tagline">Control de presencia en obra</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
 </div>
@@ -166,7 +166,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
     <div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.7);margin-top:6px;letter-spacing:1px;">ObraControl GPS</div>
   </div>
   <div style="margin-top:48px;width:100%;max-width:320px;animation:splashIn 1s ease .7s both;">
-    <button onclick="startApp()" style="width:100%;padding:17px;background:linear-gradient(135deg,#FF6B35,#E8621A);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:800;letter-spacing:1.5px;color:white;cursor:pointer;box-shadow:0 8px 28px rgba(255,107,53,.4);">COMENZAR \u2192</button>
+    <button onclick="startApp()" style="width:100%;padding:17px;background:linear-gradient(135deg,#FF6B35,#E8621A);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:800;letter-spacing:1.5px;color:white;cursor:pointer;box-shadow:0 8px 28px rgba(255,107,53,.4);">COMENZAR →</button>
     <div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.35);font-family:'Inter',sans-serif;">Construcciones Lance 2024 SL</div>
   </div>
 </div>
@@ -174,19 +174,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
 <div id="s-rgpd" style="position:fixed;inset:0;z-index:997;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px 22px;overflow-y:auto;">
   <div style="width:100%;max-width:340px;">
     <div style="text-align:center;margin-bottom:20px;">
-      <div style="font-size:44px;margin-bottom:8px;">\ud83d\udd12</div>
-      <div id="rgpd-title" style="font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px;">Protecci\u00f3n de datos</div>
+      <div style="font-size:44px;margin-bottom:8px;">🔒</div>
+      <div id="rgpd-title" style="font-family:'Montserrat',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px;">Protección de datos</div>
       <div id="rgpd-subtitle" style="font-size:12px;color:var(--muted);line-height:1.5;">Antes de continuar necesitamos tu consentimiento</div>
     </div>
     <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;max-height:280px;overflow-y:auto;">
       <div id="rgpd-text" style="font-size:11px;color:var(--muted);line-height:1.7;"></div>
     </div>
     <div style="background:rgba(37,99,174,.08);border:1px solid rgba(37,99,174,.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;">
-      <div style="font-size:18px;flex-shrink:0;">\ud83d\udccd</div>
+      <div style="font-size:18px;flex-shrink:0;">📍</div>
       <div id="rgpd-gps-txt" style="font-size:11px;color:var(--blue3);line-height:1.6;"></div>
     </div>
-    <button onclick="acceptRGPD()" id="rgpd-btn" style="width:100%;padding:15px;background:var(--blue2);border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;letter-spacing:1px;color:white;cursor:pointer;margin-bottom:8px;">\u2705 Acepto y continuar</button>
-    <button onclick="rejectRGPD()" id="rgpd-reject" style="width:100%;padding:12px;background:transparent;border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--muted);cursor:pointer;">\u2715 No acepto</button>
+    <button onclick="acceptRGPD()" id="rgpd-btn" style="width:100%;padding:15px;background:var(--blue2);border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;letter-spacing:1px;color:white;cursor:pointer;margin-bottom:8px;">✅ Acepto y continuar</button>
+    <button onclick="rejectRGPD()" id="rgpd-reject" style="width:100%;padding:12px;background:transparent;border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--muted);cursor:pointer;">✕ No acepto</button>
     <div id="rgpd-reject-msg" style="display:none;margin-top:10px;background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);border-radius:8px;padding:10px;font-size:11px;color:var(--red);text-align:center;line-height:1.5;"></div>
   </div>
 </div>
@@ -202,7 +202,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
       <text x="200" y="232" text-anchor="middle" font-family="Montserrat,Arial" font-size="28" font-weight="400" fill="#1B4F8C" letter-spacing="2">construcciones</text>
       <text x="200" y="272" text-anchor="middle" font-family="Montserrat,Arial" font-size="56" font-weight="900" fill="#1B4F8C" letter-spacing="4">LANCE</text>
     </svg>
-    <div class="logo-pill">\ud83d\udccd ObraControl GPS</div>
+    <div class="logo-pill">📍 ObraControl GPS</div>
   </div>
   <div class="steps-indicator">
     <div class="si-dot active" id="si0"></div><div class="si-dot" id="si1"></div>
@@ -210,14 +210,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
   </div>
   <div class="lang-title" id="lt">Elige tu idioma</div>
   <div class="lang-grid">
-    <div class="lang-btn sel" onclick="selLang('es',this)"><div class="lf">\ud83c\uddea\ud83c\uddf8</div><div><div class="ln">Espa\u00f1ol</div><div class="lnat">Espa\u00f1ol</div></div></div>
-    <div class="lang-btn" onclick="selLang('ca',this)"><div class="lf">\ud83c\udff4</div><div><div class="ln">Catal\u00e0</div><div class="lnat">Catal\u00e0</div></div></div>
-    <div class="lang-btn" onclick="selLang('ro',this)"><div class="lf">\ud83c\uddf7\ud83c\uddf4</div><div><div class="ln">Rom\u00e2n\u0103</div><div class="lnat">Rom\u00e2n\u0103</div></div></div>
-    <div class="lang-btn" onclick="selLang('ar',this)"><div class="lf">\ud83c\uddf2\ud83c\udde6</div><div><div class="ln">\u0627\u0644\u0639\u0631\u0628\u064a\u0629</div><div class="lnat">Darija</div></div></div>
-    <div class="lang-btn" onclick="selLang('fr',this)"><div class="lf">\ud83c\uddeb\ud83c\uddf7</div><div><div class="ln">Fran\u00e7ais</div><div class="lnat">Fran\u00e7ais</div></div></div>
-    <div class="lang-btn" onclick="selLang('en',this)"><div class="lf">\ud83c\uddec\ud83c\udde7</div><div><div class="ln">English</div><div class="lnat">English</div></div></div>
+    <div class="lang-btn sel" onclick="selLang('es',this)"><div class="lf">🇪🇸</div><div><div class="ln">Español</div><div class="lnat">Español</div></div></div>
+    <div class="lang-btn" onclick="selLang('ca',this)"><div class="lf">🏴</div><div><div class="ln">Català</div><div class="lnat">Català</div></div></div>
+    <div class="lang-btn" onclick="selLang('ro',this)"><div class="lf">🇷🇴</div><div><div class="ln">Română</div><div class="lnat">Română</div></div></div>
+    <div class="lang-btn" onclick="selLang('ar',this)"><div class="lf">🇲🇦</div><div><div class="ln">العربية</div><div class="lnat">Darija</div></div></div>
+    <div class="lang-btn" onclick="selLang('fr',this)"><div class="lf">🇫🇷</div><div><div class="ln">Français</div><div class="lnat">Français</div></div></div>
+    <div class="lang-btn" onclick="selLang('en',this)"><div class="lf">🇬🇧</div><div><div class="ln">English</div><div class="lnat">English</div></div></div>
   </div>
-  <button class="btn-main" onclick="continuarDesdeIdioma()">Continuar \u2192</button>
+  <button class="btn-main" onclick="continuarDesdeIdioma()">Continuar →</button>
 </div>
 
 <div class="screen hidden" id="s-name">
@@ -235,15 +235,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
     <div class="si-dot done"></div><div class="si-dot active"></div>
     <div class="si-dot"></div><div class="si-dot"></div>
   </div>
-  <div class="setup-title" id="name-title">Identif\u00edcate</div>
+  <div class="setup-title" id="name-title">Identifícate</div>
   <div class="setup-hint" id="name-hint">Introduce tu DNI o NIE para verificar tu identidad.</div>
   <div class="form-group">
     <label class="form-lbl" id="name-lbl">DNI o NIE</label>
     <input class="form-inp" id="worker-doc-input" type="text" placeholder="Ej: X1234567A" autocomplete="off" maxlength="9" style="display:block;text-transform:uppercase;letter-spacing:2px;font-weight:700;"/>
   </div>
   <div id="verify-msg" style="height:18px;text-align:center;font-size:11px;font-weight:700;color:var(--red);margin-top:-8px;margin-bottom:8px;font-family:'Montserrat',sans-serif;"></div>
-  <button class="btn-main" onclick="verifyDoc()" id="btn-name">Verificar \u2192</button>
-  <button class="btn-sec" onclick="goTo('s-lang')">\u2190 Volver</button>
+  <button class="btn-main" onclick="verifyDoc()" id="btn-name">Verificar →</button>
+  <button class="btn-sec" onclick="goTo('s-lang')">← Volver</button>
 </div>
 
 <div class="screen hidden" id="s-setpin">
@@ -252,7 +252,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
     <div class="si-dot active"></div><div class="si-dot"></div>
   </div>
   <div class="setup-title" id="setpin-title">Crea tu PIN</div>
-  <div class="change-pin-info" id="setpin-info">Elige 4 d\u00edgitos que recuerdes f\u00e1cilmente.</div>
+  <div class="change-pin-info" id="setpin-info">Elige 4 dígitos que recuerdes fácilmente.</div>
   <div class="pin-dots">
     <div class="pdot" id="sp0"></div><div class="pdot" id="sp1"></div>
     <div class="pdot" id="sp2"></div><div class="pdot" id="sp3"></div>
@@ -261,10 +261,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
     <div class="pk" onclick="spp('1')">1</div><div class="pk" onclick="spp('2')">2</div><div class="pk" onclick="spp('3')">3</div>
     <div class="pk" onclick="spp('4')">4</div><div class="pk" onclick="spp('5')">5</div><div class="pk" onclick="spp('6')">6</div>
     <div class="pk" onclick="spp('7')">7</div><div class="pk" onclick="spp('8')">8</div><div class="pk" onclick="spp('9')">9</div>
-    <div class="pk del" onclick="sppDel()">\u232b</div><div class="pk zero" onclick="spp('0')">0</div>
+    <div class="pk del" onclick="sppDel()">⌫</div><div class="pk zero" onclick="spp('0')">0</div>
   </div>
   <div class="pin-err" id="setpin-err"></div>
-  <button class="btn-sec" onclick="goTo('s-name')">\u2190 Volver</button>
+  <button class="btn-sec" onclick="goTo('s-name')">← Volver</button>
 </div>
 
 <div class="screen hidden" id="s-pin">
@@ -273,7 +273,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
     <div class="si-dot done"></div><div class="si-dot active"></div>
   </div>
   <div class="setup-title" id="pin-title">Tu PIN de acceso</div>
-  <div class="setup-hint" id="pin-hint" style="margin-bottom:0">Introduce tus 4 d\u00edgitos</div>
+  <div class="setup-hint" id="pin-hint" style="margin-bottom:0">Introduce tus 4 dígitos</div>
   <div class="pin-dots">
     <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
     <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
@@ -282,7 +282,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
     <div class="pk" onclick="pk('1')">1</div><div class="pk" onclick="pk('2')">2</div><div class="pk" onclick="pk('3')">3</div>
     <div class="pk" onclick="pk('4')">4</div><div class="pk" onclick="pk('5')">5</div><div class="pk" onclick="pk('6')">6</div>
     <div class="pk" onclick="pk('7')">7</div><div class="pk" onclick="pk('8')">8</div><div class="pk" onclick="pk('9')">9</div>
-    <div class="pk del" onclick="pkDel()">\u232b</div><div class="pk zero" onclick="pk('0')">0</div>
+    <div class="pk del" onclick="pkDel()">⌫</div><div class="pk zero" onclick="pk('0')">0</div>
   </div>
   <div class="pin-err" id="pin-err"></div>
 </div>
@@ -297,21 +297,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
       <text x="78" y="35" font-family="Montserrat,Arial" font-size="13" font-weight="400" fill="#CBD5E0" letter-spacing="1.5">construcciones</text>
       <text x="78" y="58" font-family="Montserrat,Arial" font-size="26" font-weight="900" fill="#EDF2F7" letter-spacing="2">LANCE</text>
     </svg>
-    <div class="ab-worker" id="worker-badge">\ud83d\udc77 Operario</div>
+    <div class="ab-worker" id="worker-badge">👷 Operario</div>
   </div>
   <div class="lang-strip">
-    <button class="ls-btn active" data-lang="es" onclick="switchLang('es')">\ud83c\uddea\ud83c\uddf8</button>
-    <button class="ls-btn" data-lang="ca" onclick="switchLang('ca')">\ud83c\udff4</button>
-    <button class="ls-btn" data-lang="ro" onclick="switchLang('ro')">\ud83c\uddf7\ud83c\uddf4</button>
-    <button class="ls-btn" data-lang="ar" onclick="switchLang('ar')">\ud83c\uddf2\ud83c\udde6</button>
-    <button class="ls-btn" data-lang="fr" onclick="switchLang('fr')">\ud83c\uddeb\ud83c\uddf7</button>
-    <button class="ls-btn" data-lang="en" onclick="switchLang('en')">\ud83c\uddec\ud83c\udde7</button>
+    <button class="ls-btn active" data-lang="es" onclick="switchLang('es')">🇪🇸</button>
+    <button class="ls-btn" data-lang="ca" onclick="switchLang('ca')">🏴</button>
+    <button class="ls-btn" data-lang="ro" onclick="switchLang('ro')">🇷🇴</button>
+    <button class="ls-btn" data-lang="ar" onclick="switchLang('ar')">🇲🇦</button>
+    <button class="ls-btn" data-lang="fr" onclick="switchLang('fr')">🇫🇷</button>
+    <button class="ls-btn" data-lang="en" onclick="switchLang('en')">🇬🇧</button>
   </div>
   <div class="app-content">
-    <div id="offline-banner" style="display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:10px;padding:9px 14px;margin-bottom:12px;font-size:11px;font-weight:600;color:#D97706;font-family:'Montserrat',sans-serif;align-items:center;gap:8px;">\ud83d\udcf5 Sin conexi\u00f3n — Fichaje guardado localmente.</div>
+    <div id="offline-banner" style="display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:10px;padding:9px 14px;margin-bottom:12px;font-size:11px;font-weight:600;color:#D97706;font-family:'Montserrat',sans-serif;align-items:center;gap:8px;">📵 Sin conexión — Fichaje guardado localmente.</div>
     <div class="gps-bar loading" id="gps-bar"><div class="gps-dot"></div><span id="gps-txt">Buscando GPS...</span></div>
     <div id="obra-card" style="background:rgba(27,79,140,.1);border:1px solid rgba(27,79,140,.25);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:none;">
-      <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--blue3);margin-bottom:3px;">\ud83d\udccd OBRA ASIGNADA</div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--blue3);margin-bottom:3px;">📍 OBRA ASIGNADA</div>
       <div id="obra-nombre" style="font-size:13px;font-weight:700;color:var(--text)"></div>
       <div id="obra-distancia" style="font-size:11px;color:var(--muted);margin-top:2px;"></div>
     </div>
@@ -320,20 +320,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
       <div class="clock-date" id="clock-date"></div>
     </div>
     <div class="geo-ind unk" id="geo-ind">
-      <div class="geo-big" id="geo-big">\ud83d\udce1</div>
-      <div class="geo-label" id="geo-label">Buscando se\u00f1al GPS...</div>
+      <div class="geo-big" id="geo-big">📡</div>
+      <div class="geo-label" id="geo-label">Buscando señal GPS...</div>
       <div class="geo-dist" id="geo-dist"></div>
       <div id="gps-precision" style="font-size:9px;color:var(--muted);margin-top:3px;"></div>
     </div>
     <div class="checkin-wrap">
       <button class="checkin-btn" id="checkin-btn" onclick="toggleCheckin()" type="button" style="background:rgba(56,224,123,.07);border:4px solid var(--green);cursor:pointer;">
-        <div class="cb-icon" id="cb-icon">\ud83d\udccd</div>
+        <div class="cb-icon" id="cb-icon">📍</div>
         <div class="cb-label" id="cb-label">FICHAR<br>ENTRADA</div>
       </button>
     </div>
     <div class="checkin-status" id="checkin-status"></div>
     <div id="ultimo-fichaje" style="display:none;text-align:center;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;margin-top:8px;">
-      <div style="font-size:9px;font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;">\u00daLTIMO FICHAJE</div>
+      <div style="font-size:9px;font-family:'Montserrat',sans-serif;font-weight:700;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;">ÚLTIMO FICHAJE</div>
       <div id="ultimo-fichaje-txt" style="font-size:12px;font-weight:600;color:var(--text)"></div>
     </div>
     <div class="divider"></div>
@@ -344,13 +344,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
       <span id="wa-share-txt">Compartir app por WhatsApp</span>
     </button>
     <div class="settings-row">
-      <button class="set-btn" onclick="goTo('s-setpin');resetSetPin(true);" id="change-pin-btn">\ud83d\udd10 Cambiar PIN</button>
-      <button class="set-btn" onclick="logout()" id="logout-btn">\u21a9 Cerrar sesi\u00f3n</button>
+      <button class="set-btn" onclick="goTo('s-setpin');resetSetPin(true);" id="change-pin-btn">🔐 Cambiar PIN</button>
+      <button class="set-btn" onclick="logout()" id="logout-btn">↩ Cerrar sesión</button>
     </div>
-    <button id="install-btn" onclick="installApp()" style="display:none;width:100%;margin-top:10px;padding:13px;background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:11px;color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;align-items:center;justify-content:center;gap:8px;">\ud83d\udcf2 A\u00d1ADIR A PANTALLA DE INICIO</button>
+    <button id="install-btn" onclick="installApp()" style="display:none;width:100%;margin-top:10px;padding:13px;background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:11px;color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;align-items:center;justify-content:center;gap:8px;">📲 AÑADIR A PANTALLA DE INICIO</button>
     <div id="ios-install" style="display:none;background:rgba(27,79,140,.15);border:1px solid rgba(27,79,140,.3);border-radius:11px;padding:12px 14px;margin-top:10px;font-size:11px;color:var(--blue3);line-height:1.6;">
-      <div style="font-family:'Montserrat',sans-serif;font-weight:700;margin-bottom:5px;">\ud83d\udcf2 A\u00f1adir a pantalla de inicio (iPhone/iPad):</div>
-      1. Toca el bot\u00f3n <strong>Compartir</strong> \u2b06\ufe0f<br>2. Selecciona <strong>"A\u00f1adir a pantalla de inicio"</strong><br>3. Toca <strong>"A\u00f1adir"</strong>
+      <div style="font-family:'Montserrat',sans-serif;font-weight:700;margin-bottom:5px;">📲 Añadir a pantalla de inicio (iPhone/iPad):</div>
+      1. Toca el botón <strong>Compartir</strong> ⬆️<br>2. Selecciona <strong>"Añadir a pantalla de inicio"</strong><br>3. Toca <strong>"Añadir"</strong>
     </div>
   </div>
 </div>
@@ -361,34 +361,34 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
 const FB_URL = 'https://lance-a99b4-default-rtdb.europe-west1.firebasedatabase.app';
 
 const RGPD_TX = {
-  es:{title:'Protecci\u00f3n de datos',subtitle:'Antes de continuar necesitamos tu consentimiento',gps:'Esta app necesita acceso a tu ubicaci\u00f3n GPS para registrar que est\u00e1s en la zona de obra al fichar.',btn:'\u2705 Acepto y continuar',reject:'No acepto',reject_msg:'Sin aceptar la protecci\u00f3n de datos no puedes usar la app.',text:`INFORMACI\u00d3N SOBRE PROTECCI\u00d3N DE DATOS (RGPD)\
+  es:{title:'Protección de datos',subtitle:'Antes de continuar necesitamos tu consentimiento',gps:'Esta app necesita acceso a tu ubicación GPS para registrar que estás en la zona de obra al fichar.',btn:'✅ Acepto y continuar',reject:'No acepto',reject_msg:'Sin aceptar la protección de datos no puedes usar la app.',text:`INFORMACIÓN SOBRE PROTECCIÓN DE DATOS (RGPD)\
 \
 Responsable: Construcciones Lance 2024 SL\
 Contacto: pedrosaborrego@gmail.com\
 \
 DATOS QUE RECOGEMOS:\
-\u2022 Tu nombre y DNI/NIE\
-\u2022 Hora de entrada y salida\
-\u2022 Ubicaci\u00f3n GPS al fichar\
+• Tu nombre y DNI/NIE\
+• Hora de entrada y salida\
+• Ubicación GPS al fichar\
 \
 TUS DERECHOS:\
 pedrosaborrego@gmail.com\
 \
-Datos en servidores europeos (Firebase, B\u00e9lgica).`},
-  ca:{title:'Protecci\u00f3 de dades',subtitle:'Abans de continuar necessitem el teu consentiment',gps:"Aquesta app necessita acc\u00e9s a la teva ubicaci\u00f3 GPS.",btn:'\u2705 Accepto i continuar',reject:'No accepto',reject_msg:"Sense acceptar no pots usar l'app.",text:`INFORMACI\u00d3 PROTECCI\u00d3 DE DADES\
+Datos en servidores europeos (Firebase, Bélgica).`},
+  ca:{title:'Protecció de dades',subtitle:'Abans de continuar necessitem el teu consentiment',gps:"Aquesta app necessita accés a la teva ubicació GPS.",btn:'✅ Accepto i continuar',reject:'No accepto',reject_msg:"Sense acceptar no pots usar l'app.",text:`INFORMACIÓ PROTECCIÓ DE DADES\
 \
 Responsable: Construccions Lance 2024 SL\
 Contacte: pedrosaborrego@gmail.com`},
-  ro:{title:'Protec\u021bia datelor',subtitle:'\u00cenainte de a continua avem nevoie de consim\u021b\u0103m\u00e2ntul t\u0103u',gps:'Aplica\u021bia necesit\u0103 acces la loca\u021bia GPS.',btn:'\u2705 Accept \u0219i continu\u0103',reject:'Nu accept',reject_msg:'F\u0103r\u0103 acceptare nu po\u021bi folosi aplica\u021bia.',text:`PROTEC\u021aIA DATELOR\
+  ro:{title:'Protecția datelor',subtitle:'Înainte de a continua avem nevoie de consimțământul tău',gps:'Aplicația necesită acces la locația GPS.',btn:'✅ Accept și continuă',reject:'Nu accept',reject_msg:'Fără acceptare nu poți folosi aplicația.',text:`PROTECȚIA DATELOR\
 \
 Responsabil: Construcciones Lance 2024 SL`},
-  ar:{title:'\u062d\u0645\u0627\u064a\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a',subtitle:'\u0642\u0628\u0644 \u0627\u0644\u0645\u062a\u0627\u0628\u0639\u0629 \u0646\u062d\u062a\u0627\u062c \u0625\u0644\u0649 \u0645\u0648\u0627\u0641\u0642\u062a\u0643',gps:'\u064a\u062d\u062a\u0627\u062c \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0625\u0644\u0649 GPS.',btn:'\u2705 \u0623\u0648\u0627\u0641\u0642 \u0648\u0623\u0643\u0645\u0644',reject:'\u0644\u0627 \u0623\u0648\u0627\u0641\u0642',reject_msg:'\u0644\u0627 \u064a\u0645\u0643\u0646\u0643 \u0627\u0644\u0627\u0633\u062a\u062e\u062f\u0627\u0645 \u0628\u062f\u0648\u0646 \u0645\u0648\u0627\u0641\u0642\u0629.',text:`\u062d\u0645\u0627\u064a\u0629 \u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a\
+  ar:{title:'حماية البيانات',subtitle:'قبل المتابعة نحتاج إلى موافقتك',gps:'يحتاج التطبيق إلى GPS.',btn:'✅ أوافق وأكمل',reject:'لا أوافق',reject_msg:'لا يمكنك الاستخدام بدون موافقة.',text:`حماية البيانات\
 \
-\u0627\u0644\u0645\u0633\u0624\u0648\u0644: Construcciones Lance 2024 SL`},
-  fr:{title:'Protection des donn\u00e9es',subtitle:'Avant de continuer nous avons besoin de ton consentement',gps:"L'app a besoin de ta localisation GPS.",btn:"\u2705 J'accepte et continuer",reject:"Je n'accepte pas",reject_msg:'Sans accepter tu ne peux pas utiliser l\'app.',text:`PROTECTION DES DONN\u00c9ES\
+المسؤول: Construcciones Lance 2024 SL`},
+  fr:{title:'Protection des données',subtitle:'Avant de continuer nous avons besoin de ton consentement',gps:"L'app a besoin de ta localisation GPS.",btn:"✅ J'accepte et continuer",reject:"Je n'accepte pas",reject_msg:'Sans accepter tu ne peux pas utiliser l\'app.',text:`PROTECTION DES DONNÉES\
 \
 Responsable: Construcciones Lance 2024 SL`},
-  en:{title:'Data Protection',subtitle:'Before continuing we need your consent',gps:'This app needs GPS location access.',btn:'\u2705 I accept and continue',reject:'I do not accept',reject_msg:'You cannot use the app without accepting.',text:`DATA PROTECTION\
+  en:{title:'Data Protection',subtitle:'Before continuing we need your consent',gps:'This app needs GPS location access.',btn:'✅ I accept and continue',reject:'I do not accept',reject_msg:'You cannot use the app without accepting.',text:`DATA PROTECTION\
 \
 Controller: Construcciones Lance 2024 SL`}
 };
@@ -407,8 +407,7 @@ function showRGPD(){
   document.getElementById('rgpd-gps-txt').textContent=r.gps;
   document.getElementById('rgpd-btn').textContent=r.btn;
   document.getElementById('rgpd-reject').textContent=r.reject;
-  document.getElementById('rgpd-text').innerHTML=r.text.replace(/\
-/g,'<br>');
+  document.getElementById('rgpd-text').innerHTML=r.text.replace(/\n/g,'<br>');
   document.getElementById('s-rgpd').style.direction=lang==='ar'?'rtl':'ltr';
   document.getElementById('s-rgpd').style.display='flex';
 }
@@ -421,7 +420,7 @@ function requestGPSPermission(){
 }
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));const el=document.getElementById(id);if(el)el.classList.remove('hidden');}
 
-// \u2500\u2500 STATE \u2500\u2500
+// ── STATE ──
 let lang='es';
 let workerName='',workerDoc='',workerObra='',workerPin='';
 let myPin='',setPinVal='',pinVal='';
@@ -443,22 +442,22 @@ function calcDist(lat1,lng1,lat2,lng2){
 }
 
 const TX = {
-  es:{lang_select:"Elige tu idioma",name_title:"Identif\u00edcate",name_hint:"Introduce tu DNI o NIE.",name_lbl:"DNI o NIE",setpin_title:"Crea tu PIN",setpin_info:"Elige 4 d\u00edgitos f\u00e1ciles de recordar.",changepin_title:"Cambiar PIN",changepin_info:"Introduce tu nuevo PIN.",pin_title:"Tu PIN de acceso",pin_hint:"Introduce tus 4 d\u00edgitos",pin_err:"PIN incorrecto.",gps_search:"Buscando GPS...",geo_in:"EST\u00c1S EN ZONA DE OBRA",geo_out:"EST\u00c1S FUERA DE LA ZONA",geo_unk:"Buscando se\u00f1al GPS...",checkin:"FICHAR\
+  es:{lang_select:"Elige tu idioma",name_title:"Identifícate",name_hint:"Introduce tu DNI o NIE.",name_lbl:"DNI o NIE",setpin_title:"Crea tu PIN",setpin_info:"Elige 4 dígitos fáciles de recordar.",changepin_title:"Cambiar PIN",changepin_info:"Introduce tu nuevo PIN.",pin_title:"Tu PIN de acceso",pin_hint:"Introduce tus 4 dígitos",pin_err:"PIN incorrecto.",gps_search:"Buscando GPS...",geo_in:"ESTÁS EN ZONA DE OBRA",geo_out:"ESTÁS FUERA DE LA ZONA",geo_unk:"Buscando señal GPS...",checkin:"FICHAR\
 ENTRADA",checkout:"FICHAR\
-SALIDA",tasks:"MIS TAREAS",no_tasks:"Sin tareas hoy.",wa_share:"Compartir app por WhatsApp",change_pin:"\ud83d\udd10 Cambiar PIN",logout:"\u21a9 Cerrar sesi\u00f3n",toast_in:"\u2705 Entrada registrada",toast_out:"\ud83d\udd34 Salida registrada",toast_pin:"\u2705 PIN guardado",continue:"Continuar \u2192",back:"\u2190 Volver"},
-  ca:{lang_select:"Tria el teu idioma",name_title:"Identifica't",name_hint:"Introdueix el teu DNI o NIE.",name_lbl:"DNI o NIE",setpin_title:"Crea el teu PIN",setpin_info:"Tria 4 d\u00edgits.",changepin_title:"Canviar PIN",changepin_info:"Nou PIN.",pin_title:"El teu PIN",pin_hint:"4 d\u00edgits",pin_err:"PIN incorrecte.",gps_search:"Cercant GPS...",geo_in:"EST\u00c0S EN ZONA D'OBRA",geo_out:"EST\u00c0S FORA DE LA ZONA",geo_unk:"Cercant GPS...",checkin:"FITXAR\
+SALIDA",tasks:"MIS TAREAS",no_tasks:"Sin tareas hoy.",wa_share:"Compartir app por WhatsApp",change_pin:"🔐 Cambiar PIN",logout:"↩ Cerrar sesión",toast_in:"✅ Entrada registrada",toast_out:"🔴 Salida registrada",toast_pin:"✅ PIN guardado",continue:"Continuar →",back:"← Volver"},
+  ca:{lang_select:"Tria el teu idioma",name_title:"Identifica't",name_hint:"Introdueix el teu DNI o NIE.",name_lbl:"DNI o NIE",setpin_title:"Crea el teu PIN",setpin_info:"Tria 4 dígits.",changepin_title:"Canviar PIN",changepin_info:"Nou PIN.",pin_title:"El teu PIN",pin_hint:"4 dígits",pin_err:"PIN incorrecte.",gps_search:"Cercant GPS...",geo_in:"ESTÀS EN ZONA D'OBRA",geo_out:"ESTÀS FORA DE LA ZONA",geo_unk:"Cercant GPS...",checkin:"FITXAR\
 ENTRADA",checkout:"FITXAR\
-SORTIDA",tasks:"LES MEVES TASQUES",no_tasks:"Sense tasques.",wa_share:"Compartir app per WhatsApp",change_pin:"\ud83d\udd10 Canviar PIN",logout:"\u21a9 Tancar sessi\u00f3",toast_in:"\u2705 Entrada",toast_out:"\ud83d\udd34 Sortida",toast_pin:"\u2705 PIN desat",continue:"Continuar \u2192",back:"\u2190 Tornar"},
-  ro:{lang_select:"Alege limba",name_title:"Identific\u0103-te",name_hint:"Introdu CNP sau ID.",name_lbl:"CNP / ID",setpin_title:"Creeaz\u0103 PIN",setpin_info:"4 cifre.",changepin_title:"Schimb\u0103 PIN",changepin_info:"PIN nou.",pin_title:"PIN de acces",pin_hint:"4 cifre",pin_err:"PIN incorect.",gps_search:"C\u0103utare GPS...",geo_in:"E\u0218TI \u00ceN ZON\u0102",geo_out:"E\u0218TI \u00ceN AFARA ZONEI",geo_unk:"GPS...",checkin:"INTRARE",checkout:"IE\u0218IRE",tasks:"SARCINILE MELE",no_tasks:"Nicio sarcin\u0103.",wa_share:"Trimite app",change_pin:"\ud83d\udd10 Schimb\u0103 PIN",logout:"\u21a9 Deconectare",toast_in:"\u2705 Intrare",toast_out:"\ud83d\udd34 Ie\u0219ire",toast_pin:"\u2705 PIN salvat",continue:"Continuare \u2192",back:"\u2190 \u00cenapoi"},
-  ar:{lang_select:"\u0627\u062e\u062a\u0631 \u0644\u063a\u062a\u0643",name_title:"\u062a\u0639\u0631\u064a\u0641 \u0627\u0644\u0647\u0648\u064a\u0629",name_hint:"\u0623\u062f\u062e\u0644 \u0631\u0642\u0645 \u0647\u0648\u064a\u062a\u0643.",name_lbl:"\u0631\u0642\u0645 \u0627\u0644\u0647\u0648\u064a\u0629",setpin_title:"\u0625\u0646\u0634\u0627\u0621 PIN",setpin_info:"4 \u0623\u0631\u0642\u0627\u0645.",changepin_title:"\u062a\u063a\u064a\u064a\u0631 PIN",changepin_info:"PIN \u062c\u062f\u064a\u062f.",pin_title:"\u0631\u0645\u0632 PIN",pin_hint:"4 \u0623\u0631\u0642\u0627\u0645",pin_err:"PIN \u062e\u0627\u0637\u0626.",gps_search:"\u0628\u062d\u062b GPS...",geo_in:"\u0623\u0646\u062a \u0641\u064a \u0627\u0644\u0645\u0648\u0642\u0639",geo_out:"\u0623\u0646\u062a \u062e\u0627\u0631\u062c \u0627\u0644\u0645\u0648\u0642\u0639",geo_unk:"GPS...",checkin:"\u062a\u0633\u062c\u064a\u0644\
-\u0627\u0644\u062f\u062e\u0648\u0644",checkout:"\u062a\u0633\u062c\u064a\u0644\
-\u0627\u0644\u062e\u0631\u0648\u062c",tasks:"\u0645\u0647\u0627\u0645\u064a",no_tasks:"\u0644\u0627 \u0645\u0647\u0627\u0645.",wa_share:"\u0645\u0634\u0627\u0631\u0643\u0629",change_pin:"\ud83d\udd10 \u062a\u063a\u064a\u064a\u0631 PIN",logout:"\u21a9 \u062e\u0631\u0648\u062c",toast_in:"\u2705 \u062f\u062e\u0648\u0644",toast_out:"\ud83d\udd34 \u062e\u0631\u0648\u062c",toast_pin:"\u2705 \u0645\u062d\u0641\u0648\u0638",continue:"\u0645\u062a\u0627\u0628\u0639\u0629 \u2192",back:"\u2192 \u0631\u062c\u0648\u0639"},
-  fr:{lang_select:"Choisis ta langue",name_title:"Identifie-toi",name_hint:"Entre ton DNI ou NIE.",name_lbl:"DNI ou NIE",setpin_title:"Cr\u00e9e ton PIN",setpin_info:"4 chiffres.",changepin_title:"Changer PIN",changepin_info:"Nouveau PIN.",pin_title:"Ton code PIN",pin_hint:"4 chiffres",pin_err:"PIN incorrect.",gps_search:"Recherche GPS...",geo_in:"TU ES DANS LA ZONE",geo_out:"TU ES HORS ZONE",geo_unk:"GPS...",checkin:"POINTER\
-ENTR\u00c9E",checkout:"POINTER\
-SORTIE",tasks:"MES T\u00c2CHES",no_tasks:"Aucune t\u00e2che.",wa_share:"Partager l'app",change_pin:"\ud83d\udd10 Changer PIN",logout:"\u21a9 D\u00e9connexion",toast_in:"\u2705 Entr\u00e9e",toast_out:"\ud83d\udd34 Sortie",toast_pin:"\u2705 PIN sauv\u00e9",continue:"Continuer \u2192",back:"\u2190 Retour"},
+SORTIDA",tasks:"LES MEVES TASQUES",no_tasks:"Sense tasques.",wa_share:"Compartir app per WhatsApp",change_pin:"🔐 Canviar PIN",logout:"↩ Tancar sessió",toast_in:"✅ Entrada",toast_out:"🔴 Sortida",toast_pin:"✅ PIN desat",continue:"Continuar →",back:"← Tornar"},
+  ro:{lang_select:"Alege limba",name_title:"Identifică-te",name_hint:"Introdu CNP sau ID.",name_lbl:"CNP / ID",setpin_title:"Creează PIN",setpin_info:"4 cifre.",changepin_title:"Schimbă PIN",changepin_info:"PIN nou.",pin_title:"PIN de acces",pin_hint:"4 cifre",pin_err:"PIN incorect.",gps_search:"Căutare GPS...",geo_in:"EȘTI ÎN ZONĂ",geo_out:"EȘTI ÎN AFARA ZONEI",geo_unk:"GPS...",checkin:"INTRARE",checkout:"IEȘIRE",tasks:"SARCINILE MELE",no_tasks:"Nicio sarcină.",wa_share:"Trimite app",change_pin:"🔐 Schimbă PIN",logout:"↩ Deconectare",toast_in:"✅ Intrare",toast_out:"🔴 Ieșire",toast_pin:"✅ PIN salvat",continue:"Continuare →",back:"← Înapoi"},
+  ar:{lang_select:"اختر لغتك",name_title:"تعريف الهوية",name_hint:"أدخل رقم هويتك.",name_lbl:"رقم الهوية",setpin_title:"إنشاء PIN",setpin_info:"4 أرقام.",changepin_title:"تغيير PIN",changepin_info:"PIN جديد.",pin_title:"رمز PIN",pin_hint:"4 أرقام",pin_err:"PIN خاطئ.",gps_search:"بحث GPS...",geo_in:"أنت في الموقع",geo_out:"أنت خارج الموقع",geo_unk:"GPS...",checkin:"تسجيل\
+الدخول",checkout:"تسجيل\
+الخروج",tasks:"مهامي",no_tasks:"لا مهام.",wa_share:"مشاركة",change_pin:"🔐 تغيير PIN",logout:"↩ خروج",toast_in:"✅ دخول",toast_out:"🔴 خروج",toast_pin:"✅ محفوظ",continue:"متابعة →",back:"→ رجوع"},
+  fr:{lang_select:"Choisis ta langue",name_title:"Identifie-toi",name_hint:"Entre ton DNI ou NIE.",name_lbl:"DNI ou NIE",setpin_title:"Crée ton PIN",setpin_info:"4 chiffres.",changepin_title:"Changer PIN",changepin_info:"Nouveau PIN.",pin_title:"Ton code PIN",pin_hint:"4 chiffres",pin_err:"PIN incorrect.",gps_search:"Recherche GPS...",geo_in:"TU ES DANS LA ZONE",geo_out:"TU ES HORS ZONE",geo_unk:"GPS...",checkin:"POINTER\
+ENTRÉE",checkout:"POINTER\
+SORTIE",tasks:"MES TÂCHES",no_tasks:"Aucune tâche.",wa_share:"Partager l'app",change_pin:"🔐 Changer PIN",logout:"↩ Déconnexion",toast_in:"✅ Entrée",toast_out:"🔴 Sortie",toast_pin:"✅ PIN sauvé",continue:"Continuer →",back:"← Retour"},
   en:{lang_select:"Choose language",name_title:"Identify yourself",name_hint:"Enter your ID number.",name_lbl:"ID Number",setpin_title:"Create PIN",setpin_info:"4 digits.",changepin_title:"Change PIN",changepin_info:"New PIN.",pin_title:"Your access PIN",pin_hint:"4 digits",pin_err:"Wrong PIN.",gps_search:"Finding GPS...",geo_in:"YOU ARE IN THE ZONE",geo_out:"YOU ARE OUTSIDE ZONE",geo_unk:"GPS...",checkin:"CLOCK\
 IN",checkout:"CLOCK\
-OUT",tasks:"MY TASKS",no_tasks:"No tasks.",wa_share:"Share app",change_pin:"\ud83d\udd10 Change PIN",logout:"\u21a9 Log out",toast_in:"\u2705 Clocked in",toast_out:"\ud83d\udd34 Clocked out",toast_pin:"\u2705 PIN saved",continue:"Continue \u2192",back:"\u2190 Back"}
+OUT",tasks:"MY TASKS",no_tasks:"No tasks.",wa_share:"Share app",change_pin:"🔐 Change PIN",logout:"↩ Log out",toast_in:"✅ Clocked in",toast_out:"🔴 Clocked out",toast_pin:"✅ PIN saved",continue:"Continue →",back:"← Back"}
 };
 
 function t(k){return (TX[lang]&&TX[lang][k])||TX.es[k]||k;}
@@ -485,16 +484,16 @@ function verifyDoc(){
   const raw=(document.getElementById('worker-doc-input')?.value||'').trim().toUpperCase();
   const msg=document.getElementById('verify-msg');
   if(!raw||raw.length<8){if(msg)msg.textContent='Introduce tu DNI o NIE completo';return;}
-  if(msg)msg.textContent='\ud83d\udd04 Verificando...';
+  if(msg)msg.textContent='🔄 Verificando...';
   const key=raw.replace(/[^A-Z0-9]/g,'');
   fetch(`${FB_URL}/operarios_registro/${key}.json`)
     .then(r=>r.json())
     .then(data=>{
-      if(!data||!data.nombre){if(msg)msg.textContent='\u274c DNI/NIE no registrado. Contacta con el encargado.';return;}
+      if(!data||!data.nombre){if(msg)msg.textContent='❌ DNI/NIE no registrado. Contacta con el encargado.';return;}
       workerDoc=key; workerName=data.nombre+(data.apellidos?' '+data.apellidos:'');
       workerPin=data.pin; workerObra=data.obra||'';
       if(msg)msg.textContent='';
-      showToast(`\u2705 Identificado: ${data.nombre}`,'ok');
+      showToast(`✅ Identificado: ${data.nombre}`,'ok');
       // ✅ Guardar consentimiento
       const consentFecha=localStorage.getItem('lance_rgpd_fecha')||new Date().toISOString().split('T')[0];
       const consentHora=localStorage.getItem('lance_rgpd_hora')||new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
@@ -509,13 +508,13 @@ function verifyDoc(){
       } else if(savedPin){myPin=savedPin;setupLoginPin();goTo('s-pin');}
       else{setupVerifyCompanyPin();goTo('s-pin');}
     })
-    .catch(()=>{if(msg)msg.textContent='\u26a0\ufe0f Sin conexi\u00f3n — no se puede verificar.';});
+    .catch(()=>{if(msg)msg.textContent='⚠️ Sin conexión — no se puede verificar.';});
 }
 
 function setupVerifyCompanyPin(){
   pinVal='';
   for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.remove('on');
-  document.getElementById('pin-title').textContent='\ud83d\udd10 PIN de empresa';
+  document.getElementById('pin-title').textContent='🔐 PIN de empresa';
   document.getElementById('pin-hint').textContent='Introduce el PIN que te ha dado el encargado';
   document.getElementById('pin-err').textContent='';
   window._verifyingCompanyPin=true;
@@ -558,10 +557,10 @@ function checkPin(){
   if(window._verifyingCompanyPin){
     if(pinVal===workerPin){
       window._verifyingCompanyPin=false;
-      showToast('\u2705 PIN correcto — crea tu PIN personal','ok');
+      showToast('✅ PIN correcto — crea tu PIN personal','ok');
       changingPin=false;resetSetPin(false);goTo('s-setpin');
     } else {
-      document.getElementById('pin-err').textContent='\u274c PIN incorrecto. Contacta con el encargado.';
+      document.getElementById('pin-err').textContent='❌ PIN incorrecto. Contacta con el encargado.';
       document.getElementById('login-pad').classList.add('shake');
       setTimeout(()=>document.getElementById('login-pad').classList.remove('shake'),450);
       pinVal='';for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.remove('on');
@@ -569,7 +568,7 @@ function checkPin(){
   } else {
     if(pinVal===myPin){
       const displayName=workerName.split(' ').slice(0,2).join(' ');
-      document.getElementById('worker-badge').textContent='\ud83d\udc77 '+displayName;
+      document.getElementById('worker-badge').textContent='👷 '+displayName;
       goTo('s-app');applyAppLang();renderTasks();startClock();startGPS();
       // ✅ BUG1 FIX: restaurar estado real buscando por DNI en todos los activos
       fetch(`${FB_URL}/operarios_activos.json`)
@@ -613,7 +612,7 @@ function tick(){
   const cl=document.getElementById('clock');
   const dt=document.getElementById('clock-date');
   if(cl)cl.textContent=n.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-  if(dt){const days=['domingo','lunes','martes','mi\u00e9rcoles','jueves','viernes','s\u00e1bado'];dt.textContent=days[n.getDay()]+', '+n.toLocaleDateString('es-ES',{day:'2-digit',month:'long'});}
+  if(dt){const days=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];dt.textContent=days[n.getDay()]+', '+n.toLocaleDateString('es-ES',{day:'2-digit',month:'long'});}
 }
 
 window.addEventListener('online',()=>{document.getElementById('offline-banner').style.display='none';});
@@ -627,7 +626,7 @@ function startGPS(){
       myLat=pos.coords.latitude;myLng=pos.coords.longitude;
       myAccuracy=Math.round(pos.coords.accuracy);
       const prec=document.getElementById('gps-precision');
-      if(prec)prec.textContent=`Precisi\u00f3n GPS: \u00b1${myAccuracy}m`;
+      if(prec)prec.textContent=`Precisión GPS: ±${myAccuracy}m`;
       fetch(`https://nominatim.openstreetmap.org/reverse?lat=${myLat}&lon=${myLng}&format=json&accept-language=es`)
         .then(r=>r.json())
         .then(data=>{
@@ -637,9 +636,9 @@ function startGPS(){
           myCountry=a.country||'';
           updateGeoUI();loadObraInfo();
         })
-        .catch(()=>{myCity='Ubicaci\u00f3n detectada';updateGeoUI();loadObraInfo();});
+        .catch(()=>{myCity='Ubicación detectada';updateGeoUI();loadObraInfo();});
     },
-    ()=>{setGpsBar('bad','\u26a0\ufe0f Activa el GPS del m\u00f3vil');},
+    ()=>{setGpsBar('bad','⚠️ Activa el GPS del móvil');},
     {enableHighAccuracy:true,timeout:15000,maximumAge:0}
   );
 }
@@ -679,23 +678,23 @@ function loadObraInfo(){
     });
 }
 
-// \u2705 NUEVA FUNCI\u00d3N: verifica si el operario est\u00e1 en la zona de su obra
+// ✅ NUEVA FUNCIÓN: verifica si el operario está en la zona de su obra
 function checkZonaObra(){
   if(!myLat||!myLng) return;
   const obraDistEl=document.getElementById('obra-distancia');
   if(workerObraLat&&workerObraLng){
     const dist=calcDist(myLat,myLng,workerObraLat,workerObraLng);
     const enZona=dist<=ZONA_RADIO;
-    if(obraDistEl) obraDistEl.textContent=`${enZona?'\u2705':'\u26a0\ufe0f'} ${enZona?'En zona de obra':'Fuera de zona'} \u00b7 ${dist}m`;
+    if(obraDistEl) obraDistEl.textContent=`${enZona?'✅':'⚠️'} ${enZona?'En zona de obra':'Fuera de zona'} · ${dist}m`;
     const ind=document.getElementById('geo-ind');
     if(ind) ind.className='geo-ind '+(enZona?'ok':'bad');
-    document.getElementById('geo-big').textContent=enZona?'\u2705':'\u26a0\ufe0f';
-    document.getElementById('geo-label').textContent=enZona?t('geo_in'):t('geo_out')+` \u00b7 ${dist}m de la obra`;
+    document.getElementById('geo-big').textContent=enZona?'✅':'⚠️';
+    document.getElementById('geo-label').textContent=enZona?t('geo_in'):t('geo_out')+` · ${dist}m de la obra`;
     window._enZona=enZona;
     window._distObra=dist;
-    if(!enZona) showToast(`\u26a0\ufe0f Est\u00e1s a ${dist}m de la obra asignada`,'err');
+    if(!enZona) showToast(`⚠️ Estás a ${dist}m de la obra asignada`,'err');
   } else {
-    if(obraDistEl) obraDistEl.textContent=`\ud83d\udccd ${myCity||'Ubicaci\u00f3n'} \u00b7 \u00b1${myAccuracy||'?'}m`;
+    if(obraDistEl) obraDistEl.textContent=`📍 ${myCity||'Ubicación'} · ±${myAccuracy||'?'}m`;
     window._enZona=null;
     window._distObra=null;
   }
@@ -704,8 +703,8 @@ function checkZonaObra(){
 function updateGeoUI(){
   if(!myLat) return;
   const locationStr=[myCity,myProvince,myCountry].filter(Boolean).join(', ');
-  setGpsBar('ok',`GPS activo \u00b7 ${myCity||myProvince||'Ubicaci\u00f3n detectada'}`);
-  document.getElementById('geo-dist').textContent=`\ud83d\udccd ${locationStr}`;
+  setGpsBar('ok',`GPS activo · ${myCity||myProvince||'Ubicación detectada'}`);
+  document.getElementById('geo-dist').textContent=`📍 ${locationStr}`;
   // La zona se actualiza en checkZonaObra — llamada desde loadObraInfo
 }
 
@@ -714,7 +713,7 @@ function setGpsBar(cls,txt){
   if(b)b.className='gps-bar '+cls;if(tx)tx.textContent=txt;
 }
 
-// \u2500\u2500 FICHAJE \u2500\u2500
+// ── FICHAJE ──
 function fbSaveCheckin(type){
   const now=new Date();
   const dateStr=now.toISOString().split('T')[0];
@@ -751,31 +750,31 @@ function toggleCheckin(){
   const now=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
   const loc=myCity||myProvince||'GPS activo';
   const tipo=isIn?'entrada':'salida';
-  const zonaInfo=window._enZona===false?` \u26a0\ufe0f Fuera de zona (${window._distObra}m)`:window._enZona===true?' \u2705 En zona':'';
+  const zonaInfo=window._enZona===false?` ⚠️ Fuera de zona (${window._distObra}m)`:window._enZona===true?' ✅ En zona':'';
   if(isIn){
     btn.classList.add('in');btn.style.borderColor='var(--red)';btn.style.background='rgba(255,71,87,.07)';
     lbl.innerHTML=t('checkout').replace('\
-','<br>');ico.textContent='\ud83d\udd34';
-    st.innerHTML=`\u2705 Entrada: ${now}${zonaInfo}<br><span style="color:var(--green);font-size:10px">\ud83d\udccd ${loc} \u00b7 \u00b1${myAccuracy||'?'}m</span>`;
-    showToast(t('toast_in')+(window._enZona===false?' \u26a0\ufe0f Fuera de zona':''),'ok');
+','<br>');ico.textContent='🔴';
+    st.innerHTML=`✅ Entrada: ${now}${zonaInfo}<br><span style="color:var(--green);font-size:10px">📍 ${loc} · ±${myAccuracy||'?'}m</span>`;
+    showToast(t('toast_in')+(window._enZona===false?' ⚠️ Fuera de zona':''),'ok');
   } else {
     btn.classList.remove('in');btn.style.borderColor='var(--green)';btn.style.background='rgba(56,224,123,.07)';
     lbl.innerHTML=t('checkin').replace('\
-','<br>');ico.textContent='\ud83d\udccd';
-    st.innerHTML=`\ud83d\udd34 Salida: ${now}<br><span style="color:var(--red);font-size:10px">\ud83d\udccd ${loc}</span>`;
+','<br>');ico.textContent='📍';
+    st.innerHTML=`🔴 Salida: ${now}<br><span style="color:var(--red);font-size:10px">📍 ${loc}</span>`;
     showToast(t('toast_out'),'err');
   }
   const uf=document.getElementById('ultimo-fichaje');
   const uft=document.getElementById('ultimo-fichaje-txt');
-  if(uf&&uft){uf.style.display='block';uft.textContent=`${tipo==='entrada'?'\u2705 Entrada':'\ud83d\udd34 Salida'} \u00b7 ${now} \u00b7 ${loc}${zonaInfo}`;}
+  if(uf&&uft){uf.style.display='block';uft.textContent=`${tipo==='entrada'?'✅ Entrada':'🔴 Salida'} · ${now} · ${loc}${zonaInfo}`;}
   if(navigator.onLine){fbSaveCheckin(tipo);}
-  else{showToast('\ud83d\udcf5 Sin internet — guardado localmente','inf');}
+  else{showToast('📵 Sin internet — guardado localmente','inf');}
   if(navigator.vibrate)navigator.vibrate([60,30,60]);
 }
 
 function renderTasks(){
   const list=document.getElementById('task-list');if(!list)return;
-  list.innerHTML='<div class="no-task">\u23f3 Cargando tareas...</div>';
+  list.innerHTML='<div class="no-task">⏳ Cargando tareas...</div>';
   const colors={urgent:'var(--red)',normal:'var(--amber)',info:'var(--blue2)'};
   fetch(`${FB_URL}/tareas.json`)
     .then(r=>r.json())
@@ -792,22 +791,22 @@ function renderTasks(){
       tareas.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
       list.innerHTML=tareas.map(tk=>{
         const prioRaw=(tk.prioridad||'').toLowerCase();
-        const prio=prioRaw.includes('urgent')||prioRaw.includes('alta')||prioRaw.includes('\ud83d\udd34')?'urgent':prioRaw.includes('info')||prioRaw.includes('baja')||prioRaw.includes('\ud83d\udd35')?'info':'normal';
-        return`<div class="task-card ${prio}"><div class="task-dot" style="background:${colors[prio]}"></div><div><div class="task-text">${tk.msg||tk.texto||'Sin descripci\u00f3n'}</div><div class="task-time">\ud83d\udce9 ${tk.time||tk.hora||''} \u00b7 ${tk.fecha||''}</div></div></div>`;
+        const prio=prioRaw.includes('urgent')||prioRaw.includes('alta')||prioRaw.includes('🔴')?'urgent':prioRaw.includes('info')||prioRaw.includes('baja')||prioRaw.includes('🔵')?'info':'normal';
+        return`<div class="task-card ${prio}"><div class="task-dot" style="background:${colors[prio]}"></div><div><div class="task-text">${tk.msg||tk.texto||'Sin descripción'}</div><div class="task-time">📩 ${tk.time||tk.hora||''} · ${tk.fecha||''}</div></div></div>`;
       }).join('');
     })
-    .catch(()=>{list.innerHTML=`<div class="no-task">\u26a0\ufe0f Sin conexi\u00f3n.</div>`;});
+    .catch(()=>{list.innerHTML=`<div class="no-task">⚠️ Sin conexión.</div>`;});
 }
 
 function shareWA(){
   const url=window.location.href;
-  const msg=encodeURIComponent(`\ud83c\udfd7\ufe0f *CONSTRUCCIONES LANCE 2024 SL*\
+  const msg=encodeURIComponent(`🏗️ *CONSTRUCCIONES LANCE 2024 SL*\
 \
 App de fichaje ObraControl GPS:\
-\ud83d\udc49 ${url}\
+👉 ${url}\
 \
 _construcciones LANCE 2024 SL_`);
-  showToast('\u2705 Abriendo WhatsApp...','inf');
+  showToast('✅ Abriendo WhatsApp...','inf');
   setTimeout(()=>window.open(`https://wa.me/?text=${msg}`,'_blank'),400);
 }
 
