@@ -459,8 +459,15 @@ function verifyDoc(){
       if(msg)msg.textContent='';
       showToast(`✅ Identificado: ${data.nombre}`,'ok');
       const savedPin=localStorage.getItem('pin_'+key);
-      if(savedPin){myPin=savedPin;setupLoginPin();goTo('s-pin');}
-      else{setupVerifyCompanyPin();goTo('s-pin');}
+      // ✅ BUG2 FIX: si la consola cambió el PIN de empresa, borrar PIN local
+      if(savedPin&&data.pin_reset===true){
+        localStorage.removeItem('pin_'+key);
+        setupVerifyCompanyPin();goTo('s-pin');
+      } else if(savedPin){
+        myPin=savedPin;setupLoginPin();goTo('s-pin');
+      } else {
+        setupVerifyCompanyPin();goTo('s-pin');
+      }
     })
     .catch(()=>{if(msg)msg.textContent='⚠️ Sin conexión — no se puede verificar.';});
 }

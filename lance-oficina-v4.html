@@ -460,9 +460,9 @@ function loadWorkersFromFirebase(){
   }).catch(()=>{});
 }
 
-function fbSyncWorker(w){
+function fbSyncWorker(w, pinChanged=false){
   const doc=(w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(!doc)return;
-  fetch(`${FB_URL}/operarios_registro/${doc}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:w.nombre,apellidos:w.apellidos,dni:w.dni||'',nie:w.nie||'',pin:w.pin,obra:w.obra||'',tel:w.tel||'',activo:true})}).catch(()=>{});
+  fetch(`${FB_URL}/operarios_registro/${doc}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:w.nombre,apellidos:w.apellidos,dni:w.dni||'',nie:w.nie||'',pin:w.pin,obra:w.obra||'',tel:w.tel||'',activo:true,pin_reset:pinChanged})}).catch(()=>{});
 }
 
 function startFirebaseListener(){loadFirebaseData();setInterval(loadFirebaseData,5000);}
@@ -477,7 +477,7 @@ function loadFirebaseData(){
       if(op.doc){const dc=op.doc.replace(/[^A-Z0-9]/gi,'').toUpperCase();w=WORKERS.find(x=>(x.dni||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()===dc||(x.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()===dc);}
       if(!w){const fn=op.nombre.toLowerCase().replace(/_/g,' ').trim();w=WORKERS.find(x=>`${x.nombre} ${x.apellidos}`.toLowerCase().trim()===fn||fn.includes(x.nombre.toLowerCase()));}
       if(!w){const ni=Math.max(0,...WORKERS.map(x=>x.id))+1;const np=op.nombre.replace(/_/g,' ').split(' ');w={id:ni,nombre:np[0]||op.nombre,apellidos:np.slice(1).join(' ')||'',dni:op.doc||'',nie:'',obra:'',pin:'----',status:'pending',arrival:null,dep:null,h:0,en_zona:null,dist_obra:null};WORKERS.push(w);}
-      w.status=op.activo?'in':'out';
+      w.status=(op.activo===true&&op.tipo==='entrada')?'in':(op.tipo==='salida'?'out':'pending');
       if(op.tipo==='entrada'){w.arrival=op.hora;w.dep=null;if(op.hora){const[eh,em]=op.hora.split(':').map(Number);const now=new Date();const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);w.h=mins>0?(mins/60).toFixed(1):0;}}
       else if(op.tipo==='salida'){w.dep=op.hora;const at=op.hora_entrada||w.arrival;if(at&&op.hora){const[eh,em]=at.split(':').map(Number);const[sh,sm]=op.hora.split(':').map(Number);const mins=(sh*60+sm)-(eh*60+em);w.h=mins>0?(mins/60).toFixed(1):0;}}
       if(op.ciudad) w.ciudad_gps=op.ciudad+(op.provincia?', '+op.provincia:'');
@@ -603,7 +603,7 @@ function saveWorker(){
   if(pin.length!==4||isNaN(pin)){showToast('PIN debe tener 4 dígitos','err');return;}
   const pinDup=WORKERS.find(w=>w.pin===pin&&w.id!=id);
   if(pinDup){showToast('PIN '+pin+' ya asignado a '+pinDup.nombre,'err');return;}
-  if(id){const w=WORKERS.find(w=>w.id==id);if(w){Object.assign(w,{nombre,apellidos,dni,nie,tel,obra,pin,status});fbSyncWorker(w);}showToast('✅ Actualizado','ok');}
+  if(id){const w=WORKERS.find(w=>w.id==id);if(w){const pinChanged=w.pin!==pin;Object.assign(w,{nombre,apellidos,dni,nie,tel,obra,pin,status});fbSyncWorker(w,pinChanged);if(pinChanged)showToast('🔐 PIN cambiado — el operario deberá crear uno nuevo','inf');}showToast('✅ Actualizado','ok');}
   else{const ni=Math.max(0,...WORKERS.map(w=>w.id))+1;const nw={id:ni,nombre,apellidos,dni,nie,tel,obra,pin,status,arrival:null,dep:null,h:0,en_zona:null,dist_obra:null};WORKERS.push(nw);lastWorkerAdded=nw;fbSyncWorker(nw);const wp=document.getElementById('wa-preview');if(wp)wp.textContent=generarMsgWA(nw);document.getElementById('wa-generado').style.display='block';showToast('✅ '+nombre+' dado de alta','ok');animKPI('kv-total',WORKERS.length);}
   saveW();resetForm();renderGestionList();renderPinTable();renderWorkers();updateTaskSelect();
 }
