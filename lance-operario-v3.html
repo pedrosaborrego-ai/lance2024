@@ -387,7 +387,27 @@ function showRGPD(){
   document.getElementById('s-rgpd').style.direction=lang==='ar'?'rtl':'ltr';
   document.getElementById('s-rgpd').style.display='flex';
 }
-function acceptRGPD(){localStorage.setItem('lance_rgpd_accepted','1');document.getElementById('s-rgpd').style.display='none';requestGPSPermission();}
+function acceptRGPD(){
+  localStorage.setItem('lance_rgpd_accepted','1');
+  document.getElementById('s-rgpd').style.display='none';
+  // ✅ Guardar consentimiento en Firebase si ya tenemos el DNI
+  if(workerDoc){
+    const consentData={
+      doc: workerDoc,
+      nombre: workerName||'',
+      fecha: new Date().toISOString().split('T')[0],
+      hora: new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
+      timestamp: Date.now(),
+      idioma: lang,
+      rgpd_aceptado: true,
+      gps_aceptado: true,
+      ip_aprox: '',
+      version: '1.0'
+    };
+    fetch(`${FB_URL}/consentimientos/${workerDoc}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(consentData)}).catch(()=>{});
+  }
+  requestGPSPermission();
+}
 function rejectRGPD(){const r=RGPD_TX[lang]||RGPD_TX.es;const msg=document.getElementById('rgpd-reject-msg');msg.textContent=r.reject_msg;msg.style.display='block';}
 function requestGPSPermission(){
   if(!navigator.geolocation){showScreen('s-lang');return;}
@@ -458,6 +478,11 @@ function verifyDoc(){
       workerPin=data.pin; workerObra=data.obra||'';
       if(msg)msg.textContent='';
       showToast(`✅ Identificado: ${data.nombre}`,'ok');
+      // Si ya aceptó RGPD antes de identificarse, guardar consentimiento ahora
+      if(localStorage.getItem('lance_rgpd_accepted')==='1'){
+        const cd={doc:key,nombre:data.nombre+(data.apellidos?' '+data.apellidos:''),fecha:new Date().toISOString().split('T')[0],hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),timestamp:Date.now(),idioma:lang,rgpd_aceptado:true,gps_aceptado:true,version:'1.0'};
+        fetch(`${FB_URL}/consentimientos/${key}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(cd)}).catch(()=>{});
+      }
       const savedPin=localStorage.getItem('pin_'+key);
       // ✅ BUG2 FIX: si la consola cambió el PIN de empresa, borrar PIN local
       if(savedPin&&data.pin_reset===true){
