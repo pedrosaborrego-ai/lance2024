@@ -361,12 +361,168 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
 const FB_URL = 'https://lance-a99b4-default-rtdb.europe-west1.firebasedatabase.app';
 
 const RGPD_TX = {
-  es:{title:'Protección de datos',subtitle:'Antes de continuar necesitamos tu consentimiento',gps:'Esta app necesita acceso a tu ubicación GPS para registrar que estás en la zona de obra al fichar.',btn:'✅ Acepto y continuar',reject:'No acepto',reject_msg:'Sin aceptar la protección de datos no puedes usar la app.',text:`INFORMACIÓN SOBRE PROTECCIÓN DE DATOS (RGPD)\n\nResponsable: Construcciones Lance 2024 SL\nContacto: pedrosaborrego@gmail.com\n\nDATOS QUE RECOGEMOS:\n• Tu nombre y DNI/NIE\n• Hora de entrada y salida\n• Ubicación GPS al fichar\n\nTUS DERECHOS:\npedrosaborrego@gmail.com\n\nDatos en servidores europeos (Firebase, Bélgica).`},
-  ca:{title:'Protecció de dades',subtitle:'Abans de continuar necessitem el teu consentiment',gps:"Aquesta app necessita accés a la teva ubicació GPS.",btn:'✅ Accepto i continuar',reject:'No accepto',reject_msg:"Sense acceptar no pots usar l'app.",text:`INFORMACIÓ PROTECCIÓ DE DADES\n\nResponsable: Construccions Lance 2024 SL\nContacte: pedrosaborrego@gmail.com`},
-  ro:{title:'Protecția datelor',subtitle:'Înainte de a continua avem nevoie de consimțământul tău',gps:'Aplicația necesită acces la locația GPS.',btn:'✅ Accept și continuă',reject:'Nu accept',reject_msg:'Fără acceptare nu poți folosi aplicația.',text:`PROTECȚIA DATELOR\n\nResponsabil: Construcciones Lance 2024 SL`},
-  ar:{title:'حماية البيانات',subtitle:'قبل المتابعة نحتاج إلى موافقتك',gps:'يحتاج التطبيق إلى GPS.',btn:'✅ أوافق وأكمل',reject:'لا أوافق',reject_msg:'لا يمكنك الاستخدام بدون موافقة.',text:`حماية البيانات\n\nالمسؤول: Construcciones Lance 2024 SL`},
-  fr:{title:'Protection des données',subtitle:'Avant de continuer nous avons besoin de ton consentement',gps:"L'app a besoin de ta localisation GPS.",btn:"✅ J'accepte et continuer",reject:"Je n'accepte pas",reject_msg:'Sans accepter tu ne peux pas utiliser l\'app.',text:`PROTECTION DES DONNÉES\n\nResponsable: Construcciones Lance 2024 SL`},
-  en:{title:'Data Protection',subtitle:'Before continuing we need your consent',gps:'This app needs GPS location access.',btn:'✅ I accept and continue',reject:'I do not accept',reject_msg:'You cannot use the app without accepting.',text:`DATA PROTECTION\n\nController: Construcciones Lance 2024 SL`}
+  es:{
+    title:'Protección de datos',
+    subtitle:'Lee y acepta antes de continuar',
+    btn:'✅ Acepto y continuar',
+    reject:'No acepto',
+    reject_msg:'Sin aceptar no puedes usar la app. Habla con el encargado.',
+    gps:'Esta app accede a tu ubicación GPS SOLO en el momento de fichar. Nunca en segundo plano.',
+    text:`INFORMACIÓN SOBRE PROTECCIÓN DE DATOS (RGPD)
+
+Responsable: Construcciones Lance 2024 SL
+Contacto: luis@construccioneslance.com
+
+DATOS QUE RECOGEMOS:
+• Tu nombre y DNI/NIE (identificación)
+• Hora de entrada y salida (control de presencia)
+• Ubicación GPS al fichar (latitud, longitud, ciudad)
+
+PARA QUÉ LOS USAMOS:
+• Control de asistencia y presencia en obra
+• Cálculo de horas trabajadas
+• Cumplimiento de normativa laboral
+
+TUS DERECHOS:
+Puedes solicitar acceso, rectificación o supresión de tus datos contactando en: luis@construccioneslance.com
+
+Los datos se almacenan en servidores europeos (Firebase, Bélgica) y no se ceden a terceros.`
+  },
+  ca:{
+    title:'Protecció de dades',
+    subtitle:'Llegeix i accepta abans de continuar',
+    btn:'✅ Accepto i continuar',
+    reject:'No accepto',
+    reject_msg:"Sense acceptar no pots usar l'app. Parla amb l'encarregat.",
+    gps:"Aquesta app accedeix al teu GPS NOMÉS en el moment de fitxar. Mai en segon pla.",
+    text:`INFORMACIÓ SOBRE PROTECCIÓ DE DADES (RGPD)
+
+Responsable: Construccions Lance 2024 SL
+Contacte: luis@construccioneslance.com
+
+DADES QUE RECOLLIM:
+• El teu nom i DNI/NIE (identificació)
+• Hora d'entrada i sortida (control de presència)
+• Ubicació GPS en fitxar (latitud, longitud, ciutat)
+
+PER A QUÈ ELS FEM SERVIR:
+• Control d'assistència i presència a l'obra
+• Càlcul d'hores treballades
+• Compliment de la normativa laboral
+
+ELS TEUS DRETS:
+Pots sol·licitar accés, rectificació o supressió de les teves dades a: luis@construccioneslance.com
+
+Les dades s'emmagatzemen a servidors europeus (Firebase, Bèlgica) i no es cedeixen a tercers.`
+  },
+  ro:{
+    title:'Protecția datelor',
+    subtitle:'Citește și acceptă înainte de a continua',
+    btn:'✅ Accept și continuă',
+    reject:'Nu accept',
+    reject_msg:'Fără acceptare nu poți folosi aplicația. Vorbește cu responsabilul.',
+    gps:'Această aplicație accesează GPS-ul TĂU DOAR în momentul pontajului. Niciodată în fundal.',
+    text:`INFORMAȚII PRIVIND PROTECȚIA DATELOR (GDPR)
+
+Responsabil: Construcciones Lance 2024 SL
+Contact: luis@construccioneslance.com
+
+DATE PE CARE LE COLECTĂM:
+• Numele și CNP/ID (identificare)
+• Ora de intrare și ieșire (control prezență)
+• Locație GPS la pontaj (latitudine, longitudine, oraș)
+
+SCOPUL COLECTĂRII:
+• Control prezență pe șantier
+• Calculul orelor lucrate
+• Conformitate cu legislația muncii
+
+DREPTURILE TALE:
+Poți solicita acces, rectificare sau ștergerea datelor la: luis@construccioneslance.com
+
+Datele sunt stocate pe servere europene (Firebase, Belgia) și nu sunt transmise terților.`
+  },
+  ar:{
+    title:'حماية البيانات',
+    subtitle:'اقرأ وافق قبل المتابعة',
+    btn:'✅ أوافق وأكمل',
+    reject:'لا أوافق',
+    reject_msg:'لا يمكنك استخدام التطبيق بدون موافقة. تحدث مع المسؤول.',
+    gps:'يصل هذا التطبيق إلى موقعك فقط لحظة تسجيل الحضور. لا يعمل في الخلفية أبداً.',
+    text:`معلومات حماية البيانات (RGPD)
+
+المسؤول: Construcciones Lance 2024 SL
+البريد الإلكتروني: luis@construccioneslance.com
+
+البيانات التي نجمعها:
+• اسمك ورقم هويتك (التعريف)
+• وقت الدخول والخروج (مراقبة الحضور)
+• موقع GPS عند التسجيل (خط العرض والطول والمدينة)
+
+الغرض من الجمع:
+• مراقبة الحضور في موقع العمل
+• حساب ساعات العمل
+• الامتثال لقانون العمل
+
+حقوقك:
+يمكنك طلب الوصول أو التصحيح أو الحذف على: luis@construccioneslance.com
+
+يتم تخزين البيانات على خوادم أوروبية (Firebase، بلجيكا) ولا تُشارك مع أطراف ثالثة.`
+  },
+  fr:{
+    title:'Protection des données',
+    subtitle:'Lis et accepte avant de continuer',
+    btn:"✅ J'accepte et continuer",
+    reject:"Je n'accepte pas",
+    reject_msg:"Sans accepter tu ne peux pas utiliser l'app. Parle au responsable.",
+    gps:"Cette app accède à ta localisation GPS UNIQUEMENT au moment du pointage. Jamais en arrière-plan.",
+    text:`INFORMATIONS SUR LA PROTECTION DES DONNÉES (RGPD)
+
+Responsable: Construcciones Lance 2024 SL
+Contact: luis@construccioneslance.com
+
+DONNÉES QUE NOUS COLLECTONS:
+• Ton nom et DNI/NIE (identification)
+• Heure d'entrée et de sortie (contrôle présence)
+• Localisation GPS au pointage (latitude, longitude, ville)
+
+POURQUOI NOUS LES UTILISONS:
+• Contrôle présence sur chantier
+• Calcul des heures travaillées
+• Conformité à la législation du travail
+
+TES DROITS:
+Tu peux demander l'accès, la rectification ou la suppression de tes données à: luis@construccioneslance.com
+
+Les données sont stockées sur des serveurs européens (Firebase, Belgique) et ne sont pas partagées.`
+  },
+  en:{
+    title:'Data Protection',
+    subtitle:'Read and accept before continuing',
+    btn:'✅ I accept and continue',
+    reject:'I do not accept',
+    reject_msg:'You cannot use the app without accepting. Talk to the supervisor.',
+    gps:'This app accesses your GPS location ONLY when clocking in. Never in the background.',
+    text:`DATA PROTECTION INFORMATION (GDPR)
+
+Controller: Construcciones Lance 2024 SL
+Contact: luis@construccioneslance.com
+
+DATA WE COLLECT:
+• Your name and ID number (identification)
+• Clock-in and clock-out time (attendance control)
+• GPS location when clocking (latitude, longitude, city)
+
+WHY WE USE THEM:
+• Attendance control on site
+• Calculation of hours worked
+• Compliance with labour regulations
+
+YOUR RIGHTS:
+You can request access, rectification or deletion of your data at: luis@construccioneslance.com
+
+Data is stored on European servers (Firebase, Belgium) and is not shared with third parties.`
+  }
 };
 
 function initWelcome(){
@@ -375,7 +531,7 @@ function initWelcome(){
   else{document.getElementById('s-welcome').style.display='flex';}
 }
 function startApp(){localStorage.setItem('lance_welcomed','1');document.getElementById('s-welcome').style.display='none';checkRGPD();}
-function checkRGPD(){if(localStorage.getItem('lance_rgpd_accepted')==='1'){showScreen('s-lang');}else{showRGPD();}}
+function checkRGPD(){showScreen('s-lang');}
 function showRGPD(){
   const r=RGPD_TX[lang]||RGPD_TX.es;
   document.getElementById('rgpd-title').textContent=r.title;
@@ -386,27 +542,22 @@ function showRGPD(){
   document.getElementById('rgpd-text').innerHTML=r.text.replace(/\n/g,'<br>');
   document.getElementById('s-rgpd').style.direction=lang==='ar'?'rtl':'ltr';
   document.getElementById('s-rgpd').style.display='flex';
+  // Marcar fecha/hora de visualización
+  localStorage.setItem('lance_rgpd_fecha',new Date().toISOString().split('T')[0]);
+  localStorage.setItem('lance_rgpd_hora',new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}));
+  localStorage.setItem('lance_rgpd_lang',lang);
 }
 function acceptRGPD(){
   localStorage.setItem('lance_rgpd_accepted','1');
+  localStorage.setItem('lance_rgpd_lang',lang);
+  localStorage.setItem('lance_rgpd_fecha',new Date().toISOString().split('T')[0]);
+  localStorage.setItem('lance_rgpd_hora',new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}));
   document.getElementById('s-rgpd').style.display='none';
-  // ✅ Guardar consentimiento en Firebase si ya tenemos el DNI
-  if(workerDoc){
-    const consentData={
-      doc: workerDoc,
-      nombre: workerName||'',
-      fecha: new Date().toISOString().split('T')[0],
-      hora: new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
-      timestamp: Date.now(),
-      idioma: lang,
-      rgpd_aceptado: true,
-      gps_aceptado: true,
-      ip_aprox: '',
-      version: '1.0'
-    };
-    fetch(`${FB_URL}/consentimientos/${workerDoc}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(consentData)}).catch(()=>{});
+  // Pedir GPS y luego ir a DNI
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(()=>{},()=>{},{enableHighAccuracy:true,timeout:5000,maximumAge:0});
   }
-  requestGPSPermission();
+  goTo('s-name');
 }
 function rejectRGPD(){const r=RGPD_TX[lang]||RGPD_TX.es;const msg=document.getElementById('rgpd-reject-msg');msg.textContent=r.reject_msg;msg.style.display='block';}
 function requestGPSPermission(){
@@ -478,11 +629,22 @@ function verifyDoc(){
       workerPin=data.pin; workerObra=data.obra||'';
       if(msg)msg.textContent='';
       showToast(`✅ Identificado: ${data.nombre}`,'ok');
-      // Si ya aceptó RGPD antes de identificarse, guardar consentimiento ahora
-      if(localStorage.getItem('lance_rgpd_accepted')==='1'){
-        const cd={doc:key,nombre:data.nombre+(data.apellidos?' '+data.apellidos:''),fecha:new Date().toISOString().split('T')[0],hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),timestamp:Date.now(),idioma:lang,rgpd_aceptado:true,gps_aceptado:true,version:'1.0'};
-        fetch(`${FB_URL}/consentimientos/${key}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(cd)}).catch(()=>{});
-      }
+      // ✅ Guardar consentimiento con nombre+DNI ahora que los tenemos
+      const consentFecha=localStorage.getItem('lance_rgpd_fecha')||new Date().toISOString().split('T')[0];
+      const consentHora=localStorage.getItem('lance_rgpd_hora')||new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      const consentLang=localStorage.getItem('lance_rgpd_lang')||lang;
+      const consentData={
+        doc:key,
+        nombre:data.nombre+(data.apellidos?' '+data.apellidos:''),
+        fecha:consentFecha,
+        hora:consentHora,
+        timestamp:Date.now(),
+        idioma:consentLang,
+        rgpd_aceptado:true,
+        gps_aceptado:true,
+        version:'1.0'
+      };
+      fetch(`${FB_URL}/consentimientos/${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(consentData)}).catch(()=>{});
       const savedPin=localStorage.getItem('pin_'+key);
       // ✅ BUG2 FIX: si la consola cambió el PIN de empresa, borrar PIN local
       if(savedPin&&data.pin_reset===true){
