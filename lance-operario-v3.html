@@ -273,7 +273,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
     <div class="si-dot done"></div><div class="si-dot active"></div>
   </div>
   <div class="setup-title" id="pin-title">Tu PIN de acceso</div>
+  <div id="pin-worker-name" style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:var(--blue2);margin-bottom:6px;text-align:center;"></div>
   <div class="setup-hint" id="pin-hint" style="margin-bottom:0">Introduce tus 4 dígitos</div>
+  <button onclick="cambiarOperario()" style="margin-top:8px;background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;">↩ No soy yo — cambiar operario</button>
   <div class="pin-dots">
     <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
     <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
@@ -399,7 +401,43 @@ function initWelcome(){
   else{document.getElementById('s-welcome').style.display='flex';}
 }
 function startApp(){localStorage.setItem('lance_welcomed','1');document.getElementById('s-welcome').style.display='none';checkRGPD();}
-function checkRGPD(){if(localStorage.getItem('lance_rgpd_accepted')==='1'){showScreen('s-lang');}else{showRGPD();}}
+function checkRGPD(){
+  const savedDoc=localStorage.getItem('lance_doc_saved');
+  const savedName=localStorage.getItem('lance_name_saved');
+  const rgpdOk=localStorage.getItem('lance_rgpd_accepted')==='1';
+  // Si tiene DNI guardado y RGPD aceptado → ir directo al PIN
+  if(savedDoc&&savedName&&rgpdOk){
+    workerDoc=savedDoc;
+    workerName=savedName;
+    fetch(`${FB_URL}/operarios_registro/${savedDoc}.json`)
+      .then(r=>r.json())
+      .then(data=>{
+        if(!data||!data.nombre){
+          localStorage.removeItem('lance_doc_saved');
+          localStorage.removeItem('lance_name_saved');
+          showScreen('s-lang');return;
+        }
+        workerPin=data.pin;workerObra=data.obra||'';
+        const savedPin=localStorage.getItem('pin_'+savedDoc);
+        if(savedPin&&data.pin_reset===true){
+          localStorage.removeItem('pin_'+savedDoc);
+          setupVerifyCompanyPin();showScreen('s-pin');
+        } else if(savedPin){
+          myPin=savedPin;setupLoginPin();showScreen('s-pin');
+        } else {
+          setupVerifyCompanyPin();showScreen('s-pin');
+        }
+      }).catch(()=>{
+        const savedPin=localStorage.getItem('pin_'+savedDoc);
+        if(savedPin){myPin=savedPin;setupLoginPin();showScreen('s-pin');}
+        else{showScreen('s-lang');}
+      });
+  } else if(rgpdOk){
+    showScreen('s-lang');
+  } else {
+    showRGPD();
+  }
+}
 function showRGPD(){
   const r=RGPD_TX[lang]||RGPD_TX.es;
   document.getElementById('rgpd-title').textContent=r.title;
@@ -503,6 +541,9 @@ function verifyDoc(){
       if(!data||!data.nombre){if(msg)msg.textContent='❌ DNI/NIE no registrado. Contacta con el encargado.';return;}
       workerDoc=key; workerName=data.nombre+(data.apellidos?' '+data.apellidos:'');
       workerPin=data.pin; workerObra=data.obra||'';
+      // Guardar DNI para no pedirlo la próxima vez
+      localStorage.setItem('lance_doc_saved', key);
+      localStorage.setItem('lance_name_saved', workerName);
       if(msg)msg.textContent='';
       showToast(`✅ Identificado: ${data.nombre}`,'ok');
       // ✅ Guardar consentimiento
@@ -546,11 +587,22 @@ function spp(d){
 function sppDel(){setPinVal=setPinVal.slice(0,-1);updateSetDots();}
 function updateSetDots(){for(let i=0;i<4;i++)document.getElementById('sp'+i).classList.toggle('on',i<setPinVal.length);}
 
+function cambiarOperario(){
+  // Borrar DNI guardado y volver a pedir
+  localStorage.removeItem('lance_doc_saved');
+  localStorage.removeItem('lance_name_saved');
+  workerDoc='';workerName='';myPin='';
+  showScreen('s-lang');
+}
+
 function setupLoginPin(){
   pinVal='';
   for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.remove('on');
   document.getElementById('pin-title').textContent=t('pin_title');
   document.getElementById('pin-hint').textContent=t('pin_hint');
+  // Mostrar nombre del operario en PIN screen
+  const pnEl=document.getElementById('pin-worker-name');
+  if(pnEl)pnEl.textContent='👷 '+workerName.split(' ').slice(0,2).join(' ');
   document.getElementById('pin-err').textContent='';
 }
 function pk(d){
@@ -827,12 +879,14 @@ _construcciones LANCE 2024 SL_`);
 }
 
 function logout(){
-  isIn=false;pinVal='';workerName='';workerDoc='';myPin='';setPinVal='';
+  isIn=false;pinVal='';myPin='';setPinVal='';
   myLat=null;myLng=null;workerObraLat=null;workerObraLng=null;
   window._enZona=null;window._distObra=null;
   document.getElementById('checkin-btn').classList.remove('in');
   document.getElementById('checkin-status').textContent='';
-  goTo('s-lang');
+  // NO borramos workerDoc ni lance_doc_saved — el DNI se recuerda
+  // Volver al PIN directamente
+  checkRGPD();
 }
 
 window.addEventListener('load',()=>{
