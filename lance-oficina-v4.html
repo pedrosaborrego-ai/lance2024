@@ -267,6 +267,10 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
         WhatsApp
       </div>
       <div class="sb-lbl">Administración</div>
+      <div class="nav-item" onclick="showPage('obras')" id="ni-obras">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="8" width="6" height="7" rx="1"/><rect x="9" y="4" width="6" height="11" rx="1"/><path d="M4 8V5l4-4 4 4v1"/></svg>
+        Obras
+      </div>
       <div class="nav-item" onclick="showPage('gestion')" id="ni-gestion">
         <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="6" cy="4" r="2.5"/><path d="M1 13c0-2.5 2.2-4.5 5-4.5"/><path d="M10 9v4m-2-2h4"/></svg>
         Alta de operarios
@@ -467,6 +471,62 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
       </div>
     </div>
 
+    <!-- OBRAS -->
+    <div class="page" id="page-obras">
+      <div class="row-2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title" id="obra-form-title">🏗️ Nueva obra</div>
+            <button onclick="resetObraForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">✕ Limpiar</button>
+          </div>
+          <div class="card-body">
+            <input type="hidden" id="obra-edit-id">
+            <div class="form-g">
+              <label class="form-lbl">Nombre de la obra</label>
+              <input class="form-ctrl" id="obra-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Nave Industrial Almacelles">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">Cliente / Empresa</label>
+              <input class="form-ctrl" id="obra-cliente" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Excavaciones Barroso SL">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">Dirección completa</label>
+              <div style="display:flex;gap:6px;">
+                <input class="form-ctrl" id="obra-direccion" type="text" placeholder="Ej: Polígon Industrial, Carrer A, 25100 Almacelles" style="flex:1;">
+                <button type="button" onclick="geocodificarObraForm()" id="btn-geo-obra" style="padding:10px 8px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:11px;white-space:nowrap;">📍 Zona</button>
+              </div>
+              <div id="geo-obra-result" style="font-size:10px;color:var(--green);margin-top:4px;display:none;"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-g">
+                <label class="form-lbl">Radio zona (metros)</label>
+                <input class="form-ctrl" id="obra-radio" type="number" value="500" min="100" max="2000" placeholder="500">
+              </div>
+              <div class="form-g">
+                <label class="form-lbl">Estado</label>
+                <select class="form-ctrl" id="obra-estado">
+                  <option value="activa">🟢 Activa</option>
+                  <option value="pausada">🟡 Pausada</option>
+                  <option value="terminada">🔴 Terminada</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="saveObra()" id="obra-btn">+ Crear obra</button>
+            <button class="btn-secondary" onclick="resetObraForm()">Cancelar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">🏗️ Obras registradas</div>
+            <span id="obras-count" style="font-size:10px;color:var(--text3)"></span>
+          </div>
+          <div id="obras-list" style="max-height:600px;overflow-y:auto;">
+            <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin obras registradas aún.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ALTA OPERARIOS -->
     <div class="page" id="page-gestion">
       <div class="row-3">
@@ -484,7 +544,14 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
             </div>
             <div class="form-row">
               <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
-              <div class="form-g"><label class="form-lbl">Obra asignada</label><input class="form-ctrl" id="g-obra" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Calle Major 45, 25001 Lleida"></div>
+              <div class="form-g">
+                <label class="form-lbl">Obra asignada</label>
+                <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
+                  <option value="">— Sin obra asignada —</option>
+                </select>
+                <input type="hidden" id="g-obra">
+                <div id="g-obra-info" style="font-size:10px;color:var(--blue2);margin-top:4px;display:none;"></div>
+              </div>
             </div>
             <div class="form-g">
                 <label class="form-lbl">🌍 Idioma del operario</label>
@@ -740,7 +807,7 @@ function tick(){const n=new Date();document.getElementById('clock').textContent=
 setInterval(tick,1000);tick();
 
 // ── PÁGINAS ──
-const TITLES={dashboard:'Tablero',jornada:'Resumen de jornada',operarios:'Operarios',alertas:'Alertas',extras:'Horas extras',horas:'Horas trabajadas',tareas:'Tareas',whatsapp:'WhatsApp',gestion:'Alta de operarios',asistente:'Asistente IA',consentimientos:'Consentimientos RGPD'};
+const TITLES={dashboard:'Tablero',jornada:'Resumen de jornada',operarios:'Operarios',alertas:'Alertas',extras:'Horas extras',horas:'Horas trabajadas',tareas:'Tareas',whatsapp:'WhatsApp',gestion:'Alta de operarios',asistente:'Asistente IA',consentimientos:'Consentimientos RGPD',obras:'Obras'};
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -751,9 +818,11 @@ function showPage(name){
   if(name==='jornada')renderJornada();
   if(name==='horas')renderHours();
   if(name==='tareas')renderTaskLog();
-  if(name==='gestion'){renderGestionList();renderPinTable();updateExtraSelect();}
+  if(name==='gestion'){renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
   if(name==='extras')updateExtraSelect();
   if(name==='consentimientos')cargarConsentimientos();
+  if(name==='obras'){cargarObras();renderObrasList();}
+  if(name==='gestion'){renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
   if(name==='jornada'){renderJornada();mostrarFichajeManual&&document.getElementById('fichaje-manual-panel')&&(document.getElementById('fichaje-manual-panel').style.display='none');}
 }
 
@@ -769,6 +838,7 @@ function initApp(){
     WORKERS.forEach(w=>{const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();sel.innerHTML+=`<option value="${doc}">${w.nombre} ${w.apellidos}</option>`;});
     document.getElementById('jornada-date').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long'});
     startFirebaseListener();
+    cargarObras();
   },1500);
 }
 
@@ -1422,6 +1492,195 @@ function borrarTodasTareas(){
   fetch(`${FB_URL}/tareas.json`,{method:'DELETE'})
     .then(()=>{showToast('✅ Tareas eliminadas','ok');renderTaskLog();})
     .catch(()=>showToast('⚠️ Error','err'));
+}
+
+// ══════════════════════════════════════
+// GESTOR DE OBRAS
+// ══════════════════════════════════════
+let OBRAS = [];
+let _obraFormLat = null, _obraFormLng = null;
+
+function cargarObras(){
+  fetch(`${FB_URL}/obras.json`).then(r=>r.json()).then(data=>{
+    if(!data){OBRAS=[];renderObrasList();return;}
+    OBRAS=Object.entries(data).map(([id,o])=>({id,...o}));
+    OBRAS.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
+    renderObrasList();
+    updateObrasSelect();
+    showToast(`✅ ${OBRAS.length} obras cargadas`,'ok');
+  }).catch(()=>{OBRAS=[];renderObrasList();});
+}
+
+function renderObrasList(){
+  const list=document.getElementById('obras-list');
+  const cnt=document.getElementById('obras-count');
+  if(!list)return;
+  const activas=OBRAS.filter(o=>o.estado!=='terminada');
+  if(cnt)cnt.textContent=OBRAS.length+' obras';
+  if(!OBRAS.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin obras. Crea la primera.</div>';return;}
+  const colEstado={'activa':'p-in','pausada':'p-pend','terminada':'p-out'};
+  const txtEstado={'activa':'🟢 Activa','pausada':'🟡 Pausada','terminada':'🔴 Terminada'};
+  list.innerHTML=OBRAS.map(o=>`
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div>
+          <div style="font-weight:700;font-size:13px;color:var(--text)">${o.nombre||'Sin nombre'}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:1px;">${o.cliente||'—'}</div>
+        </div>
+        <span class="pill ${colEstado[o.estado]||'p-pend'}">${txtEstado[o.estado]||o.estado}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;">📍 ${o.direccion||'—'}</div>
+      ${o.lat?`<div style="font-size:10px;color:var(--green);margin-bottom:8px;">✅ Zona geocodificada · Radio ${o.radio||500}m</div>`:`<div style="font-size:10px;color:var(--amber);margin-bottom:8px;">⚠️ Sin zona GPS — pulsa 📍 Zona al editar</div>`}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn-edit" onclick="editObra('${o.id}')">✏️ Editar</button>
+        <button onclick="asignarObraRapida('${o.id}')" style="padding:6px 10px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;">👷 Asignar a operario</button>
+        <button class="btn-danger" onclick="deleteObra('${o.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateObrasSelect(){
+  const sel=document.getElementById('g-obra-select');
+  if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">— Sin obra asignada —</option>';
+  OBRAS.filter(o=>o.estado!=='terminada').forEach(o=>{
+    sel.innerHTML+=`<option value="${o.id}">${o.nombre}${o.cliente?' · '+o.cliente:''}</option>`;
+  });
+  if(current)sel.value=current;
+}
+
+function seleccionarObraEnAlta(){
+  const sel=document.getElementById('g-obra-select');
+  const obraId=sel.value;
+  const info=document.getElementById('g-obra-info');
+  const obraHidden=document.getElementById('g-obra');
+  if(!obraId){
+    if(info)info.style.display='none';
+    if(obraHidden)obraHidden.value='';
+    _obraLat=null;_obraLng=null;
+    return;
+  }
+  const obra=OBRAS.find(o=>o.id===obraId);
+  if(!obra)return;
+  if(obraHidden)obraHidden.value=obra.direccion||obra.nombre||'';
+  if(obra.lat&&obra.lng){_obraLat=obra.lat;_obraLng=obra.lng;}
+  if(info){
+    info.textContent=`📍 ${obra.direccion||''}${obra.lat?' · Zona ✅':' · ⚠️ Sin zona GPS'}`;
+    info.style.display='block';
+  }
+}
+
+function geocodificarObraForm(){
+  const dir=document.getElementById('obra-direccion')?.value.trim();
+  if(!dir){showToast('Escribe la dirección primero','err');return;}
+  const btn=document.getElementById('btn-geo-obra');
+  const res=document.getElementById('geo-obra-result');
+  if(btn)btn.textContent='⏳...';
+  fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(dir+', España')+'&format=json&limit=1')
+    .then(r=>r.json()).then(data=>{
+      if(data&&data[0]){
+        _obraFormLat=parseFloat(data[0].lat);
+        _obraFormLng=parseFloat(data[0].lon);
+        if(btn)btn.textContent='✅ OK';
+        if(res){res.textContent='📍 '+_obraFormLat.toFixed(4)+', '+_obraFormLng.toFixed(4);res.style.display='block';}
+        showToast('✅ Zona geocodificada','ok');
+      } else {
+        if(btn)btn.textContent='❌';
+        showToast('⚠️ Dirección no encontrada','err');
+      }
+    }).catch(()=>{if(btn)btn.textContent='📍 Zona';showToast('⚠️ Error','err');});
+}
+
+function saveObra(){
+  const nombre=document.getElementById('obra-nombre')?.value.trim();
+  const cliente=document.getElementById('obra-cliente')?.value.trim();
+  const direccion=document.getElementById('obra-direccion')?.value.trim();
+  const radio=parseInt(document.getElementById('obra-radio')?.value)||500;
+  const estado=document.getElementById('obra-estado')?.value||'activa';
+  const editId=document.getElementById('obra-edit-id')?.value;
+  if(!nombre){showToast('Escribe el nombre de la obra','err');return;}
+  const obraData={nombre,cliente:cliente||'',direccion:direccion||'',radio,estado,
+    lat:_obraFormLat||null,lng:_obraFormLng||null,
+    fecha:new Date().toISOString().split('T')[0]};
+  const key=editId||'obra_'+Date.now();
+  fetch(`${FB_URL}/obras/${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(obraData)})
+    .then(()=>{
+      showToast(`✅ Obra "${nombre}" guardada`,'ok');
+      resetObraForm();
+      cargarObras();
+    }).catch(()=>showToast('⚠️ Error al guardar','err'));
+}
+
+function editObra(id){
+  const o=OBRAS.find(o=>o.id===id);if(!o)return;
+  document.getElementById('obra-edit-id').value=id;
+  document.getElementById('obra-nombre').value=o.nombre||'';
+  document.getElementById('obra-cliente').value=o.cliente||'';
+  document.getElementById('obra-direccion').value=o.direccion||'';
+  document.getElementById('obra-radio').value=o.radio||500;
+  document.getElementById('obra-estado').value=o.estado||'activa';
+  document.getElementById('obra-form-title').textContent='✏️ Editar obra';
+  document.getElementById('obra-btn').textContent='💾 Guardar cambios';
+  _obraFormLat=o.lat||null;_obraFormLng=o.lng||null;
+  const res=document.getElementById('geo-obra-result');
+  const btn=document.getElementById('btn-geo-obra');
+  if(o.lat&&o.lng){
+    if(res){res.textContent='📍 '+o.lat.toFixed(4)+', '+o.lng.toFixed(4);res.style.display='block';}
+    if(btn)btn.textContent='✅ OK';
+  }
+  showPage('obras');
+  window.scrollTo(0,0);
+}
+
+function deleteObra(id){
+  const o=OBRAS.find(o=>o.id===id);if(!o)return;
+  if(!confirm(`¿Eliminar obra "${o.nombre}"?`))return;
+  fetch(`${FB_URL}/obras/${id}.json`,{method:'DELETE'})
+    .then(()=>{showToast(`✅ Obra eliminada`,'ok');cargarObras();})
+    .catch(()=>showToast('⚠️ Error','err'));
+}
+
+function resetObraForm(){
+  document.getElementById('obra-edit-id').value='';
+  ['obra-nombre','obra-cliente','obra-direccion'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('obra-radio').value=500;
+  document.getElementById('obra-estado').value='activa';
+  document.getElementById('obra-form-title').textContent='🏗️ Nueva obra';
+  document.getElementById('obra-btn').textContent='+ Crear obra';
+  const res=document.getElementById('geo-obra-result');if(res)res.style.display='none';
+  const btn=document.getElementById('btn-geo-obra');if(btn)btn.textContent='📍 Zona';
+  _obraFormLat=null;_obraFormLng=null;
+}
+
+// Asignar obra a operario directamente desde la sección Obras
+let _obraRapidaId=null;
+function asignarObraRapida(obraId){
+  const o=OBRAS.find(o=>o.id===obraId);if(!o)return;
+  _obraRapidaId=obraId;
+  // Mostrar lista de operarios para elegir
+  const nombres=WORKERS.map((w,i)=>`${i+1}. ${w.nombre} ${w.apellidos} (${w.dni||w.nie||'—'})`).join('\n');
+  const idx=prompt(`Asignar obra "${o.nombre}" a:\n\n${nombres}\n\nEscribe el número del operario:`);
+  if(!idx)return;
+  const w=WORKERS[parseInt(idx)-1];if(!w){showToast('Operario no válido','err');return;}
+  if(!confirm(`¿Asignar "${o.nombre}" a ${w.nombre} ${w.apellidos}?`))return;
+  // Actualizar operario
+  const doc=(w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  w.obra=o.direccion||o.nombre;
+  if(o.lat&&o.lng){w.obra_lat=o.lat;w.obra_lng=o.lng;}
+  fbSyncWorker(w,false);
+  // Recalcular zona en activos si tiene ubicación
+  if(w._lat&&w._lng&&o.lat&&o.lng){
+    const dist=calcDist(w._lat,w._lng,o.lat,o.lng);
+    const enZona=dist<=(o.radio||500);
+    fetch(`${FB_URL}/operarios_activos/${doc}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({en_zona:enZona,dist_obra:dist,obra_lat:o.lat,obra_lng:o.lng})}).catch(()=>{});
+    showToast(`✅ ${w.nombre} asignado a "${o.nombre}" · ${enZona?'✅ En zona':'⚠️ '+dist+'m fuera'}`,'ok');
+  } else {
+    showToast(`✅ ${w.nombre} asignado a "${o.nombre}"`,'ok');
+  }
+  saveW();renderWorkers();
 }
 
 let toastTimer;
