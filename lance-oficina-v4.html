@@ -757,6 +757,8 @@ function loadFirebaseData(){
       if(op.tipo==='entrada'){w.arrival=op.hora;w.dep=null;if(op.hora){const[eh,em]=op.hora.split(':').map(Number);const now=new Date();const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);w.h=mins>0?(mins/60).toFixed(1):0;}}
       else if(op.tipo==='salida'){w.dep=op.hora;const at=op.hora_entrada||w.arrival;if(at&&op.hora){w.arrival=at;const[eh,em]=at.split(':').map(Number);const[sh,sm]=op.hora.split(':').map(Number);const mins=(sh*60+sm)-(eh*60+em);w.h=mins>0?(mins/60).toFixed(1):0;}}
       if(op.ciudad) w.ciudad_gps=op.ciudad+(op.provincia?', '+op.provincia:'');
+      // Coordenadas para botón Google Maps
+      if(op.lat&&op.lng){w._lat=parseFloat(op.lat);w._lng=parseFloat(op.lng);}
       // ✅ ZONA DE OBRA
       if(op.en_zona!==undefined) w.en_zona=op.en_zona;
       if(op.dist_obra!==undefined) w.dist_obra=op.dist_obra;
