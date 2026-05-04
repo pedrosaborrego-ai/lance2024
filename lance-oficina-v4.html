@@ -267,10 +267,6 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
         WhatsApp
       </div>
       <div class="sb-lbl">Administración</div>
-      <div class="nav-item" onclick="showPage('mapa')" id="ni-mapa">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z"/></svg>
-        Mapa
-      </div>
       <div class="nav-item" onclick="showPage('obras')" id="ni-obras">
         <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="8" width="6" height="7" rx="1"/><rect x="9" y="4" width="6" height="11" rx="1"/><path d="M4 8V5l4-4 4 4v1"/></svg>
         Obras <span style="background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:8px;margin-left:4px;font-family:'Montserrat',sans-serif;letter-spacing:1px;">NUEVO</span>
@@ -478,38 +474,6 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
       <div class="card">
         <div class="card-hdr"><div class="card-title">💬 Mensajes WhatsApp</div></div>
         <div id="wp-log"></div>
-      </div>
-    </div>
-
-    <!-- MAPA -->
-    <div class="page" id="page-mapa">
-      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
-        <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--text3);">VER:</div>
-        <button onclick="setMapaFiltro('todos')" id="mf-todos" style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;background:var(--blue2);color:#fff;border:none;font-family:'Montserrat',sans-serif;">👷 Todos</button>
-        <button onclick="setMapaFiltro('in')" id="mf-in" style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--text2);border:1px solid var(--border);font-family:'Montserrat',sans-serif;">✅ En obra</button>
-        <button onclick="setMapaFiltro('out')" id="mf-out" style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--text2);border:1px solid var(--border);font-family:'Montserrat',sans-serif;">⚠️ Fuera zona</button>
-        <button onclick="setMapaFiltro('obras')" id="mf-obras" style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--text2);border:1px solid var(--border);font-family:'Montserrat',sans-serif;">🏗️ Por obra</button>
-        <button onclick="refrescarMapa()" style="padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:var(--green-l);color:var(--green);border:1px solid rgba(22,163,74,.2);font-family:'Montserrat',sans-serif;">🔄 Actualizar</button>
-        <div id="mapa-last-update" style="font-size:10px;color:var(--text3);margin-left:auto;"></div>
-      </div>
-      <div class="row-2">
-        <div class="card" style="margin-bottom:0;">
-          <div class="card-hdr"><div class="card-title">🗺️ Ubicación en tiempo real</div><div id="mapa-status" style="font-size:10px;color:var(--green);font-weight:700;">● EN VIVO</div></div>
-          <div id="mapa-container" style="height:500px;border-radius:0 0 16px 16px;overflow:hidden;background:#e8f0e8;position:relative;">
-            <div id="mapa-loading" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:10;font-size:13px;color:var(--text3);">⏳ Cargando mapa...</div>
-            <iframe id="mapa-iframe" style="width:100%;height:100%;border:none;display:none;" allowfullscreen></iframe>
-          </div>
-        </div>
-        <div>
-          <div class="card" style="margin-bottom:12px;">
-            <div class="card-hdr"><div class="card-title">📍 Operarios en mapa</div><span id="mapa-op-count" style="font-size:10px;color:var(--text3)"></span></div>
-            <div id="mapa-lista" style="max-height:220px;overflow-y:auto;"></div>
-          </div>
-          <div class="card">
-            <div class="card-hdr"><div class="card-title">🏗️ Obras con zona</div></div>
-            <div id="mapa-obras-lista" style="max-height:220px;overflow-y:auto;"></div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -809,11 +773,7 @@ function loadFirebaseData(){
     if(document.getElementById('page-operarios').classList.contains('active'))renderWorkers();
     showFirebaseBadge(Object.keys(data).length);
     saveW();
-    // Refrescar mapa si está activo
-    if(_mapaInited&&document.getElementById('page-mapa').classList.contains('active')){
-      renderMapaLista();renderMapaObrasLista();construirUrlMapa();
-      document.getElementById('mapa-last-update').textContent='Actualizado: '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-    }
+
   }).catch(e=>console.log('Firebase read error:',e));
 }
 
@@ -866,7 +826,7 @@ function tick(){const n=new Date();document.getElementById('clock').textContent=
 setInterval(tick,1000);tick();
 
 // ── PÁGINAS ──
-const TITLES={dashboard:'Tablero',jornada:'Resumen de jornada',operarios:'Operarios',alertas:'Alertas',extras:'Horas extras',horas:'Horas trabajadas',tareas:'Tareas',whatsapp:'WhatsApp',gestion:'Alta de operarios',asistente:'Asistente IA',consentimientos:'Consentimientos RGPD',obras:'Obras',mapa:'Mapa — Ubicación en tiempo real'};
+const TITLES={dashboard:'Tablero',jornada:'Resumen de jornada',operarios:'Operarios',alertas:'Alertas',extras:'Horas extras',horas:'Horas trabajadas',tareas:'Tareas',whatsapp:'WhatsApp',gestion:'Alta de operarios',asistente:'Asistente IA',consentimientos:'Consentimientos RGPD',obras:'Obras'};
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -881,7 +841,6 @@ function showPage(name){
   if(name==='extras')updateExtraSelect();
   if(name==='consentimientos')cargarConsentimientos();
   if(name==='obras'){cargarObras();renderObrasList();}
-  if(name==='mapa'){initMapa();}
   if(name==='gestion'){renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
   if(name==='jornada'){renderJornada();mostrarFichajeManual&&document.getElementById('fichaje-manual-panel')&&(document.getElementById('fichaje-manual-panel').style.display='none');}
 }
@@ -938,7 +897,11 @@ function renderWorkers(){
   const sb={in:'<span class="pill p-in">✅ En obra</span>',out:'<span class="pill p-out">🔴 Fuera</span>',pending:'<span class="pill p-pend">⏳ Sin fichar</span>'};
   tb.innerHTML=filtered.map((w,i)=>`<tr>
     <td style="font-weight:700;color:var(--text3)">${i+1}</td>
-    <td><div class="w-name">${w.nombre} ${w.apellidos}</div><div class="w-doc">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''}</div></td>
+    <td><div class="w-name">${w.nombre} ${w.apellidos}</div><div class="w-doc">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''}</div>${w._lat&&w._lng?'<a href="https://www.google.com/maps?q='+w._lat+','+w._lng+'" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:#E8F1FB;border:1px solid #D0DDF0;border-radius:5px;font-size:9px;color:#2563AE;font-weight:700;text-decoration:none;margin-top:3px;">📍 Ver en Maps</a>':''}</td>
+
+
+
+
     <td style="font-size:11px">${w.dni||w.nie||'—'}</td>
     <td style="font-size:11px;color:var(--text3)">${w.obra||'—'}</td>
     <td><span style="font-family:'Montserrat';font-weight:800;font-size:16px;color:var(--blue2);letter-spacing:3px">${w.pin}</span></td>
@@ -1569,7 +1532,9 @@ function renderJornada(){
     if(w.status==='pending')estadoLabel='<span style="font-size:10px;color:var(--red);font-weight:600">Sin fichar</span>';
     else if(w.status==='in')estadoLabel='<span style="font-size:10px;color:var(--green);font-weight:600">En obra</span>';
     else estadoLabel='<span style="font-size:10px;color:var(--amber);font-weight:600">Salida</span>';
-    const ubicacion=w.ciudad_gps?`<div style="font-size:10px;color:var(--text3)">${w.ciudad_gps}</div>`:'';
+    const gmUrl=w._lat&&w._lng?`https://www.google.com/maps?q=${w._lat},${w._lng}`:'';
+    const gmBtn=gmUrl?`<a href="${gmUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:#E8F1FB;border:1px solid #D0DDF0;border-radius:5px;font-size:10px;color:#2563AE;font-weight:700;text-decoration:none;margin-top:3px;">📍 Maps</a>`:'';
+    const ubicacion=w.ciudad_gps?`<div style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:6px;">${w.ciudad_gps}${gmBtn}</div>`:gmBtn?`<div>${gmBtn}</div>`:'';
     return`<tr>
       <td><div style="font-weight:600">${w.nombre} ${w.apellidos}</div>${ubicacion}</td>
       <td style="font-weight:600">${w.arrival||'—'}</td>
@@ -1593,172 +1558,6 @@ function borrarTodasTareas(){
   fetch(`${FB_URL}/tareas.json`,{method:'DELETE'})
     .then(()=>{showToast('✅ Tareas eliminadas','ok');renderTaskLog();})
     .catch(()=>showToast('⚠️ Error','err'));
-}
-
-// ══════════════════════════════════════
-// MAPA EN TIEMPO REAL
-// ══════════════════════════════════════
-let _mapaFiltro='todos';
-let _mapaInited=false;
-
-function initMapa(){
-  _mapaInited=true;
-  renderMapaLista();
-  renderMapaObrasLista();
-  construirUrlMapa();
-  document.getElementById('mapa-last-update').textContent='Actualizado: '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-}
-
-function setMapaFiltro(f){
-  _mapaFiltro=f;
-  ['todos','in','out','obras'].forEach(k=>{
-    const btn=document.getElementById('mf-'+k);
-    if(!btn)return;
-    if(k===f){btn.style.background='var(--blue2)';btn.style.color='#fff';btn.style.border='none';}
-    else{btn.style.background='var(--bg)';btn.style.color='var(--text2)';btn.style.border='1px solid var(--border)';}
-  });
-  renderMapaLista();
-  construirUrlMapa();
-}
-
-function refrescarMapa(){
-  initMapa();
-  showToast('🗺️ Mapa actualizado','ok');
-}
-
-function renderMapaLista(){
-  const list=document.getElementById('mapa-lista');
-  const cnt=document.getElementById('mapa-op-count');
-  if(!list)return;
-  let ops=WORKERS.filter(w=>w._lat&&w._lng);
-  if(_mapaFiltro==='in')ops=ops.filter(w=>w.status==='in');
-  if(_mapaFiltro==='out')ops=ops.filter(w=>w.en_zona===false);
-  if(cnt)cnt.textContent=ops.length+' operarios con GPS';
-  if(!ops.length){
-    list.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px;">Sin operarios con ubicación activa.</div>';
-    return;
-  }
-  list.innerHTML=ops.map(w=>{
-    const ciudad=w.ciudad_gps||'—';
-    const zona=w.en_zona===true?'<span class="pill p-in" style="font-size:9px;">✅ En zona</span>':w.en_zona===false?'<span class="pill p-out" style="font-size:9px;">⚠️ Fuera</span>':'';
-    const estado=w.status==='in'?'🟢':w.status==='out'?'🔴':'⚪';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;" onclick="centrarMapaEnOperario(${w._lat||0},${w._lng||0})">
-      <div style="font-size:18px;">${estado}</div>
-      <div style="flex:1;">
-        <div style="font-weight:600;font-size:12px;">${w.nombre} ${w.apellidos}</div>
-        <div style="font-size:10px;color:var(--text3);">📍 ${ciudad}</div>
-      </div>
-      ${zona}
-    </div>`;
-  }).join('');
-}
-
-function renderMapaObrasLista(){
-  const list=document.getElementById('mapa-obras-lista');
-  if(!list)return;
-  if(!OBRAS.length){
-    list.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px;">Sin obras geocodificadas.</div>';
-    return;
-  }
-  const obrasGeo=OBRAS.filter(o=>o.lat&&o.lng);
-  list.innerHTML=obrasGeo.map(o=>{
-    const opsEnObra=WORKERS.filter(w=>w.obra&&(w.obra===o.direccion||w.obra===o.nombre));
-    const enZona=opsEnObra.filter(w=>w.en_zona===true).length;
-    const fuera=opsEnObra.filter(w=>w.en_zona===false).length;
-    return `<div style="padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;" onclick="centrarMapaEnObra(${o.lat},${o.lng})">
-      <div style="font-weight:600;font-size:12px;">${o.nombre}</div>
-      <div style="font-size:10px;color:var(--text3);margin-top:2px;">📍 ${o.direccion||'—'} · Radio ${o.radio||500}m</div>
-      <div style="display:flex;gap:6px;margin-top:4px;">
-        ${opsEnObra.length?`<span class="pill p-in" style="font-size:9px;">✅ ${enZona} en zona</span>`:''}
-        ${fuera?`<span class="pill p-out" style="font-size:9px;">⚠️ ${fuera} fuera</span>`:''}
-        ${!opsEnObra.length?'<span style="font-size:10px;color:var(--text3);">Sin operarios asignados</span>':''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function construirUrlMapa(){
-  // Construir URL de OpenStreetMap con marcadores via uMap o iframe simple
-  // Usamos OpenStreetMap bbox con los operarios
-  let ops=WORKERS.filter(w=>w._lat&&w._lng);
-  if(_mapaFiltro==='in')ops=ops.filter(w=>w.status==='in');
-  if(_mapaFiltro==='out')ops=ops.filter(w=>w.en_zona===false);
-
-  const loading=document.getElementById('mapa-loading');
-  const iframe=document.getElementById('mapa-iframe');
-
-  if(!ops.length&&!OBRAS.filter(o=>o.lat&&o.lng).length){
-    if(loading){loading.style.display='flex';loading.textContent='📍 Sin ubicaciones disponibles aún. Los operarios deben abrir la app.';}
-    if(iframe)iframe.style.display='none';
-    return;
-  }
-
-  // Calcular centro del mapa
-  const todosLat=[...ops.map(w=>w._lat),...OBRAS.filter(o=>o.lat).map(o=>o.lat)];
-  const todosLng=[...ops.map(w=>w._lng),...OBRAS.filter(o=>o.lng).map(o=>o.lng)];
-  const lat=todosLat.length?(todosLat.reduce((a,b)=>a+b,0)/todosLat.length):41.6175;
-  const lng=todosLng.length?(todosLng.reduce((a,b)=>a+b,0)/todosLng.length):0.6200;
-
-  // Construir marcadores para URL
-  // Usar OpenStreetMap con marcadores via enlace
-  // Como iframe de OSM con marcadores de obras y operarios
-  const markers=[];
-  
-  // Marcadores operarios
-  ops.forEach(w=>{
-    const color=w.en_zona===true?'green':w.en_zona===false?'red':'blue';
-    markers.push({lat:w._lat,lng:w._lng,label:w.nombre.charAt(0),title:`${w.nombre} ${w.apellidos}`,color});
-  });
-  
-  // Marcadores obras
-  OBRAS.filter(o=>o.lat&&o.lng).forEach(o=>{
-    markers.push({lat:o.lat,lng:o.lng,label:'🏗',title:o.nombre,color:'orange'});
-  });
-
-  // Generar HTML del mapa usando Leaflet desde CDN
-  const mapaHTML=generarMapaLeaflet(lat,lng,markers,OBRAS.filter(o=>o.lat&&o.lng));
-  const blob=new Blob([mapaHTML],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  if(iframe){iframe.src=url;iframe.style.display='block';}
-  if(loading)loading.style.display='none';
-}
-
-function generarMapaLeaflet(centerLat,centerLng,markers,obras){
-  let mJS='';
-  markers.forEach(function(m){
-    var col=m.color==='green'?'#16A34A':m.color==='red'?'#DC2626':m.color==='orange'?'#E8621A':'#2563AE';
-    var ico='<div style=background:'+col+';color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.4)>'+m.label+'</div>';
-    mJS+='L.marker(['+m.lat+','+m.lng+'],{icon:L.divIcon({html:"'+ico+'",iconSize:[32,32],iconAnchor:[16,16]})}).addTo(map).bindPopup("'+m.title+'");';
-  });
-  let zJS='';
-  obras.forEach(function(o){
-    if(!o.lat||!o.lng)return;
-    zJS+='L.circle(['+o.lat+','+o.lng+'],{radius:'+(o.radio||500)+',color:"#E8621A",fillColor:"#E8621A",fillOpacity:0.12,weight:2,dashArray:"6"}).addTo(map).bindPopup("<b>'+o.nombre.replace(/"/g,"'")+'</b><br>Radio: '+(o.radio||500)+'m");';
-  });
-  var zoom=markers.length===1?15:markers.length<4?14:13;
-  return '<!DOCTYPE html><html><head><meta charset=UTF-8>'
-    +'<link rel=stylesheet href=https://unpkg.com/leaflet@1.9.4/dist/leaflet.css>'
-    +'<script src=https://unpkg.com/leaflet@1.9.4/dist/leaflet.js><\/script>'
-    +'<style>body{margin:0}#map{width:100vw;height:100vh}<\/style><\/head><body>'
-    +'<div id=map><\/div><script>'
-    +'var map=L.map("map").setView(['+centerLat+','+centerLng+'],'+zoom+');'
-    +'L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"OSM"}).addTo(map);'
-    +mJS+zJS
-    +'<\/script><\/body><\/html>';
-}
-
-function centrarMapaEnOperario(lat,lng){
-  const iframe=document.getElementById('mapa-iframe');
-  if(iframe&&iframe.contentWindow){
-    try{iframe.contentWindow.map.setView([lat,lng],16);}catch(e){}
-  }
-}
-
-function centrarMapaEnObra(lat,lng){
-  const iframe=document.getElementById('mapa-iframe');
-  if(iframe&&iframe.contentWindow){
-    try{iframe.contentWindow.map.setView([lat,lng],15);}catch(e){}
-  }
 }
 
 // ══════════════════════════════════════
