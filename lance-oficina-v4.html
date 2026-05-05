@@ -758,6 +758,8 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
         </div>
       </div>
     </div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -818,6 +820,11 @@ function fbSyncWorker(w,pinChanged=false){
   fetch(`${FB_URL}/operarios_registro/${doc}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(regData)}).catch(()=>{});
 }
 
+// ✅ FIX 2: Redondear horas a medias horas (0.5h)
+function redondearMediaHora(h){
+  return Math.round(h*2)/2;
+}
+
 function startFirebaseListener(){loadFirebaseData();setInterval(loadFirebaseData,5000);}
 
 function loadFirebaseData(){
@@ -833,8 +840,12 @@ function loadFirebaseData(){
       if(!w){const fn=op.nombre.toLowerCase().replace(/[_\s]+/g,' ').trim();w=WORKERS.find(x=>{const wn=`${x.nombre} ${x.apellidos}`.toLowerCase().trim();return wn===fn||wn.includes(fn.split(' ')[0])||fn.includes(wn.split(' ')[0]);});}
       if(!w){const np=op.nombre.replace(/_/g,' ').split(' ');const ni=Math.max(0,...WORKERS.map(x=>x.id))+1;w={id:ni,nombre:np[0]||op.nombre,apellidos:np.slice(1).join(' ')||'',dni:op.doc||'',nie:'',obra:'',pin:'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true};WORKERS.push(w);}
       w.status=op.activo?'in':'out';
-      if(op.tipo==='entrada'){w.arrival=op.hora;w.dep=null;if(op.hora){const[eh,em]=op.hora.split(':').map(Number);const now=new Date();const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);w.h=mins>0?(mins/60).toFixed(1):0;}}
-      else if(op.tipo==='salida'){w.dep=op.hora;const at=op.hora_entrada||w.arrival;if(at&&op.hora){w.arrival=at;const[eh,em]=at.split(':').map(Number);const[sh,sm]=op.hora.split(':').map(Number);const mins=(sh*60+sm)-(eh*60+em);w.h=mins>0?(mins/60).toFixed(1):0;}}
+      // ✅ FIX 1: guardar fecha del último fichaje en el worker
+      w._fechaFichaje=op.fecha||null;
+      const hoyStr2=new Date().toISOString().split('T')[0];
+      const esDeFechaAnterior=op.fecha&&op.fecha!==hoyStr2;
+      if(op.tipo==='entrada'){w.arrival=op.hora;w.dep=null;if(op.hora&&!esDeFechaAnterior){const[eh,em]=op.hora.split(':').map(Number);const now=new Date();const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);w.h=mins>0?redondearMediaHora(mins/60):0;}else if(esDeFechaAnterior){w.h=0;}}
+      else if(op.tipo==='salida'){w.dep=op.hora;const at=op.hora_entrada||w.arrival;if(at&&op.hora){w.arrival=at;const[eh,em]=at.split(':').map(Number);const[sh,sm]=op.hora.split(':').map(Number);const mins=(sh*60+sm)-(eh*60+em);w.h=mins>0?redondearMediaHora(mins/60):0;}}
       if(op.ciudad) w.ciudad_gps=op.ciudad+(op.provincia?', '+op.provincia:'');
       // Coordenadas para botón Google Maps
       if(op.lat&&op.lng){w._lat=parseFloat(op.lat);w._lng=parseFloat(op.lng);}
@@ -1039,7 +1050,7 @@ function renderHours(){
           const now=new Date();mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);
         }
         if(mins<=0)return;
-        const h=(mins/60).toFixed(1)*1;
+        const h=redondearMediaHora(mins/60);
         if(!horasPorDia[fecha])horasPorDia[fecha]={};
         if(!horasPorDia[fecha][doc])horasPorDia[fecha][doc]={nombre,h:0};
         horasPorDia[fecha][doc].h+=h;
@@ -1750,12 +1761,17 @@ function renderJornada(){
     const gmBtn=gmUrl?`<a href="${gmUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:#E8F1FB;border:1px solid #D0DDF0;border-radius:5px;font-size:10px;color:#2563AE;font-weight:700;text-decoration:none;margin-top:3px;">📍 Maps</a>`:'';
     const ubicacion=w.ciudad_gps?`<div style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:6px;">${w.ciudad_gps}${gmBtn}</div>`:gmBtn?`<div>${gmBtn}</div>`:'';
     // Número de orden solo para fichados (1, 2, 3...)
-    const numOrden=idx<sepIdx?`<span style="font-family:'Montserrat';font-size:9px;font-weight:700;color:var(--text3);margin-right:6px;">#${idx+1}</span>`:'';
+    const numOrden=idx<sepIdx?`<span style="font-family:'Montserrat';font-size:9px;font-weight:700;color:var(--text3);margin-right:6px;">#${idx+1}</span>`:''
+    // ✅ FIX 1: Badge de fecha si el fichaje es de un día anterior
+    const hoyCheck=new Date().toISOString().split('T')[0];
+    const fechaFichaje=w._fechaFichaje||null;
+    const esAnterior=fechaFichaje&&fechaFichaje!==hoyCheck;
+    const fechaBadge=esAnterior?`<span style="display:inline-block;margin-left:6px;font-size:9px;background:#FEF3C7;color:#92400E;border-radius:3px;padding:1px 5px;font-weight:700;">📅 ${fechaFichaje}</span>`:'';;
     return separador+`<tr>
-      <td><div style="font-weight:600">${numOrden}${w.nombre} ${w.apellidos}</div>${ubicacion}</td>
+      <td><div style="font-weight:600">${numOrden}${w.nombre} ${w.apellidos}${fechaBadge}</div>${ubicacion}</td>
       <td style="font-weight:600">${w.arrival||'—'}</td>
       <td style="color:var(--red)">${w.dep||'—'}</td>
-      <td style="font-family:'Montserrat';font-weight:800;color:var(--blue2)">${w.h}h</td>
+      <td style="font-family:'Montserrat';font-weight:800;color:var(--blue2)">${(+w.h).toLocaleString('es-ES')}h</td>
       <td>${zonaCell}</td>
       <td>${estadoLabel}${w.manual?'<div style="font-size:9px;color:var(--orange);margin-top:2px;">✏️ Manual</div>':''}</td>
     </tr>`;
