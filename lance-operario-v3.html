@@ -632,7 +632,7 @@ function checkPin(){
     if(pinVal===myPin){
       const displayName=workerName.split(' ').slice(0,2).join(' ');
       document.getElementById('worker-badge').textContent='👷 '+displayName;
-      goTo('s-app');applyAppLang();renderTasks();startClock();startGPS();
+      goTo('s-app');applyAppLang();renderTasks();startClock();startStateSync();startGPS();
           // Resetear botón a verde mientras se consulta Firebase
           const btn0=document.getElementById('checkin-btn');
           const lbl0=document.getElementById('cb-label');
@@ -693,6 +693,46 @@ function checkPin(){
 }
 
 function startClock(){tick();setInterval(tick,1000);}
+
+// ✅ FIX: Sincronizar estado isIn desde Firebase cada 30s
+// Evita que el operario quede como "en obra" cuando la consola registró su salida manualmente
+function startStateSync(){
+  if(window._stateSyncInterval)clearInterval(window._stateSyncInterval);
+  window._stateSyncInterval=setInterval(()=>{
+    if(!workerDoc)return;
+    fetch(`${FB_URL}/operarios_activos/${workerDoc}.json`)
+      .then(r=>r.json())
+      .then(data=>{
+        if(!data)return;
+        const activoFirebase=data.activo===true;
+        // Solo sincronizar si hay discrepancia Y el cambio vino de fuera (consola)
+        // Detectamos cambio externo si la fecha/hora del fichaje no coincide con el último que hizo el operario
+        const miUltimoFichaje=localStorage.getItem('lance_last_fichaje_ts');
+        const fbTimestamp=data.timestamp||0;
+        const cambioExterno=miUltimoFichaje&&parseInt(miUltimoFichaje)<fbTimestamp;
+        if(isIn!==activoFirebase&&cambioExterno){
+          isIn=activoFirebase;
+          const btn=document.getElementById('checkin-btn');
+          const lbl=document.getElementById('cb-label');
+          const ico=document.getElementById('cb-icon');
+          const st=document.getElementById('checkin-status');
+          if(!btn)return;
+          if(isIn){
+            entryTime=data.hora||entryTime;
+            btn.classList.add('in');btn.style.borderColor='var(--red)';btn.style.background='rgba(255,71,87,.07)';
+            if(lbl)lbl.innerHTML='FICHAR<br>SALIDA';if(ico)ico.textContent='🔴';
+            if(st)st.innerHTML=`🔴 En obra desde ${data.hora||'—'}`;
+          } else {
+            entryTime=null;localStorage.removeItem('lance_entry_time');
+            btn.classList.remove('in');btn.style.borderColor='var(--green)';btn.style.background='rgba(22,163,74,.07)';
+            if(lbl)lbl.innerHTML='FICHAR<br>ENTRADA';if(ico)ico.textContent='🟢';
+            if(st)st.innerHTML='🟢 Listo para fichar entrada';
+            showToast('✅ Salida registrada desde consola','ok');
+          }
+        }
+      }).catch(()=>{});
+  },30000);
+}
 function tick(){
   const n=new Date();
   const cl=document.getElementById('clock');
@@ -843,6 +883,8 @@ function fbSaveCheckin(type){
   };
   if(type==='entrada'){entryTime=timeStr;localStorage.setItem('lance_entry_time',timeStr);}
   if(type==='salida'){entryTime=null;localStorage.removeItem('lance_entry_time');}
+  // Guardar timestamp propio para detectar si luego hay cambios externos
+  localStorage.setItem('lance_last_fichaje_ts', String(now.getTime()));
   const key=workerDoc;
   fetch(`${FB_URL}/fichajes/${dateStr}/${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).catch(e=>console.log('Firebase error:',e));
   fetch(`${FB_URL}/operarios_activos/${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,activo:type==='entrada'})}).catch(e=>console.log('Firebase error:',e));
