@@ -2199,6 +2199,13 @@ function getFechasRango(){
   return fechas;
 }
 
+// Formatea horas: 1.5 → "1,5", 2.0 → "2", 0.5 → "0,5"
+function formatH(h){
+  if(!h||h===0)return '0';
+  const redondeado=redondearMediaHora(h);
+  return redondeado%1===0?String(redondeado):redondeado.toFixed(1).replace('.',',');
+}
+
 async function generarInforme(){
   const fechas=getFechasRango();
   if(!fechas.length){showToast('⚠️ Selecciona un período válido','err');return;}
@@ -2240,12 +2247,12 @@ async function generarInforme(){
         const[eh,em]=op.entrada.split(':').map(Number);
         const[sh,sm]=op.salida.split(':').map(Number);
         const mins=(sh*60+sm)-(eh*60+em);
-        op.horas=mins>0?(mins/60).toFixed(2)*1:0;
+        op.horas=mins>0?redondearMediaHora(mins/60):0;
       } else if(op.entrada&&fecha===hoy){
         const[eh,em]=op.entrada.split(':').map(Number);
         const now=new Date();
         const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);
-        op.horas=mins>0?(mins/60).toFixed(2)*1:0;
+        op.horas=mins>0?redondearMediaHora(mins/60):0;
       }
     });
   });
@@ -2304,6 +2311,9 @@ async function generarInforme(){
       button{display:none!important;}
       .no-print{display:none!important;}
     }
+    .btn-print{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#1B4F8C;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;margin-bottom:16px;}
+    .btn-print:hover{background:#1a3d6e;}
+    .print-bar{padding:12px 0;border-bottom:2px solid #EBF0FA;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
   `;
 
   // Construir secciones de días
@@ -2316,9 +2326,9 @@ async function generarInforme(){
     fechasConDatos.forEach(fecha=>{
       const ops=Object.values(porFecha[fecha]);
       const fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      const totalDia=ops.reduce((a,v)=>a+v.horas,0).toFixed(2);
+      const totalDia=redondearMediaHora(ops.reduce((a,v)=>a+v.horas,0)).toFixed(2);
       ops.sort((a,b)=>(a.entrada||'99:99').localeCompare(b.entrada||'99:99'));
-      seccionesDias+=`<div class="dia-header">📅 ${fechaFmt.charAt(0).toUpperCase()+fechaFmt.slice(1)} — ${ops.length} operario${ops.length!==1?'s':''} · ${totalDia}h total</div>`;
+      seccionesDias+=`<div class="dia-header">📅 ${fechaFmt.charAt(0).toUpperCase()+fechaFmt.slice(1)} — ${ops.length} operario${ops.length!==1?'s':''} · ${formatH(parseFloat(totalDia))}h total</div>`;
       if(ops.length===0){seccionesDias+='<div class="sin-datos">Sin fichajes registrados.</div>';return;}
       seccionesDias+=`<table>
         <thead><tr>
@@ -2338,7 +2348,7 @@ async function generarInforme(){
           <td style="font-size:9px">${op.obra||'—'}</td>
           <td style="font-weight:700;color:#1B4F8C">${op.entrada||'—'}</td>
           <td style="color:#DC2626">${salidaLabel}</td>
-          <td style="font-weight:900;color:#1B4F8C">${op.horas>0?op.horas.toFixed(2)+'h':'—'}</td>
+          <td style="font-weight:900;color:#1B4F8C">${op.horas>0?formatH(op.horas):'—'}</td>
           <td style="font-size:9px">${gpsLabel}</td>
           <td>${zonaLabel}</td>
           <td>${manualLabel}</td>
@@ -2356,14 +2366,18 @@ async function generarInforme(){
     tablaAcum=`<h2>Resumen acumulado por operario</h2>
     <table><thead><tr><th>#</th><th>Operario</th><th>DNI/NIE</th><th>Días trabajados</th><th>Total horas</th><th>Media h/día</th></tr></thead><tbody>`;
     opAcumList.forEach((op,i)=>{
-      const media=op.dias>0?(op.total/op.dias).toFixed(2):0;
-      tablaAcum+=`<tr><td>${i+1}</td><td style="font-weight:600">${op.nombre}</td><td style="font-size:9px">${op.dni||'—'}</td><td style="text-align:center">${op.dias}</td><td style="font-weight:900;color:#1B4F8C">${op.total.toFixed(2)}h</td><td>${media}h</td></tr>`;
+      const media=op.dias>0?formatH(redondearMediaHora(op.total/op.dias)):0;
+      tablaAcum+=`<tr><td>${i+1}</td><td style="font-weight:600">${op.nombre}</td><td style="font-size:9px">${op.dni||'—'}</td><td style="text-align:center">${op.dias}</td><td style="font-weight:900;color:#1B4F8C">${redondearMediaHora(op.total).toFixed(2)}h</td><td>${media}h</td></tr>`;
     });
-    tablaAcum+=`<tr class="total-row"><td colspan="3">TOTAL PERÍODO:</td><td style="text-align:center">${fechasConDatos.length} días</td><td>${totalHorasGlobal.toFixed(2)}h</td><td>—</td></tr>`;
+    tablaAcum+=`<tr class="total-row"><td colspan="3">TOTAL PERÍODO:</td><td style="text-align:center">${fechasConDatos.length} días</td><td>${redondearMediaHora(totalHorasGlobal).toFixed(2)}h</td><td>—</td></tr>`;
     tablaAcum+='</tbody></table>';
   }
 
   _informeHTML=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe Jornada — ${empresa}</title><style>${css}</style></head><body>
+    <div class="print-bar no-print">
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <span style="font-size:10px;color:#888;">En el di&aacute;logo de impresi&oacute;n selecciona <strong>Guardar como PDF</strong> como destino</span>
+    </div>
     <div class="cabecera">
       <div>
         <div class="logo-empresa">${empresa}</div>
