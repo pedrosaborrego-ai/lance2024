@@ -447,9 +447,24 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
 
     <!-- HORAS TRABAJADAS -->
     <div class="page" id="page-horas">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">⏱ Horas trabajadas hoy</div></div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hdr">
+          <div class="card-title">⏱ Horas trabajadas</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="horas-periodo" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderHours()">
+              <option value="hoy">Hoy</option>
+              <option value="semana">Esta semana</option>
+              <option value="mes" selected>Este mes</option>
+            </select>
+            <button onclick="renderHours()" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;">🔄 Actualizar</button>
+          </div>
+        </div>
+        <div id="horas-resumen" style="display:flex;gap:10px;padding:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);"></div>
         <div id="hours-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">📅 Desglose por días</div></div>
+        <div id="horas-dias-list" style="max-height:400px;overflow-y:auto;"></div>
       </div>
     </div>
 
@@ -604,7 +619,14 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
         <div>
           <div class="card">
             <div class="card-hdr"><div class="card-title">👷 Operarios dados de alta</div><span id="g-count" style="font-size:10px;color:var(--text3)"></span></div>
-            <div style="padding:12px 16px 0;"><div class="search-wrap"><svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg><input class="search-inp" id="g-search" placeholder="Buscar..." oninput="renderGestionList()"></div></div>
+            <div style="padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <div class="search-wrap" style="flex:1;min-width:140px;"><svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg><input class="search-inp" id="g-search" placeholder="Buscar..." oninput="renderGestionList()"></div>
+              <select id="g-filtro-estado" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderGestionList()">
+                <option value="activos">✅ Activos</option>
+                <option value="todos">👁 Todos</option>
+                <option value="inactivos">⏸ Inactivos</option>
+              </select>
+            </div>
             <div id="gestion-list" style="max-height:500px;overflow-y:auto;"></div>
           </div>
         </div>
@@ -717,7 +739,7 @@ function loadWorkersFromFirebase(){
     Object.entries(data).forEach(([key,op])=>{
       if(!op||!op.nombre)return;
       const exists=WORKERS.find(w=>(w.dni&&w.dni.replace(/[^A-Z0-9]/gi,'').toUpperCase()===key.toUpperCase())||(w.nie&&w.nie.replace(/[^A-Z0-9]/gi,'').toUpperCase()===key.toUpperCase()));
-      if(!exists){WORKERS.push({id:1000+id,nombre:op.nombre||'',apellidos:op.apellidos||'',dni:op.dni||'',nie:op.nie||'',tel:op.tel||'',obra:op.obra||'',pin:op.pin||'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null});id++;}
+      if(!exists){WORKERS.push({id:1000+id,nombre:op.nombre||'',apellidos:op.apellidos||'',dni:op.dni||'',nie:op.nie||'',tel:op.tel||'',obra:op.obra||'',pin:op.pin||'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true});id++;}
     });
     const seen=new Set();
     WORKERS=WORKERS.filter(w=>{const d=(w.dni||w.nie||'').toUpperCase();if(!d)return true;if(seen.has(d))return false;seen.add(d);return true;});
@@ -742,10 +764,12 @@ function loadFirebaseData(){
     Object.entries(data).forEach(([fbKey,op])=>{
       if(!op||!op.nombre)return;
       if(isDeleted(op.nombre))return;
+      // ✅ MEJORA 3: Skip operarios inactivos en jornada en tiempo real
+      if(op.inactivo===true)return;
       let w=null;
       if(op.doc){const dc=op.doc.replace(/[^A-Z0-9]/gi,'').toUpperCase();w=WORKERS.find(x=>(x.dni&&x.dni.replace(/[^A-Z0-9]/gi,'').toUpperCase()===dc)||(x.nie&&x.nie.replace(/[^A-Z0-9]/gi,'').toUpperCase()===dc));}
       if(!w){const fn=op.nombre.toLowerCase().replace(/[_\s]+/g,' ').trim();w=WORKERS.find(x=>{const wn=`${x.nombre} ${x.apellidos}`.toLowerCase().trim();return wn===fn||wn.includes(fn.split(' ')[0])||fn.includes(wn.split(' ')[0]);});}
-      if(!w){const np=op.nombre.replace(/_/g,' ').split(' ');const ni=Math.max(0,...WORKERS.map(x=>x.id))+1;w={id:ni,nombre:np[0]||op.nombre,apellidos:np.slice(1).join(' ')||'',dni:op.doc||'',nie:'',obra:'',pin:'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null};WORKERS.push(w);}
+      if(!w){const np=op.nombre.replace(/_/g,' ').split(' ');const ni=Math.max(0,...WORKERS.map(x=>x.id))+1;w={id:ni,nombre:np[0]||op.nombre,apellidos:np.slice(1).join(' ')||'',dni:op.doc||'',nie:'',obra:'',pin:'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true};WORKERS.push(w);}
       w.status=op.activo?'in':'out';
       if(op.tipo==='entrada'){w.arrival=op.hora;w.dep=null;if(op.hora){const[eh,em]=op.hora.split(':').map(Number);const now=new Date();const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);w.h=mins>0?(mins/60).toFixed(1):0;}}
       else if(op.tipo==='salida'){w.dep=op.hora;const at=op.hora_entrada||w.arrival;if(at&&op.hora){w.arrival=at;const[eh,em]=at.split(':').map(Number);const[sh,sm]=op.hora.split(':').map(Number);const mins=(sh*60+sm)-(eh*60+em);w.h=mins>0?(mins/60).toFixed(1):0;}}
@@ -895,11 +919,93 @@ function renderWorkers(){
 
 function renderHours(){
   const list=document.getElementById('hours-list');if(!list)return;
+  const diasList=document.getElementById('horas-dias-list');
+  const resumenEl=document.getElementById('horas-resumen');
+  const periodo=(document.getElementById('horas-periodo')||{value:'hoy'}).value;
+  // ✅ MEJORA 2: Horas por días + acumulado mensual desde Firebase/fichajes
+  const hoy=new Date();
+  const hoyStr=hoy.toISOString().split('T')[0];
+  // Calcular rango de fechas según período
+  let fechas=[];
+  if(periodo==='hoy'){fechas=[hoyStr];}
+  else if(periodo==='semana'){
+    const lunes=new Date(hoy);lunes.setDate(hoy.getDate()-hoy.getDay()+1);
+    for(let i=0;i<7;i++){const d=new Date(lunes);d.setDate(lunes.getDate()+i);fechas.push(d.toISOString().split('T')[0]);}
+  } else {
+    const primeroDeMes=new Date(hoy.getFullYear(),hoy.getMonth(),1);
+    const diasMes=new Date(hoy.getFullYear(),hoy.getMonth()+1,0).getDate();
+    for(let i=0;i<diasMes;i++){const d=new Date(primeroDeMes);d.setDate(i+1);fechas.push(d.toISOString().split('T')[0]);}
+  }
+  // Mostrar horas de hoy (datos en memoria WORKERS) en tabla principal
   list.innerHTML=WORKERS.map(w=>`<div style="display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--border);">
     <div style="width:140px;flex-shrink:0"><span style="font-size:13px;font-weight:600">${w.nombre}</span><br><small style="color:var(--text3)">${w.apellidos}</small></div>
-    <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:${(w.h/9*100).toFixed(0)}%;height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue3));border-radius:3px;"></div></div>
+    <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:${Math.min((w.h/9*100),100).toFixed(0)}%;height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue3));border-radius:3px;"></div></div>
     <div style="text-align:right;width:48px"><div style="font-family:'Montserrat';font-weight:800;font-size:17px;color:var(--blue2)">${w.h}h</div></div>
   </div>`).join('');
+  // Cargar fichajes históricos de Firebase para el período
+  if(diasList){diasList.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">⏳ Cargando histórico...</div>';}
+  // Fechas a consultar: solo las pasadas + hoy (no futuras)
+  const fechasConsultar=fechas.filter(f=>f<=hoyStr);
+  if(!fechasConsultar.length){if(diasList)diasList.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">Sin datos para este período.</div>';return;}
+  Promise.all(fechasConsultar.map(fecha=>
+    fetch(`${FB_URL}/fichajes/${fecha}.json`).then(r=>r.json()).then(d=>({fecha,data:d})).catch(()=>({fecha,data:null}))
+  )).then(resultados=>{
+    // Acumular horas por operario y por día
+    const horasPorDia={}; // {fecha: {doc: {nombre,horas}}}
+    const horasAcum={}; // {doc: {nombre,total}}
+    resultados.forEach(({fecha,data})=>{
+      if(!data)return;
+      Object.values(data).forEach(f=>{
+        if(!f||!f.doc)return;
+        const doc=f.doc;
+        const nombre=f.nombre||doc;
+        let mins=0;
+        if(f.tipo==='salida'&&f.hora&&f.hora_entrada){
+          const[eh,em]=f.hora_entrada.split(':').map(Number);
+          const[sh,sm]=f.hora.split(':').map(Number);
+          mins=(sh*60+sm)-(eh*60+em);
+        } else if(f.tipo==='entrada'&&f.hora&&fecha===hoyStr){
+          // Si es entrada de hoy, calcular hasta ahora
+          const[eh,em]=f.hora.split(':').map(Number);
+          const now=new Date();mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);
+        }
+        if(mins<=0)return;
+        const h=(mins/60).toFixed(1)*1;
+        if(!horasPorDia[fecha])horasPorDia[fecha]={};
+        if(!horasPorDia[fecha][doc])horasPorDia[fecha][doc]={nombre,h:0};
+        horasPorDia[fecha][doc].h+=h;
+        if(!horasAcum[doc])horasAcum[doc]={nombre,total:0};
+        horasAcum[doc].total+=h;
+      });
+    });
+    // Resumen acumulado (kpis)
+    const totalH=Object.values(horasAcum).reduce((a,v)=>a+v.total,0).toFixed(1);
+    const diasConFichaje=Object.keys(horasPorDia).length;
+    if(resumenEl)resumenEl.innerHTML=`
+      <div style="background:var(--blue-pale);border-radius:8px;padding:8px 14px;font-size:11px;"><div style="font-family:'Montserrat';font-weight:800;font-size:18px;color:var(--blue2)">${totalH}h</div><div style="color:var(--text3)">Total período</div></div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px 14px;font-size:11px;"><div style="font-family:'Montserrat';font-weight:800;font-size:18px;color:var(--text)">${diasConFichaje}</div><div style="color:var(--text3)">Días con fichajes</div></div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px 14px;font-size:11px;"><div style="font-family:'Montserrat';font-weight:800;font-size:18px;color:var(--green)">${diasConFichaje>0?(totalH/diasConFichaje).toFixed(1):0}h</div><div style="color:var(--text3)">Media por día</div></div>`;
+    // Desglose por días (más reciente primero)
+    if(diasList){
+      const diasOrdenados=Object.keys(horasPorDia).sort((a,b)=>b.localeCompare(a));
+      if(!diasOrdenados.length){diasList.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">Sin fichajes en este período.</div>';return;}
+      diasList.innerHTML=diasOrdenados.map(fecha=>{
+        const ops=Object.values(horasPorDia[fecha]);
+        const totalDia=ops.reduce((a,v)=>a+v.h,0).toFixed(1);
+        const fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-ES',{weekday:'short',day:'2-digit',month:'short'});
+        return `<div style="border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--bg);">
+            <span style="font-family:'Montserrat';font-size:11px;font-weight:700;color:var(--text);text-transform:capitalize">${fechaFmt}</span>
+            <span style="font-family:'Montserrat';font-size:13px;font-weight:800;color:var(--blue2)">${totalDia}h total</span>
+          </div>
+          ${ops.sort((a,b)=>b.h-a.h).map(op=>`<div style="display:flex;justify-content:space-between;padding:6px 24px;font-size:11px;border-top:1px solid var(--border);">
+            <span style="color:var(--text2)">${op.nombre}</span>
+            <span style="font-weight:600;color:var(--blue2)">${op.h.toFixed(1)}h</span>
+          </div>`).join('')}
+        </div>`;
+      }).join('');
+    }
+  }).catch(()=>{if(diasList)diasList.innerHTML='<div style="padding:16px;text-align:center;color:var(--red);font-size:12px">⚠️ Error al cargar histórico.</div>';});
 }
 
 function updateExtraSelect(){const sel=document.getElementById('ex-worker');if(!sel)return;sel.innerHTML=WORKERS.map(w=>`<option value="${w.id}">${w.nombre} ${w.apellidos}</option>`).join('');}
@@ -932,21 +1038,59 @@ function renderExtrasList(){
 function renderGestionList(){
   const list=document.getElementById('gestion-list');if(!list)return;
   const q=(document.getElementById('g-search')?.value||'').toLowerCase();
+  const filtroEstado=(document.getElementById('g-filtro-estado')?.value||'activos');
   const cnt=document.getElementById('g-count');
-  const filtered=WORKERS.filter(w=>`${w.nombre} ${w.apellidos} ${w.dni} ${w.nie}`.toLowerCase().includes(q));
-  if(cnt)cnt.textContent=WORKERS.length+' operarios';
-  list.innerHTML=filtered.map(w=>`<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);">
-    <div style="width:36px;height:36px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:var(--blue2);flex-shrink:0;">${(w.nombre[0]||'')+(w.apellidos[0]||'')}</div>
-    <div style="flex:1;min-width:0">
-      <div style="font-weight:600;font-size:13px;color:var(--text)">${w.nombre} ${w.apellidos}</div>
-      <div style="font-size:10px;color:var(--text3)">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''} · PIN: <strong style="color:var(--blue2)">${w.pin}</strong>${w.tel?' · 📱 '+w.tel:''}</div>
-    </div>
-    <div style="display:flex;gap:5px;flex-shrink:0">
-      <button onclick="sendWaOperario(${w.id})" style="padding:5px 8px;border-radius:6px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);color:var(--green);font-size:11px;cursor:pointer;">📱</button>
-      <button class="btn-edit" onclick="editWorker(${w.id})">✏️</button>
-      <button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️</button>
-    </div>
-  </div>`).join('');
+  // ✅ MEJORA 3: Filtrar por activos/inactivos
+  let filtered=WORKERS.filter(w=>`${w.nombre} ${w.apellidos} ${w.dni} ${w.nie}`.toLowerCase().includes(q));
+  if(filtroEstado==='activos') filtered=filtered.filter(w=>!w.inactivo);
+  else if(filtroEstado==='inactivos') filtered=filtered.filter(w=>w.inactivo);
+  const activos=WORKERS.filter(w=>!w.inactivo).length;
+  const inactivos=WORKERS.filter(w=>w.inactivo).length;
+  if(cnt)cnt.textContent=`${activos} activos${inactivos?' · '+inactivos+' pausados':''}`;
+  if(!filtered.length){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">'+( filtroEstado==='inactivos'?'Sin operarios pausados.':'Sin operarios.')+ '</div>';return;}
+  list.innerHTML=filtered.map(w=>{
+    const inactivo=!!w.inactivo;
+    const avatarBg=inactivo?'var(--border)':'var(--blue-light)';
+    const avatarColor=inactivo?'var(--text3)':'var(--blue2)';
+    const nombreColor=inactivo?'var(--text3)':'var(--text)';
+    const btnPausa=inactivo
+      ?`<button onclick="toggleInactivoWorker(${w.id},false)" style="padding:5px 8px;border-radius:6px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);color:var(--green);font-size:11px;cursor:pointer;" title="Reactivar">▶️</button>`
+      :`<button onclick="toggleInactivoWorker(${w.id},true)" style="padding:5px 8px;border-radius:6px;background:#FEF3C7;border:1px solid rgba(217,119,6,.25);color:var(--amber);font-size:11px;cursor:pointer;" title="Pausar/Desactivar">⏸</button>`;
+    const badgeInactivo=inactivo?'<span style="font-size:9px;background:#FEF3C7;color:var(--amber);border-radius:4px;padding:1px 5px;margin-left:5px;font-weight:600;">PAUSADO</span>':''  ;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);${inactivo?'opacity:0.65;':''}" >
+      <div style="width:36px;height:36px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:${avatarColor};flex-shrink:0;">${(w.nombre[0]||'')+( w.apellidos[0]||'')} </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px;color:${nombreColor}">${w.nombre} ${w.apellidos}${badgeInactivo}</div>
+        <div style="font-size:10px;color:var(--text3)">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''} · PIN: <strong style="color:var(--blue2)">${w.pin}</strong>${w.tel?' · 📱 '+w.tel:''}</div>
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        ${!inactivo?`<button onclick="sendWaOperario(${w.id})" style="padding:5px 8px;border-radius:6px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);color:var(--green);font-size:11px;cursor:pointer;">📱</button>`:''}
+        ${btnPausa}
+        <button class="btn-edit" onclick="editWorker(${w.id})">✏️</button>
+        <button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ✅ MEJORA 3: Activar/Desactivar operario
+function toggleInactivoWorker(id, pausar){
+  const w=WORKERS.find(x=>x.id===id);if(!w)return;
+  const accion=pausar?'pausar':'reactivar';
+  const msg=pausar?`¿Pausar a ${w.nombre} ${w.apellidos}? No aparecerá en fichajes ni jornada mientras esté pausado.`:
+    `¿Reactivar a ${w.nombre} ${w.apellidos}?`;
+  if(!confirm(msg))return;
+  w.inactivo=pausar;
+  // Guardar en Firebase
+  const docKey=(w.dni||w.nie||''). replace(/[^A-Z0-9]/gi,'').toUpperCase();
+  if(docKey){
+    fetch(`${FB_URL}/operarios_registro/${docKey}/inactivo.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(pausar)}).catch(()=>{});
+  }
+  saveW();
+  renderGestionList();
+  renderJornada();
+  renderWorkers();
+  showToast(pausar?`⏸ ${w.nombre} pausado`:`▶️ ${w.nombre} reactivado`,'ok');
 }
 
 function renderPinTable(){
@@ -1336,17 +1480,18 @@ function cargarConsentimientos(){
       return;
     }
     const flags={es:'🇪🇸',ca:'🏴',ro:'🇷🇴',ar:'🇲🇦',fr:'🇫🇷',en:'🇬🇧'};
+    const langNames={es:'Español',ca:'Català',ro:'Română',ar:'العربية',fr:'Français',en:'English'};
     _consentData=Object.values(data).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
     tb.innerHTML=_consentData.map((c,i)=>{
       const rgpdOk=c.rgpd_aceptado===true;
       const gpsOk=c.gps_aceptado===true;
       const estado=c.estado==='pendiente_aceptacion'?'<span class="pill p-pend">⏳ Pendiente</span>':'<span class="pill p-in">✅ Aceptado</span>';
       return '<tr>'
-        +'<td style="font-weight:600">'+(c.nombre||'—')+'</td>'
+        +'<td style="font-weight:600">'+(c.nombre&&c.nombre.trim()?c.nombre:'<span style="color:var(--red);font-style:italic">Sin nombre ('+( c.doc||'?')+')</span>')+'</td>'
         +'<td style="font-size:11px">'+(c.doc||'—')+'</td>'
         +'<td>'+(c.fecha||'—')+'</td>'
         +'<td>'+(c.hora||'—')+'</td>'
-        +'<td>'+(flags[c.idioma]||'🇪🇸')+' '+(c.idioma||'es')+'</td>'
+        +'<td>'+(flags[c.idioma]||'🇪🇸')+' '+(langNames[c.idioma]||'Español')+'</td>'
         +'<td>'+(rgpdOk?'<span class="pill p-in">✅</span>':estado)+'</td>'
         +'<td>'+(gpsOk?'<span class="pill p-in">✅</span>':estado)+'</td>'
         +'<td style="display:flex;gap:4px;">'
@@ -1369,7 +1514,13 @@ function generarConsentimientosDesdeOperarios(){
       return fetch(`${FB_URL}/consentimientos/${key}.json`)
         .then(r=>r.json())
         .then(existing=>{
-          if(existing&&existing.doc)return; // Ya existe
+          if(existing&&existing.doc&&existing.nombre&&existing.nombre.trim()){return;} // Ya existe con nombre OK
+          // Si existe pero sin nombre, reparar — si no existe, crear
+          const nombreCompleto=(op.nombre||'')+(op.apellidos?' '+op.apellidos:'');
+          if(existing&&existing.doc&&(!existing.nombre||!existing.nombre.trim())){
+            count++;
+            return fetch(`${FB_URL}/consentimientos/${key}/nombre.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(nombreCompleto)});
+          }
           // Crear consentimiento pendiente
           const cd={
             doc:key,
@@ -1500,7 +1651,19 @@ function guardarFichajeManual(){
 // ── UBICACIÓN EXACTA EN JORNADA ──
 function renderJornada(){
   const tb=document.getElementById('jornada-tbody');if(!tb)return;
-  tb.innerHTML=WORKERS.map(w=>{
+  // ✅ MEJORA 1: Corte por día + orden de llegada
+  // Fichados hoy = tienen arrival o dep (status in/out). Sin fichar = status pending
+  const fichadosHoy=WORKERS.filter(w=>!w.inactivo&&w.status!=='pending'&&(w.arrival||w.dep));
+  const sinFicharHoy=WORKERS.filter(w=>!w.inactivo&&(w.status==='pending'||(!w.arrival&&!w.dep)));
+  // Ordenar fichados por hora de entrada (primero quien llegó antes)
+  fichadosHoy.sort((a,b)=>(a.arrival||a.dep||'99:99').localeCompare(b.arrival||b.dep||'99:99'));
+  const todosOrdenados=[...fichadosHoy,...sinFicharHoy];
+  const sepIdx=fichadosHoy.length; // índice donde empieza el bloque "sin fichar"
+  tb.innerHTML=todosOrdenados.map((w,idx)=>{
+    // Separador visual antes del primer operario sin fichar
+    const separador=(idx===sepIdx&&sinFicharHoy.length>0&&fichadosHoy.length>0)
+      ?`<tr><td colspan="6" style="padding:6px 14px;background:var(--bg);border-bottom:1px solid var(--border);font-family:'Montserrat';font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);">⏳ Pendientes de fichar</td></tr>`
+      :'';
     const ciudad=w.ciudad_gps?w.ciudad_gps.split(',')[0]:'';
     const distOk=(w.dist_obra||0)<100000;
     const zonaCell=w.en_zona===true
@@ -1517,8 +1680,10 @@ function renderJornada(){
     const gmUrl=w._lat&&w._lng?`https://www.google.com/maps?q=${w._lat},${w._lng}`:'';
     const gmBtn=gmUrl?`<a href="${gmUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:#E8F1FB;border:1px solid #D0DDF0;border-radius:5px;font-size:10px;color:#2563AE;font-weight:700;text-decoration:none;margin-top:3px;">📍 Maps</a>`:'';
     const ubicacion=w.ciudad_gps?`<div style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:6px;">${w.ciudad_gps}${gmBtn}</div>`:gmBtn?`<div>${gmBtn}</div>`:'';
-    return`<tr>
-      <td><div style="font-weight:600">${w.nombre} ${w.apellidos}</div>${ubicacion}</td>
+    // Número de orden solo para fichados (1, 2, 3...)
+    const numOrden=idx<sepIdx?`<span style="font-family:'Montserrat';font-size:9px;font-weight:700;color:var(--text3);margin-right:6px;">#${idx+1}</span>`:'';
+    return separador+`<tr>
+      <td><div style="font-weight:600">${numOrden}${w.nombre} ${w.apellidos}</div>${ubicacion}</td>
       <td style="font-weight:600">${w.arrival||'—'}</td>
       <td style="color:var(--red)">${w.dep||'—'}</td>
       <td style="font-family:'Montserrat';font-weight:800;color:var(--blue2)">${w.h}h</td>
