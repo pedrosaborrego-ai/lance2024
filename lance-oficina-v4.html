@@ -563,7 +563,7 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
     <div class="page" id="page-gestion">
       <div class="row-3">
         <div class="card">
-          <div class="card-hdr"><div class="card-title" id="gestion-title">➕ Alta de operario</div><button onclick="resetForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;font-weight:600;">✕ Limpiar</button></div>
+          <div class="card-hdr"><div class="card-title" id="gestion-title">➕ Alta de operario</div><div style="display:flex;gap:8px;"><button onclick="resetForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;font-weight:600;">✕ Limpiar</button><button onclick="resetTotalPanel()" style="font-size:10px;color:#fff;background:var(--red);border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">🗑️ BORRAR TODO</button></div></div>
           <div class="card-body">
             <input type="hidden" id="edit-id">
             <div class="form-row">
@@ -1289,6 +1289,49 @@ function editWorker(id){
   document.getElementById('g-btn').textContent='💾 Guardar cambios';
   document.getElementById('gestion-title').textContent='✏️ Editar operario';
   showPage('gestion');
+}
+
+function resetTotalPanel(){
+  if(!confirm('⚠️ ¿Borrar TODOS los operarios, fichajes y estadísticas? Esta acción no se puede deshacer.'))return;
+  if(!confirm('🔴 ÚLTIMA CONFIRMACIÓN — ¿Seguro que quieres dejar el panel en cero?'))return;
+
+  showToast('⏳ Limpiando Firebase...','inf');
+
+  // Borrar todo en Firebase
+  const rutas=['operarios_registro','operarios_activos','fichajes','tareas','consentimientos'];
+  const promises=rutas.map(r=>
+    fetch(`${FB_URL}/${r}.json`,{method:'DELETE'}).catch(()=>{})
+  );
+
+  Promise.all(promises).then(()=>{
+    // Limpiar localStorage
+    localStorage.removeItem('lance_workers_v2');
+    localStorage.removeItem('lance_deleted_keys');
+    // Limpiar array local
+    WORKERS=[];
+    extras=[];
+    window._zonaAlertas={};
+    window._horarioAlertasGeneradas={};
+    // Resetear KPIs
+    animKPI('kv-total',0);
+    animKPI('kv-in',0);
+    animKPI('kv-alerts',0);
+    animKPI('kv-extras',0);
+    // Resetear alertas
+    const alertList=document.getElementById('alerts-list');
+    if(alertList)alertList.innerHTML='<div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">✅ No hay alertas activas hoy.</div>';
+    const alertHdr=document.getElementById('alertas-hdr-status');
+    if(alertHdr){alertHdr.textContent='✅ Sin alertas activas';alertHdr.style.color='var(--green)';}
+    const alertCnt=document.getElementById('alert-count');
+    if(alertCnt)alertCnt.style.display='none';
+    const dashPreview=document.getElementById('dashboard-alerts-preview');
+    if(dashPreview)dashPreview.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">✅ Sin alertas activas hoy.</div>';
+    // Renderizar tablas vacías
+    renderGestionList();renderPinTable();renderWorkers();renderJornada();
+    const taskLog=document.getElementById('task-log');
+    if(taskLog)taskLog.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin tareas enviadas aún.</div>';
+    showToast('✅ Panel limpio y listo para datos reales','ok');
+  });
 }
 
 function deleteWorker(id){
