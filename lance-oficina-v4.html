@@ -510,20 +510,20 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
             <input type="hidden" id="obra-edit-id">
             <div class="form-g">
               <label class="form-lbl">Nombre de la obra</label>
-              <input class="form-ctrl" id="obra-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Nave Industrial Almacelles">
+              <input class="form-ctrl" id="obra-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="">
             </div>
             <div class="form-g">
               <label class="form-lbl">Cliente / Empresa</label>
-              <input class="form-ctrl" id="obra-cliente" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Excavaciones Barroso SL">
+              <input class="form-ctrl" id="obra-cliente" type="text" oninput="capitalizarCampo(this)" placeholder="">
             </div>
             <div class="form-g">
               <label class="form-lbl">Descripción / Referencia</label>
-              <input class="form-ctrl" id="obra-direccion" type="text" placeholder="Ej: Nave Polígono Industrial, Almacelles">
+              <input class="form-ctrl" id="obra-direccion" type="text" placeholder="">
             </div>
             <div class="form-g">
               <label class="form-lbl">📍 Coordenadas GPS <span style="font-weight:400;color:var(--text3)">(copia desde Google Maps)</span></label>
               <div style="display:flex;gap:8px;align-items:center;">
-                <input class="form-ctrl" id="obra-coords" type="text" placeholder="37.3201432, -5.4067291" oninput="parsearCoordsObra(this.value)" style="flex:1;font-family:'Montserrat',sans-serif;letter-spacing:0.5px;">
+                <input class="form-ctrl" id="obra-coords" type="text" placeholder="" oninput="parsearCoordsObra(this.value)" style="flex:1;font-family:'Montserrat',sans-serif;letter-spacing:0.5px;">
                 <button type="button" onclick="abrirGoogleMaps()" style="padding:10px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:11px;white-space:nowrap;">🌍 Maps</button>
               </div>
               <div id="geo-obra-result" style="font-size:10px;margin-top:5px;display:none;"></div>
@@ -1878,8 +1878,8 @@ function renderObrasList(){
     <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
         <div>
-          <div style="font-weight:700;font-size:13px;color:var(--text)">${o.nombre||'Sin nombre'}</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:1px;">${o.cliente||'—'}</div>
+          <div style="font-weight:700;font-size:13px;color:var(--text)">${o.cliente||'—'}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:1px;">${o.nombre||'Sin nombre'}</div>
         </div>
         <span class="pill ${colEstado[o.estado]||'p-pend'}">${txtEstado[o.estado]||o.estado}</span>
       </div>
