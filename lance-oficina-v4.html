@@ -1142,6 +1142,12 @@ function renderGestionList(){
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:13px;color:${nombreColor}">${w.nombre} ${w.apellidos}${badgeInactivo}</div>
         <div style="font-size:10px;color:var(--text3)">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''} · PIN: <strong style="color:var(--blue2)">${w.pin}</strong>${w.tel?' · 📱 '+w.tel:''}</div>
+        <div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          ${w.obra
+            ?`<span style="font-size:10px;background:#EBF0FA;color:var(--blue2);border-radius:4px;padding:2px 7px;font-weight:600;">🏗️ ${w.obra}</span>`
+            :`<span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:2px 7px;font-weight:600;">⚠️ Sin obra asignada</span>`}
+          <button onclick="asignarObraDesdelista(${w.id})" style="font-size:9px;padding:2px 7px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);border-radius:4px;cursor:pointer;font-weight:600;">🔀 Cambiar obra</button>
+        </div>
       </div>
       <div style="display:flex;gap:5px;flex-shrink:0">
         ${!inactivo?`<button onclick="sendWaOperario(${w.id})" style="padding:5px 8px;border-radius:6px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);color:var(--green);font-size:11px;cursor:pointer;">📱</button>`:''}
@@ -1151,6 +1157,36 @@ function renderGestionList(){
       </div>
     </div>`;
   }).join('');
+}
+
+// Asignar obra directamente desde la lista de operarios
+function asignarObraDesdeLista(id){
+  const w=WORKERS.find(x=>x.id===id);if(!w)return;
+  if(!OBRAS||!OBRAS.length){showToast('⚠️ Primero crea obras en el apartado Obras','err');return;}
+  const activas=OBRAS.filter(o=>o.estado!=='terminada');
+  if(!activas.length){showToast('⚠️ No hay obras activas','err');return;}
+  const opciones=activas.map((o,i)=>`${i+1}. ${o.nombre}${o.cliente?' · '+o.cliente:''}${o.lat?' ✅':' ⚠️'}`).join('\n');
+  const actual=w.obra?`\nActual: ${w.obra}`:'';
+  const idx=prompt(`Asignar obra a ${w.nombre} ${w.apellidos}${actual}\n\n${opciones}\n\nEscribe el número (0 para quitar obra):`);
+  if(idx===null)return;
+  const num=parseInt(idx);
+  let obraSelec=null;
+  if(num===0){w.obra='';w.obra_lat=null;w.obra_lng=null;}
+  else if(num>=1&&num<=activas.length){
+    obraSelec=activas[num-1];
+    w.obra=obraSelec.nombre;
+    if(obraSelec.lat&&obraSelec.lng){w.obra_lat=parseFloat(obraSelec.lat);w.obra_lng=parseFloat(obraSelec.lng);}
+  } else {showToast('⚠️ Número no válido','err');return;}
+  // Guardar en Firebase
+  const docKey=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+  if(docKey){
+    const upd={obra:w.obra||'',obra_lat:w.obra_lat||null,obra_lng:w.obra_lng||null};
+    fetch(`${FB_URL}/operarios_registro/${docKey}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(upd)}).catch(()=>{});
+    // También actualizar en activos si está fichado
+    fetch(`${FB_URL}/operarios_activos/${docKey}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(upd)}).catch(()=>{});
+  }
+  saveW();renderGestionList();
+  showToast(w.obra?`✅ ${w.nombre} → ${w.obra}`:`✅ ${w.nombre} sin obra`,'ok');
 }
 
 // ✅ MEJORA 3: Activar/Desactivar operario
@@ -1176,7 +1212,20 @@ function toggleInactivoWorker(id, pausar){
 function renderPinTable(){
   const tb=document.getElementById('pin-tbody');if(!tb)return;
   const sb={in:'<span class="pill p-in">✅ En obra</span>',out:'<span class="pill p-out">🔴 Fuera</span>',pending:'<span class="pill p-pend">⏳ Sin fichar</span>'};
-  tb.innerHTML=WORKERS.map((w,i)=>`<tr><td style="font-weight:700;color:var(--text3)">${i+1}</td><td><div class="w-name">${w.nombre} ${w.apellidos}</div></td><td style="font-size:11px">${w.dni||w.nie||'—'}</td><td style="font-size:11px;color:var(--text3)">${w.obra||'—'}</td><td><span style="font-family:'Montserrat';font-size:20px;font-weight:900;color:var(--blue2);letter-spacing:4px">${w.pin}</span></td><td>${sb[w.status]||'—'}</td><td><button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️ Eliminar</button></td></tr>`).join('');
+  tb.innerHTML=WORKERS.map((w,i)=>{
+    const obraCell=w.obra
+      ?`<span style="font-size:10px;background:#EBF0FA;color:var(--blue2);border-radius:4px;padding:2px 6px;font-weight:600;">🏗️ ${w.obra}</span>`
+      :`<span style="font-size:10px;background:#FEF3C7;color:#92400E;border-radius:4px;padding:2px 6px;font-weight:600;">⚠️ Sin obra</span>`;
+    return `<tr>
+      <td style="font-weight:700;color:var(--text3)">${i+1}</td>
+      <td><div class="w-name">${w.nombre} ${w.apellidos}</div></td>
+      <td style="font-size:11px">${w.dni||w.nie||'—'}</td>
+      <td style="font-size:11px">${obraCell}<br><button onclick="asignarObraDesdelista(${w.id})" style="font-size:9px;margin-top:3px;padding:2px 6px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);border-radius:4px;cursor:pointer;font-weight:600;">🔀 Asignar</button></td>
+      <td><span style="font-family:'Montserrat';font-size:20px;font-weight:900;color:var(--blue2);letter-spacing:4px">${w.pin}</span></td>
+      <td>${sb[w.status]||'—'}</td>
+      <td><button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️ Eliminar</button></td>
+    </tr>`;
+  }).join('');
 }
 
 function saveWorker(){
