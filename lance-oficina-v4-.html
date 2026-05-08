@@ -1,0 +1,2702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ObraControl — Panel de Oficina · Construcciones Lance 2024 SL</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1B4F8C;--blue2:#2563AE;--blue3:#3B82C4;--blue-light:#E8F1FB;--blue-pale:#F0F6FF;--orange:#E8621A;--orange2:#FF7A35;--orange-l:#FFF3EC;--bg:#F4F7FC;--white:#FFFFFF;--card:#FFFFFF;--border:#E2EAF4;--border2:#D0DDF0;--text:#1A2840;--text2:#4A6080;--text3:#8FA5C0;--green:#16A34A;--green-l:#DCFCE7;--red:#DC2626;--red-l:#FEE2E2;--amber:#D97706;--amber-l:#FEF3C7;--purple:#7C3AED;--purple-l:#EDE9FE;--shadow:0 1px 3px rgba(27,79,140,.08),0 4px 16px rgba(27,79,140,.06);--shadow-lg:0 4px 24px rgba(27,79,140,.12),0 1px 4px rgba(27,79,140,.06);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(27,79,140,.04) 1px,transparent 0);background-size:28px 28px;pointer-events:none;z-index:0;}
+#login-screen{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#0A1628 0%,#1B3A6B 50%,#0A1628 100%);display:flex;align-items:center;justify-content:center;padding:24px;}
+.login-card{background:rgba(255,255,255,.97);border-radius:24px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,.4);position:relative;z-index:1;text-align:center;}
+.login-logo-svg{width:200px;height:auto;display:block;margin:0 auto 8px;}
+.login-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blue-light);border:1px solid var(--border2);padding:5px 14px;border-radius:20px;font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:1.5px;font-family:'Montserrat',sans-serif;margin-bottom:28px;}
+.login-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.login-sub{font-size:12px;color:var(--text3);margin-bottom:26px;}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:22px;}
+.pdot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);background:transparent;transition:all .15s;}
+.pdot.on{background:var(--blue2);border-color:var(--blue2);transform:scale(1.15);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:260px;margin:0 auto;}
+.pk{height:58px;border-radius:12px;background:var(--bg);border:1.5px solid var(--border);font-family:'Montserrat',sans-serif;font-size:22px;font-weight:700;color:var(--text);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;}
+.pk:hover{background:var(--blue-light);border-color:var(--blue2);}
+.pk:active{background:var(--blue2);color:#fff;transform:scale(.93);}
+.pk.del{font-size:16px;color:var(--text3);}
+.pk.zero{grid-column:2;}
+.pin-err{height:18px;text-align:center;font-size:11px;font-weight:700;color:var(--red);margin-top:10px;font-family:'Montserrat',sans-serif;}
+.pin-demo{margin-top:10px;font-size:11px;color:var(--text3);}
+.pin-demo strong{color:var(--blue2);}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .4s ease;}
+#app{display:none;position:relative;z-index:1;min-height:100vh;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--blue);display:flex;flex-direction:column;z-index:50;box-shadow:4px 0 20px rgba(27,79,140,.2);}
+.sb-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sb-logo-svg{width:160px;height:auto;display:block;margin-bottom:8px;}
+.sb-tagline{font-family:'Montserrat',sans-serif;font-size:8px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.sb-nav{flex:1;padding:16px 12px;overflow-y:auto;}
+.sb-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);padding:0 8px;margin:16px 0 6px;font-family:'Montserrat',sans-serif;}
+.sb-lbl:first-child{margin-top:0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .18s;font-size:13px;font-weight:500;color:rgba(255,255,255,.7);margin-bottom:2px;font-family:'Inter',sans-serif;}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;}
+.nav-item:hover{background:rgba(255,255,255,.1);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,.18);color:#fff;font-weight:600;}
+.n-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:9px;font-weight:800;}
+.sb-footer{padding:16px 12px;border-top:1px solid rgba(255,255,255,.1);}
+.sb-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,.08);}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--orange2),var(--orange));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;font-weight:700;color:#fff;font-family:'Montserrat',sans-serif;}
+.sb-user-name{font-size:12px;font-weight:600;color:#fff;}
+.sb-user-role{font-size:10px;color:rgba(255,255,255,.5);}
+.sb-logout{margin-top:8px;width:100%;padding:8px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:rgba(255,255,255,.5);font-size:11px;cursor:pointer;transition:all .18s;font-family:'Inter',sans-serif;}
+.sb-logout:hover{background:rgba(255,71,87,.2);border-color:rgba(255,71,87,.4);color:#fca5a5;}
+.main-content{margin-left:240px;padding:0;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;box-shadow:0 1px 0 var(--border);}
+.topbar-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.live-pill{display:flex;align-items:center;gap:6px;background:var(--green-l);border:1px solid rgba(22,163,74,.2);padding:5px 12px;border-radius:20px;font-size:10px;font-weight:700;color:var(--green);font-family:'Montserrat',sans-serif;letter-spacing:1px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:lp 2s infinite;}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.3}}
+.tb-clock{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:var(--blue2);letter-spacing:1px;}
+.tb-date{font-size:11px;color:var(--text3);}
+.page{padding:24px 28px;display:none;}
+.page.active{display:block;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;}
+.kc-blue::after{background:linear-gradient(90deg,var(--blue),var(--blue3));}
+.kc-green::after{background:linear-gradient(90deg,var(--green),#4ADE80);}
+.kc-red::after{background:linear-gradient(90deg,var(--red),#F87171);}
+.kc-orange::after{background:linear-gradient(90deg,var(--orange),var(--orange2));}
+.kc-purple::after{background:linear-gradient(90deg,var(--purple),#A78BFA);}
+.kpi-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.kpi-label{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text3);}
+.kpi-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;}
+.kc-blue .kpi-icon{background:var(--blue-light);}
+.kc-green .kpi-icon{background:var(--green-l);}
+.kc-red .kpi-icon{background:var(--red-l);}
+.kc-orange .kpi-icon{background:var(--orange-l);}
+.kc-purple .kpi-icon{background:var(--purple-l);}
+.kpi-val{font-family:'Montserrat',sans-serif;font-size:44px;font-weight:900;line-height:1;letter-spacing:-1px;}
+.kc-blue .kpi-val{color:var(--blue2);}
+.kc-green .kpi-val{color:var(--green);}
+.kc-red .kpi-val{color:var(--red);}
+.kc-orange .kpi-val{color:var(--orange);}
+.kc-purple .kpi-val{color:var(--purple);}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.kpi-trend{font-size:10px;font-weight:600;margin-top:8px;display:flex;align-items:center;gap:3px;}
+.t-up{color:var(--green);}.t-dn{color:var(--red);}.t-ne{color:var(--amber);}
+.card{background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+.card-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);display:flex;align-items:center;gap:8px;}
+.card-body{padding:20px;}
+.row-2{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;margin-bottom:20px;}
+.row-2-eq{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;}
+.row-3{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;margin-bottom:20px;}
+.jornada-info{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.jor-badge{background:var(--blue-light);border:1px solid var(--border2);border-radius:10px;padding:10px 16px;font-size:12px;color:var(--blue2);}
+.jor-badge strong{font-family:'Montserrat',sans-serif;font-weight:800;display:block;font-size:14px;margin-bottom:2px;}
+.jornada-table{width:100%;border-collapse:collapse;}
+.jornada-table th{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;background:var(--bg);}
+.jornada-table td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;}
+.jornada-table tr:last-child td{border-bottom:none;}
+.jornada-table tr:hover td{background:var(--blue-pale);}
+.check-ok{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--green-l);color:var(--green);font-size:14px;font-weight:700;}
+.check-err{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--red-l);color:var(--red);font-size:14px;font-weight:700;}
+.check-pend{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--amber-l);color:var(--amber);font-size:14px;font-weight:700;}
+.extra-item{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);}
+.extra-item:last-child{border-bottom:none;}
+.extra-badge{background:var(--purple-l);border:1px solid rgba(124,58,237,.2);color:var(--purple);padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Montserrat',sans-serif;}
+.wtbl{width:100%;border-collapse:collapse;}
+.wtbl thead th{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;background:var(--bg);}
+.wtbl tbody td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:12px;}
+.wtbl tbody tr:last-child td{border-bottom:none;}
+.wtbl tbody tr:hover td{background:var(--blue-pale);}
+.w-name{font-weight:600;font-size:13px;color:var(--text);}
+.w-doc{font-size:10px;color:var(--text3);margin-top:1px;}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:'Montserrat',sans-serif;}
+.p-in{background:var(--green-l);color:var(--green);}
+.p-out{background:var(--red-l);color:var(--red);}
+.p-pend{background:var(--amber-l);color:var(--amber);}
+.p-warn{background:#FEF3C7;color:#D97706;}
+.search-wrap{position:relative;margin-bottom:16px;}
+.search-inp{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--white);outline:none;transition:border-color .2s;}
+.search-inp:focus{border-color:var(--blue2);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);}
+.form-g{margin-bottom:13px;}
+.form-lbl{display:block;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:6px;}
+.form-ctrl{width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);padding:10px 12px;border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+.form-ctrl:focus{border-color:var(--blue2);background:var(--white);}
+textarea.form-ctrl{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn-primary{width:100%;padding:12px;background:var(--blue2);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all .18s;box-shadow:0 4px 12px rgba(37,99,174,.3);}
+.btn-primary:hover{background:var(--blue);}
+.btn-secondary{width:100%;padding:11px;background:transparent;border:1.5px solid var(--border);border-radius:9px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;transition:all .18s;margin-top:8px;}
+.btn-secondary:hover{border-color:var(--blue2);color:var(--blue2);}
+.btn-danger{padding:6px 12px;background:var(--red-l);border:1px solid rgba(220,38,38,.2);color:var(--red);border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15px;}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-edit{padding:6px 12px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;}
+.btn-edit:hover{background:var(--blue2);color:#fff;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(10,22,40,.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.overlay.show{display:flex;}
+.modal{background:var(--white);border-radius:16px;width:440px;max-width:95vw;overflow:hidden;box-shadow:var(--shadow-lg);}
+.modal-hdr{background:linear-gradient(135deg,#075e54,#128c7e);padding:16px 20px;display:flex;align-items:center;gap:10px;}
+.modal-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;letter-spacing:1px;color:#fff;}
+.modal-body{padding:20px;}
+.modal-foot{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;}
+.btn-cancel{background:var(--bg);color:var(--text3);border:1px solid var(--border);padding:9px 16px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-send-wp{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;}
+.toast{position:fixed;bottom:22px;right:22px;padding:12px 18px;border-radius:10px;font-size:12px;font-weight:600;display:none;z-index:500;animation:tIn .3s ease;font-family:'Montserrat',sans-serif;box-shadow:var(--shadow-lg);}
+.toast.show{display:flex;align-items:center;gap:8px;}
+.toast.ok{background:var(--green-l);border:1px solid rgba(22,163,74,.3);color:var(--green);}
+.toast.err{background:var(--red-l);border:1px solid rgba(220,38,38,.3);color:var(--red);}
+.toast.inf{background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);}
+@keyframes tIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+.alert-item{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;transition:background .15s;position:relative;}
+.alert-item:hover{background:var(--blue-pale);}
+.alert-item:last-child{border-bottom:none;}
+.alert-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.ai-crit::before{background:var(--red);}
+.ai-warn::before{background:var(--amber);}
+.al-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ai-crit .al-icon{background:var(--red-l);}
+.ai-warn .al-icon{background:var(--amber-l);}
+.al-name{font-weight:700;font-size:13px;color:var(--text);margin-bottom:2px;}
+.al-desc{font-size:11px;color:var(--text3);line-height:1.5;}
+.al-time{font-size:10px;color:var(--text3);margin-top:4px;}
+.al-actions{display:flex;gap:6px;margin-top:8px;}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:5px;font-size:9px;font-weight:700;font-family:'Montserrat',sans-serif;letter-spacing:.5px;flex-shrink:0;}
+.b-crit{background:var(--red-l);color:var(--red);}
+.b-warn{background:var(--amber-l);color:var(--amber);}
+.b-ok{background:var(--green-l);color:var(--green);}
+.btn-wp{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:7px;font-size:10px;font-weight:600;cursor:pointer;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);color:var(--green);font-family:'Inter',sans-serif;transition:all .15s;}
+.btn-wp:hover{background:var(--green);color:#fff;}
+.btn-resolve{padding:5px 12px;border-radius:7px;font-size:10px;font-weight:600;cursor:pointer;background:var(--bg);border:1px solid var(--border);color:var(--text3);font-family:'Inter',sans-serif;transition:all .15s;}
+.btn-resolve:hover{border-color:var(--green);color:var(--green);}
+.extra-form{background:var(--purple-l);border:1px solid rgba(124,58,237,.2);border-radius:12px;padding:16px;margin-bottom:16px;}
+.extra-form .form-lbl{color:var(--purple);}
+.wp-item{display:flex;gap:10px;align-items:center;padding:11px 20px;border-bottom:1px solid var(--border);}
+.wp-item:last-child{border-bottom:none;}
+.wp-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.wp-n{font-size:12px;font-weight:600;color:var(--text);}
+.wp-m{font-size:10px;color:var(--text3);margin-top:1px;}
+.wp-t{font-size:10px;color:var(--text3);margin-left:auto;flex-shrink:0;}
+@media(max-width:900px){.sidebar{display:none;}.main-content{margin-left:0;}.kpi-grid,.row-2,.row-2-eq,.row-3{grid-template-columns:1fr 1fr;}.page{padding:14px;}}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <svg class="login-logo-svg" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+      <rect x="148" y="20" width="104" height="140" fill="#1B4F8C"/>
+      <rect x="245" y="55" width="70" height="105" fill="none" stroke="#1B4F8C" stroke-width="8"/>
+      <rect x="85" y="75" width="63" height="85" fill="none" stroke="#1B4F8C" stroke-width="8"/>
+      <rect x="170" y="32" width="60" height="55" fill="none" stroke="#E8F1FB" stroke-width="6"/>
+      <line x1="60" y1="160" x2="340" y2="160" stroke="#1B4F8C" stroke-width="7"/>
+      <text x="200" y="190" text-anchor="middle" font-family="Montserrat,Arial" font-size="24" font-weight="400" fill="#1B4F8C" letter-spacing="2">construcciones</text>
+      <text x="200" y="232" text-anchor="middle" font-family="Montserrat,Arial" font-size="52" font-weight="900" fill="#1B4F8C" letter-spacing="4">LANCE</text>
+    </svg>
+    <div class="login-badge">🏢 PANEL DE OFICINA · ENCARGADO</div>
+    <div class="login-title">Acceso restringido</div>
+    <div class="login-sub">Introduce tu PIN de encargado para continuar</div>
+    <div class="pin-dots">
+      <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
+      <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
+    </div>
+    <div class="pin-pad" id="pin-pad">
+      <div class="pk" onclick="pk('1')">1</div><div class="pk" onclick="pk('2')">2</div><div class="pk" onclick="pk('3')">3</div>
+      <div class="pk" onclick="pk('4')">4</div><div class="pk" onclick="pk('5')">5</div><div class="pk" onclick="pk('6')">6</div>
+      <div class="pk" onclick="pk('7')">7</div><div class="pk" onclick="pk('8')">8</div><div class="pk" onclick="pk('9')">9</div>
+      <div class="pk del" onclick="pkDel()">⌫</div><div class="pk zero" onclick="pk('0')">0</div>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+    <div class="pin-demo">PIN: <strong>0000</strong></div>
+  </div>
+</div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg class="sb-logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="60" y="5" width="55" height="75" fill="white"/>
+        <rect x="110" y="20" width="38" height="60" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
+        <rect x="30" y="30" width="33" height="50" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
+        <line x1="15" y1="80" x2="165" y2="80" stroke="white" stroke-width="5"/>
+        <text x="185" y="45" font-family="Montserrat,Arial" font-size="15" font-weight="400" fill="rgba(255,255,255,.65)" letter-spacing="2">construcciones</text>
+        <text x="185" y="80" font-family="Montserrat,Arial" font-size="34" font-weight="900" fill="white" letter-spacing="3">LANCE</text>
+        <text x="185" y="100" font-family="Montserrat,Arial" font-size="10" font-weight="500" fill="rgba(255,255,255,.4)" letter-spacing="2">2024 SL</text>
+      </svg>
+      <div class="sb-tagline">ObraControl GPS</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-lbl">Principal</div>
+      <div class="nav-item active" onclick="showPage('dashboard')" id="ni-dashboard">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Tablero
+      </div>
+      <div class="nav-item" onclick="showPage('jornada')" id="ni-jornada">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2m6-2v2M2 6h12"/></svg>
+        Resumen jornada
+      </div>
+      <div class="nav-item" onclick="showPage('operarios')" id="ni-operarios">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        Operarios
+      </div>
+      <div class="sb-lbl">Control</div>
+      <div class="nav-item" onclick="showPage('alertas')" id="ni-alertas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
+        Alertas <span class="n-badge" id="alert-count" style="display:none">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('extras')" id="ni-extras">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Horas extras
+      </div>
+      <div class="nav-item" onclick="showPage('horas')" id="ni-horas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Horas trabajadas
+      </div>
+      <div class="sb-lbl">Comunicación</div>
+      <div class="nav-item" onclick="showPage('tareas')" id="ni-tareas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
+        Tareas
+      </div>
+      <div class="nav-item" onclick="showPage('whatsapp')" id="ni-whatsapp">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8 1C4.1 1 1 4.1 1 8c0 1.2.3 2.4.9 3.4L1 15l3.7-.9C5.7 14.7 6.8 15 8 15c3.9 0 7-3.1 7-7S11.9 1 8 1z"/></svg>
+        WhatsApp
+      </div>
+      <div class="sb-lbl">Administración</div>
+      <div class="nav-item" onclick="showPage('obras')" id="ni-obras">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="8" width="6" height="7" rx="1"/><rect x="9" y="4" width="6" height="11" rx="1"/><path d="M4 8V5l4-4 4 4v1"/></svg>
+        Obras <span style="background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:8px;margin-left:4px;font-family:'Montserrat',sans-serif;letter-spacing:1px;">NUEVO</span>
+      </div>
+      <div class="nav-item" onclick="showPage('gestion')" id="ni-gestion">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="6" cy="4" r="2.5"/><path d="M1 13c0-2.5 2.2-4.5 5-4.5"/><path d="M10 9v4m-2-2h4"/></svg>
+        Alta de operarios
+      </div>
+      <div class="nav-item" onclick="showPage('asistente')" id="ni-asistente">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6 6.5c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.5-1.2 1.8L8 9v1"/><circle cx="8" cy="11.5" r=".5" fill="currentColor"/></svg>
+        Asistente IA
+      </div>
+      <div class="nav-item" onclick="showPage('consentimientos')" id="ni-consentimientos">📋 Consentimientos</div>
+      <div class="nav-item" onclick="showPage('informes')" id="ni-informes">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/></svg>
+        Informes de jornada
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">JM</div>
+        <div>
+          <div class="sb-user-name">Luis Campaña</div>
+          <div class="sb-user-role">Encargado · Lance 2024</div>
+        </div>
+      </div>
+      <button onclick="sendResumenWA()" style="width:100%;margin-top:6px;padding:8px;background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:#25d366;font-size:10px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📱 Resumen a mi WhatsApp</button>
+      <button class="sb-logout" onclick="logout()">↩ Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Tablero</div>
+      <div class="topbar-right">
+        <div class="live-pill"><div class="live-dot"></div>EN VIVO</div>
+        <div id="fb-live-badge" style="font-size:10px;color:var(--green);font-weight:600;display:none;"></div>
+        <div><div class="tb-clock" id="clock">--:--:--</div><div class="tb-date" id="tb-date"></div></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi-card kc-blue" onclick="showPage('operarios')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Operarios</span><div class="kpi-icon"><svg fill="none" stroke="var(--blue2)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></div></div>
+          <div class="kpi-val" id="kv-total">0</div>
+          <div class="kpi-sub">Plantilla completa</div>
+        </div>
+        <div class="kpi-card kc-green" onclick="showPage('jornada')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">En obra · GPS</span><div class="kpi-icon"><svg fill="none" stroke="var(--green)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z"/></svg></div></div>
+          <div class="kpi-val" id="kv-in">0</div>
+          <div class="kpi-sub">Fichados hoy</div>
+        </div>
+        <div class="kpi-card kc-red" onclick="showPage('alertas')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Alertas</span><div class="kpi-icon"><svg fill="none" stroke="var(--red)" stroke-width="1.8" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg></div></div>
+          <div class="kpi-val" id="kv-alerts">0</div>
+          <div class="kpi-sub">Requieren atención</div>
+        </div>
+        <div class="kpi-card kc-purple" onclick="showPage('extras')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Horas extras</span><div class="kpi-icon" style="background:var(--purple-l)"><svg fill="none" stroke="var(--purple)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg></div></div>
+          <div class="kpi-val" id="kv-extras">0</div>
+          <div class="kpi-sub">Horas extra hoy</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+        <button onclick="showPage('jornada')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📅</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">JORNADA</div></button>
+        <button onclick="showPage('operarios')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">👷</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">OPERARIOS</div></button>
+        <button onclick="showPage('tareas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📋</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">TAREAS</div></button>
+        <button onclick="showPage('alertas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🚨</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALERTAS</div></button>
+        <button onclick="showPage('gestion')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">➕</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALTA</div></button>
+        <button onclick="showPage('horas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">⏱</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">HORAS</div></button>
+        <button onclick="showPage('whatsapp')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='#25d366'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">💬</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">WHATSAPP</div></button>
+        <button onclick="showPage('asistente')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🤖</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ASISTENTE</div></button>
+      </div>
+      <div class="jornada-info">
+        <div class="jor-badge"><strong>Lun – Jue</strong>08:00–13:00 · 14:00–18:00 (9h)</div>
+        <div class="jor-badge"><strong>Viernes</strong>08:00–14:00 (6h)</div>
+        <div class="jor-badge" style="background:var(--purple-l);border-color:rgba(124,58,237,.2);color:var(--purple)"><strong>Semana</strong>42h totales</div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🚨 Alertas del día</div><button onclick="showPage('alertas')" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">Ver todas →</button></div>
+        <div id="dashboard-alerts-preview" style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">✅ Sin alertas activas hoy.</div>
+      </div>
+    </div>
+
+    <!-- RESUMEN JORNADA -->
+    <div class="page" id="page-jornada">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">📅 Resumen de jornada — Hoy</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button onclick="mostrarFichajeManual()" style="font-size:10px;background:var(--orange-l);border:1px solid rgba(232,98,26,.3);color:var(--orange);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">✏️ Fichaje manual</button>
+            <button onclick="showPage('informes')" style="font-size:10px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">🖨️ Informe</button>
+            <span id="jornada-date" style="font-size:10px;color:var(--text3)"></span></div></div>
+        <div id="fichaje-manual-panel" style="display:none;background:var(--orange-l);border:1px solid rgba(232,98,26,.25);border-radius:12px;padding:16px;margin-bottom:16px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--orange);margin-bottom:12px;">✏️ FICHAJE MANUAL — Añadir/modificar hora</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end;">
+            <div>
+              <label class="form-lbl">Operario</label>
+              <select class="form-ctrl" id="fm-worker" style="border-color:rgba(232,98,26,.3);"></select>
+            </div>
+            <div>
+              <label class="form-lbl">Tipo</label>
+              <select class="form-ctrl" id="fm-tipo" style="border-color:rgba(232,98,26,.3);">
+                <option value="entrada">✅ Entrada</option>
+                <option value="salida">🔴 Salida</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-lbl">Hora</label>
+              <input class="form-ctrl" id="fm-hora" type="time" style="border-color:rgba(232,98,26,.3);">
+            </div>
+            <div>
+              <label class="form-lbl">Obra</label>
+              <select class="form-ctrl" id="fm-obra" style="border-color:rgba(232,98,26,.3);">
+                <option value="">— Obra actual —</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-lbl">Nota</label>
+              <input class="form-ctrl" id="fm-nota" type="text" placeholder="Médico, transporte..." style="border-color:rgba(232,98,26,.3);">
+            </div>
+            <div>
+              <button onclick="guardarFichajeManual()" style="padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Guardar</button>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:10px;color:var(--text3);">ℹ️ El fichaje manual sobreescribe el fichaje del operario en Firebase para hoy.</div>
+        </div>
+        <table class="jornada-table">
+          <thead><tr><th>Operario</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Zona</th><th>Estado</th></tr></thead>
+          <tbody id="jornada-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OPERARIOS -->
+    <div class="page" id="page-operarios">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">👷 Operarios registrados</div><span id="op-count" style="font-size:10px;color:var(--text3)"></span></div>
+        <div style="padding:16px 20px 0;">
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+            <input class="search-inp" id="op-search" placeholder="Buscar por nombre, DNI o NIE..." oninput="renderWorkers()">
+          </div>
+        </div>
+        <table class="wtbl">
+          <thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Zona GPS</th><th>Acción</th></tr></thead>
+          <tbody id="op-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="page" id="page-alertas">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Centro de alertas</div><span id="alertas-hdr-status" style="font-size:10px;color:var(--green);font-weight:700">✅ Sin alertas activas</span></div>
+        <div id="alerts-list">
+          <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">✅ No hay alertas activas hoy.<br><br><span style="font-size:11px;">Las alertas aparecerán cuando un operario fiche fuera de su zona de obra.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HORAS EXTRAS -->
+    <div class="page" id="page-extras">
+      <div class="row-3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">➕ Registrar horas extras</div></div>
+          <div class="card-body">
+            <div class="extra-form">
+              <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="ex-worker" style="border-color:rgba(124,58,237,.3);"></select></div>
+              <div class="form-row">
+                <div class="form-g"><label class="form-lbl">Hora inicio</label><input class="form-ctrl" id="ex-start" type="time" style="border-color:rgba(124,58,237,.3);"></div>
+                <div class="form-g"><label class="form-lbl">Hora fin</label><input class="form-ctrl" id="ex-end" type="time" style="border-color:rgba(124,58,237,.3);"></div>
+              </div>
+              <div class="form-g"><label class="form-lbl">Motivo</label><input class="form-ctrl" id="ex-reason" type="text" placeholder="Ej: Acabar tabiquería" style="border-color:rgba(124,58,237,.3);"></div>
+            </div>
+            <button class="btn-primary" style="background:var(--purple);" onclick="addExtra()">+ Registrar horas extras</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-hdr"><div class="card-title">📋 Horas extras hoy</div></div><div id="extras-list"><div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin horas extras hoy.</div></div></div>
+      </div>
+    </div>
+
+    <!-- HORAS TRABAJADAS -->
+    <div class="page" id="page-horas">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hdr">
+          <div class="card-title">⏱ Horas trabajadas</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="horas-periodo" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderHours()">
+              <option value="hoy">Hoy</option>
+              <option value="semana">Esta semana</option>
+              <option value="mes" selected>Este mes</option>
+            </select>
+            <button onclick="renderHours()" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;">🔄 Actualizar</button>
+            <button onclick="showPage('informes')" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;font-weight:700;color:var(--blue2);">🖨️ Informe</button>
+          </div>
+        </div>
+        <div id="horas-resumen" style="display:flex;gap:10px;padding:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);"></div>
+        <div id="hours-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📅 Desglose por días</div>
+        </div>
+        <div id="horas-dias-list" style="max-height:400px;overflow-y:auto;"></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-hdr">
+          <div class="card-title">📆 Control de asistencia mensual</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="cal-mes" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderCalendario()"></select>
+            <select id="cal-operario" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderCalendario()">
+              <option value="todos">👷 Todos</option>
+            </select>
+            <button onclick="renderCalendario()" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;">🔄</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;padding:10px 16px;flex-wrap:wrap;font-size:10px;color:var(--text3);">
+          <span>🟢 Completo</span>
+          <span>🟡 Parcial (solo entrada o salida)</span>
+          <span>🔴 No fichó</span>
+          <span>⚪ Fin de semana</span>
+          <span>🔵 Hoy</span>
+        </div>
+        <div id="cal-container" style="padding:0 16px 16px;overflow-x:auto;"></div>
+      </div>
+    </div>
+
+    <!-- TAREAS -->
+    <div class="page" id="page-tareas">
+      <div class="row-2-eq">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">📤 Enviar tarea</div></div>
+          <div class="card-body">
+            <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="task-to"><option value="all">Todos los operarios</option></select></div>
+            <div class="form-g"><label class="form-lbl">Prioridad</label><select class="form-ctrl" id="task-prio"><option>🟡 Normal</option><option>🔴 Urgente</option><option>🔵 Informativa</option></select></div>
+            <div class="form-g"><label class="form-lbl">Descripción</label><textarea class="form-ctrl" id="task-msg" placeholder="Describe el trabajo a realizar..."></textarea></div>
+            <button class="btn-primary" onclick="sendTask()">Enviar tarea →</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-hdr"><div class="card-title">Tareas enviadas</div><button onclick="borrarTodasTareas()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todas</button></div><div id="task-log" style="max-height:420px;overflow-y:auto;"></div></div>
+      </div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="page" id="page-whatsapp">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">💬 Mensajes WhatsApp</div></div>
+        <div id="wp-log"></div>
+      </div>
+    </div>
+
+    <!-- OBRAS -->
+    <div class="page" id="page-obras">
+      <div class="row-2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title" id="obra-form-title">🏗️ Nueva obra</div>
+            <button onclick="resetObraForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">✕ Limpiar</button>
+          </div>
+          <div class="card-body">
+            <input type="hidden" id="obra-edit-id">
+            <div class="form-g">
+              <label class="form-lbl">Nombre de la obra</label>
+              <input class="form-ctrl" id="obra-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">Cliente / Empresa</label>
+              <input class="form-ctrl" id="obra-cliente" type="text" oninput="capitalizarCampo(this)" placeholder="">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">Descripción / Referencia</label>
+              <input class="form-ctrl" id="obra-direccion" type="text" placeholder="">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">📍 Coordenadas GPS <span style="font-weight:400;color:var(--text3)">(copia desde Google Maps)</span></label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input class="form-ctrl" id="obra-coords" type="text" placeholder="37.3201432, -5.4067291" oninput="parsearCoordsObra(this.value)" style="flex:1;font-family:'Montserrat',sans-serif;letter-spacing:0.5px;">
+                <button type="button" onclick="abrirGoogleMaps()" style="padding:10px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:11px;white-space:nowrap;">🌍 Maps</button>
+              </div>
+              <div id="geo-obra-result" style="font-size:10px;margin-top:5px;display:none;"></div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px;">💡 En Google Maps: manten pulsado en el punto de la obra → copia las coordenadas → pégalas aquí</div>
+            </div>
+            <div class="form-row">
+              <div class="form-g">
+                <label class="form-lbl">Radio zona (metros)</label>
+                <input class="form-ctrl" id="obra-radio" type="number" value="500" min="100" max="2000" placeholder="500">
+              </div>
+              <div class="form-g">
+                <label class="form-lbl">Estado</label>
+                <select class="form-ctrl" id="obra-estado">
+                  <option value="activa">🟢 Activa</option>
+                  <option value="pausada">🟡 Pausada</option>
+                  <option value="terminada">🔴 Terminada</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="saveObra()" id="obra-btn">+ Crear obra</button>
+            <button class="btn-secondary" onclick="resetObraForm()">Cancelar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">🏗️ Obras registradas</div>
+            <span id="obras-count" style="font-size:10px;color:var(--text3)"></span>
+          </div>
+          <div id="obras-list" style="max-height:600px;overflow-y:auto;">
+            <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin obras registradas aún.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALTA OPERARIOS -->
+    <div class="page" id="page-gestion">
+      <div class="row-3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title" id="gestion-title">➕ Alta de operario</div><button onclick="resetForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;font-weight:600;">✕ Limpiar</button></div>
+          <div class="card-body">
+            <input type="hidden" id="edit-id">
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">Nombre</label><input class="form-ctrl" id="g-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Nombre"></div>
+              <div class="form-g"><label class="form-lbl">Apellidos</label><input class="form-ctrl" id="g-apellidos" type="text" oninput="capitalizarCampo(this)" placeholder="Apellidos"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">DNI</label><input class="form-ctrl" id="g-dni" type="text" placeholder="12345678A" maxlength="9"></div>
+              <div class="form-g"><label class="form-lbl">NIE</label><input class="form-ctrl" id="g-nie" type="text" placeholder="X1234567A" maxlength="9"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
+              <div class="form-g">
+                <label class="form-lbl">Obra asignada</label>
+                <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
+                  <option value="">— Sin obra asignada —</option>
+                </select>
+                <input type="hidden" id="g-obra">
+                <div id="g-obra-info" style="font-size:10px;color:var(--blue2);margin-top:4px;display:none;"></div>
+              </div>
+            </div>
+            <div class="form-g">
+                <label class="form-lbl">🌍 Idioma del operario</label>
+                <select class="form-ctrl" id="g-idioma">
+                  <option value="es">🇪🇸 Español</option>
+                  <option value="ca">🏴 Català</option>
+                  <option value="ro">🇷🇴 Română</option>
+                  <option value="ar">🇲🇦 العربية</option>
+                  <option value="fr">🇫🇷 Français</option>
+                  <option value="en">🇬🇧 English</option>
+                </select>
+              </div>
+            <div class="form-row">
+              <div class="form-g">
+                <label class="form-lbl">PIN empresa</label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input class="form-ctrl" id="g-pin" type="text" maxlength="4" placeholder="4 dígitos" style="letter-spacing:4px;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;flex:1;">
+                  <button type="button" onclick="generarPinUnico()" style="padding:10px 12px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:14px;">🔄</button>
+                </div>
+              </div>
+              <div class="form-g"><label class="form-lbl">Estado</label><select class="form-ctrl" id="g-status"><option value="pending">⏳ Sin fichar</option><option value="in">✅ En obra</option></select></div>
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">📱 Sistema operativo</label>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="so-android" onclick="selectSO('android')" style="flex:1;padding:12px;background:rgba(56,224,123,.08);border:2px solid var(--green);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--green);">🤖 Android</button>
+                <button type="button" id="so-iphone" onclick="selectSO('iphone')" style="flex:1;padding:12px;background:var(--card);border:2px solid var(--border);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--text3);">🍎 iPhone</button>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="saveWorker()" id="g-btn">+ Dar de alta</button>
+            <button class="btn-secondary" onclick="resetForm()">Cancelar</button>
+            <div id="wa-generado" style="display:none;margin-top:14px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:12px;padding:14px;">
+              <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--green);margin-bottom:8px;">✅ OPERARIO DADO DE ALTA</div>
+              <div id="wa-preview" style="font-size:11px;color:var(--text2);line-height:1.6;white-space:pre-wrap;background:white;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid var(--border);"></div>
+              <button onclick="sendWaAlta()" style="width:100%;padding:10px;background:#25d366;border:none;border-radius:8px;color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📱 ABRIR WHATSAPP Y ENVIAR</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">👷 Operarios dados de alta</div><span id="g-count" style="font-size:10px;color:var(--text3)"></span></div>
+            <div style="padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <div class="search-wrap" style="flex:1;min-width:140px;"><svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg><input class="search-inp" id="g-search" placeholder="Buscar..." oninput="renderGestionList()"></div>
+              <select id="g-filtro-estado" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderGestionList()">
+                <option value="activos">✅ Activos</option>
+                <option value="todos">👁 Todos</option>
+                <option value="inactivos">⏸ Inactivos</option>
+              </select>
+            </div>
+            <div id="gestion-list" style="max-height:500px;overflow-y:auto;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🔐 Tabla de PINs</div><button onclick="window.print()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🖨️ Imprimir</button></div>
+        <table class="wtbl"><thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Eliminar</th></tr></thead><tbody id="pin-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ASISTENTE IA -->
+    <div class="page" id="page-asistente">
+      <div style="max-width:700px;margin:0 auto;">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">🤖 Asistente IA</div></div>
+          <div style="padding:16px;max-height:420px;overflow-y:auto;" id="chat-messages">
+            <div style="background:var(--blue-light);border-radius:12px 12px 12px 0;padding:12px 16px;margin-bottom:10px;max-width:85%;font-size:13px;color:var(--text);">
+              👋 Hola Luis! Soy tu asistente de ObraControl GPS.<br><br>
+              Puedo ayudarte con:<br>
+              • <strong>¿Quién no ha fichado hoy?</strong><br>
+              • <strong>¿Quién fichó fuera de zona?</strong><br>
+              • <strong>Resumen del día</strong>
+            </div>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;">
+            <input class="form-ctrl" id="chat-input" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter') sendChat()" style="flex:1;">
+            <button onclick="sendChat()" style="padding:10px 16px;background:var(--blue2);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Enviar</button>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="quickChat('¿Quién no ha fichado hoy?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Quién no fichó?</button>
+            <button onclick="quickChat('¿Quién fichó fuera de zona?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Fuera de zona?</button>
+            <button onclick="quickChat('Resumen del día')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">Resumen</button>
+            <button onclick="sendResumenWA()" style="padding:6px 12px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:20px;font-size:11px;cursor:pointer;color:var(--green);font-weight:600;">📱 Enviar a mi WA</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="wp-overlay">
+  <div class="modal">
+    <div class="modal-hdr"><span style="font-size:24px">💬</span><div><div class="modal-title">ENVIAR WHATSAPP</div></div></div>
+    <div class="modal-body">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text3)">Para: <strong style="color:var(--text)" id="wp-name"></strong></div>
+      <label class="form-lbl">Mensaje</label>
+      <textarea class="form-ctrl" id="wp-ta" style="min-height:110px;"></textarea>
+      <div class="modal-foot"><button class="btn-cancel" onclick="closeWP()">Cancelar</button><button class="btn-send-wp" onclick="sendWP()">📱 Enviar</button></div>
+    </div>
+  </div>
+</div>
+
+    <!-- CONSENTIMIENTOS -->
+    <div class="page" id="page-consentimientos">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📋 Registro de consentimientos RGPD</div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="cargarConsentimientos()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🔄 Actualizar</button>
+            <button onclick="generarConsentimientosDesdeOperarios()" style="font-size:10px;color:var(--green);background:none;border:none;cursor:pointer;font-weight:600;">🔧 Generar faltantes</button>
+            <button onclick="borrarTodosConsentimientos()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todos</button>
+          </div>
+        </div>
+        <table class="wtbl">
+          <thead><tr><th>Operario</th><th>DNI/NIE</th><th>Fecha</th><th>Hora</th><th>Idioma</th><th>RGPD</th><th>GPS</th><th>Acción</th></tr></thead>
+          <tbody id="consent-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INFORMES DE JORNADA -->
+    <div class="page" id="page-informes">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hdr">
+          <div class="card-title">📄 Informes de jornada</div>
+          <div style="font-size:10px;color:var(--text3);">Cumplimiento RD 8/2019 — Registro de jornada</div>
+        </div>
+        <div class="card-body">
+          <!-- Controles -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:16px;">
+            <div>
+              <label class="form-lbl">Tipo de informe</label>
+              <select class="form-ctrl" id="inf-tipo" onchange="onChangeTipoInforme()">
+                <option value="diario">📅 Diario</option>
+                <option value="semanal">📆 Semanal</option>
+                <option value="mensual">🗓️ Mensual</option>
+              </select>
+            </div>
+            <div id="inf-ctrl-fecha">
+              <label class="form-lbl">Fecha</label>
+              <input class="form-ctrl" type="date" id="inf-fecha">
+            </div>
+            <div id="inf-ctrl-semana" style="display:none;">
+              <label class="form-lbl">Semana (lunes)</label>
+              <input class="form-ctrl" type="date" id="inf-semana-ini">
+            </div>
+            <div id="inf-ctrl-mes" style="display:none;">
+              <label class="form-lbl">Mes</label>
+              <input class="form-ctrl" type="month" id="inf-mes">
+            </div>
+            <div>
+              <label class="form-lbl">Operario</label>
+              <select class="form-ctrl" id="inf-operario">
+                <option value="todos">👷 Todos los operarios</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-primary" onclick="generarInforme()" style="white-space:nowrap;">🔍 Previsualizar</button>
+            </div>
+          </div>
+          <!-- Botones de exportación -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;">
+            <button onclick="imprimirInforme()" style="padding:9px 16px;background:var(--blue2);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">🖨️ Imprimir / PDF digital</button>
+            <button onclick="descargarInformeHTML()" style="padding:9px 16px;background:var(--blue-light);color:var(--blue2);border:1px solid var(--border2);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">💾 Guardar HTML</button>
+            <span style="font-size:10px;color:var(--text3);align-self:center;">Desde el navegador: Imprimir → Guardar como PDF → listo para inspección</span>
+          </div>
+          <!-- Preview -->
+          <div id="inf-preview-wrap" style="display:none;">
+            <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Vista previa del informe</div>
+            <div id="inf-preview" style="border:1px solid var(--border);border-radius:8px;overflow:auto;background:#fff;max-height:600px;"></div>
+          </div>
+          <div id="inf-empty" style="padding:32px;text-align:center;color:var(--text3);font-size:12px;">Selecciona el tipo de informe, el período y pulsa Previsualizar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function calcDist(lat1,lng1,lat2,lng2){
+  const R=6371000;
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+
+const FB_URL = 'https://lance-a99b4-default-rtdb.europe-west1.firebasedatabase.app';
+const APP_URL = 'https://obracontrol-tech.github.io/lance2024/lance-operario-v3.html';
+const ENCARGADO_WA = '+34629108645';
+const DAYS_CAP=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+const JORNADA={
+  'Lunes':{t1s:'08:00',t1e:'13:00',t2s:'14:00',t2e:'18:00',total:9},
+  'Martes':{t1s:'08:00',t1e:'13:00',t2s:'14:00',t2e:'18:00',total:9},
+  'Miércoles':{t1s:'08:00',t1e:'13:00',t2s:'14:00',t2e:'18:00',total:9},
+  'Jueves':{t1s:'08:00',t1e:'13:00',t2s:'14:00',t2e:'18:00',total:9},
+  'Viernes':{t1s:'08:00',t1e:'14:00',t2s:null,t2e:null,total:6},
+};
+
+let WORKERS=[];
+if(new URLSearchParams(window.location.search).get('reset')==='1'){localStorage.removeItem('lance_workers_v2');localStorage.removeItem('lance_deleted_keys');history.replaceState(null,'',window.location.pathname);}
+try{const s=localStorage.getItem('lance_workers_v2');if(s){WORKERS=JSON.parse(s);}}catch(e){}
+function saveW(){try{localStorage.setItem('lance_workers_v2',JSON.stringify(WORKERS));}catch(e){}}
+
+let extras=[],tasks=[];
+const wpLog=[];
+let deletedKeys=JSON.parse(localStorage.getItem('lance_deleted_keys')||'[]');
+function addToDeletedList(n,a){const k=`${n}_${a}`.toLowerCase().replace(/\s+/g,'_');if(!deletedKeys.includes(k))deletedKeys.push(k);localStorage.setItem('lance_deleted_keys',JSON.stringify(deletedKeys));}
+function isDeleted(n){return deletedKeys.some(k=>n.toLowerCase().replace(/\s+/g,'_').includes(k.split('_')[0]));}
+
+function loadWorkersFromFirebase(){
+  fetch(`${FB_URL}/operarios_registro.json`).then(r=>r.json()).then(data=>{
+    if(!data)return;
+    let id=1;
+    Object.entries(data).forEach(([key,op])=>{
+      if(!op||!op.nombre)return;
+      const exists=WORKERS.find(w=>(w.dni&&w.dni.replace(/[^A-Z0-9]/gi,'').toUpperCase()===key.toUpperCase())||(w.nie&&w.nie.replace(/[^A-Z0-9]/gi,'').toUpperCase()===key.toUpperCase()));
+      if(!exists){WORKERS.push({id:1000+id,nombre:op.nombre||'',apellidos:op.apellidos||'',dni:op.dni||'',nie:op.nie||'',tel:op.tel||'',obra:op.obra||'',pin:op.pin||'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true});id++;}
+    });
+    const seen=new Set();
+    WORKERS=WORKERS.filter(w=>{const d=(w.dni||w.nie||'').toUpperCase();if(!d)return true;if(seen.has(d))return false;seen.add(d);return true;});
+    WORKERS.forEach((w,i)=>w.id=i+1);
+    saveW();animKPI('kv-total',WORKERS.length);
+    showToast(`✅ ${WORKERS.length} operarios cargados`,'ok');
+  }).catch(e=>console.log('Error:',e));
+}
+
+function fbSyncWorker(w,pinChanged=false){
+  const doc=(w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(!doc)return;
+  const regData={nombre:w.nombre,apellidos:w.apellidos,dni:w.dni||'',nie:w.nie||'',pin:w.pin,obra:w.obra||'',tel:w.tel||'',activo:true,pin_reset:pinChanged};
+  if(w.obra_lat&&w.obra_lng){regData.obra_lat=w.obra_lat;regData.obra_lng=w.obra_lng;}
+  fetch(`${FB_URL}/operarios_registro/${doc}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(regData)}).catch(()=>{});
+}
+
+// ✅ FIX 2: Redondear horas a medias horas (0.5h)
+function redondearMediaHora(h){
+  return Math.round(h*2)/2;
+}
+
+function startFirebaseListener(){loadFirebaseData();setInterval(loadFirebaseData,5000);}
+
+function loadFirebaseData(){
+  fetch(`${FB_URL}/operarios_activos.json`).then(r=>r.json()).then(data=>{
+    if(!data)return;
+    Object.entries(data).forEach(([fbKey,op])=>{
+      if(!op||!op.nombre)return;
+      if(isDeleted(op.nombre))return;
+      // ✅ MEJORA 3: Skip operarios inactivos en jornada en tiempo real
+      if(op.inactivo===true)return;
+      let w=null;
+      if(op.doc){const dc=op.doc.replace(/[^A-Z0-9]/gi,'').toUpperCase();w=WORKERS.find(x=>(x.dni&&x.dni.replace(/[^A-Z0-9]/gi,'').toUpperCase()===dc)||(x.nie&&x.nie.replace(/[^A-Z0-9]/gi,'').toUpperCase()===dc));}
+      if(!w){const fn=op.nombre.toLowerCase().replace(/[_\s]+/g,' ').trim();w=WORKERS.find(x=>{const wn=`${x.nombre} ${x.apellidos}`.toLowerCase().trim();return wn===fn||wn.includes(fn.split(' ')[0])||fn.includes(wn.split(' ')[0]);});}
+      if(!w){const np=op.nombre.replace(/_/g,' ').split(' ');const ni=Math.max(0,...WORKERS.map(x=>x.id))+1;w={id:ni,nombre:np[0]||op.nombre,apellidos:np.slice(1).join(' ')||'',dni:op.doc||'',nie:'',obra:'',pin:'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true};WORKERS.push(w);}
+      w.status=op.activo?'in':'out';
+      // ✅ FIX 1: guardar fecha del último fichaje en el worker
+      w._fechaFichaje=op.fecha||null;
+      const hoyStr2=new Date().toISOString().split('T')[0];
+      const esDeFechaAnterior=op.fecha&&op.fecha!==hoyStr2;
+      if(op.tipo==='entrada'){w.arrival=op.hora;w.dep=null;if(op.hora&&!esDeFechaAnterior){const[eh,em]=op.hora.split(':').map(Number);const now=new Date();const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);w.h=mins>0?redondearMediaHora(mins/60):0;}else if(esDeFechaAnterior){w.h=0;}}
+      else if(op.tipo==='salida'){w.dep=op.hora;if(esDeFechaAnterior){w.h=0;}else{const at=op.hora_entrada||w.arrival;if(at&&op.hora){w.arrival=at;const[eh,em]=at.split(':').map(Number);const[sh,sm]=op.hora.split(':').map(Number);const mins=(sh*60+sm)-(eh*60+em);w.h=mins>0?redondearMediaHora(mins/60):0;}}}
+      if(op.ciudad) w.ciudad_gps=op.ciudad+(op.provincia?', '+op.provincia:'');
+      // Coordenadas para botón Google Maps
+      if(op.lat&&op.lng){w._lat=parseFloat(op.lat);w._lng=parseFloat(op.lng);}
+      // ✅ ZONA DE OBRA
+      if(op.en_zona!==undefined) w.en_zona=op.en_zona;
+      if(op.dist_obra!==undefined) w.dist_obra=op.dist_obra;
+      // ✅ Alerta automática si fichó fuera de zona
+      if(op.en_zona===false&&op.activo&&op.tipo==='entrada'){
+        if(!window._zonaAlertas)window._zonaAlertas={};
+        const ak='zona_'+fbKey;
+        if(!window._zonaAlertas[ak]){window._zonaAlertas[ak]=true;addZonaAlerta(w.nombre+' '+w.apellidos,op.dist_obra||'?',op.hora||'');}
+      }
+    });
+    const enObra=WORKERS.filter(w=>w.status==='in').length;
+    animKPI('kv-total',WORKERS.length);animKPI('kv-in',enObra);
+    if(document.getElementById('page-jornada').classList.contains('active'))renderJornada();
+    if(document.getElementById('page-operarios').classList.contains('active'))renderWorkers();
+    showFirebaseBadge(Object.keys(data).length);
+    saveW();
+
+  }).catch(e=>console.log('Firebase read error:',e));
+}
+
+function showFirebaseBadge(count){const b=document.getElementById('fb-live-badge');if(b){b.style.display='inline';b.textContent=`🔴 ${count} fichajes`;}}
+
+// ── ALERTAS DE ZONA ✅ ──
+function addZonaAlerta(nombre,dist,hora){
+  const list=document.getElementById('alerts-list');if(!list)return;
+  const empty=list.querySelector('[style*="padding:32px"]');if(empty)empty.remove();
+  const hdr=document.getElementById('alertas-hdr-status');
+  if(hdr){hdr.textContent='⚠️ Alertas activas';hdr.style.color='var(--red)';}
+  const cnt=document.getElementById('alert-count');
+  const kv=document.getElementById('kv-alerts');
+  if(cnt){cnt.style.display='inline';cnt.textContent=parseInt(cnt.textContent||0)+1;}
+  if(kv)kv.textContent=parseInt(kv.textContent||0)+1;
+  const id='al_zona_'+Date.now();
+  const div=document.createElement('div');
+  div.className='alert-item ai-crit';div.id=id;
+  div.innerHTML=`<div class="al-icon">⚠️</div><div style="flex:1"><div class="al-name">${nombre}</div><div class="al-desc">Fichó FUERA de su zona de obra · ${dist}m de distancia · ${hora}</div><div class="al-time">Detectado automáticamente por GPS</div><div class="al-actions"><span class="badge b-crit">FUERA DE ZONA</span><button class="btn-resolve" onclick="resolveAlert('${id}')">✓ Resolver</button></div></div>`;
+  list.insertBefore(div,list.firstChild);
+  // Actualizar preview en dashboard
+  const preview=document.getElementById('dashboard-alerts-preview');
+  if(preview)preview.innerHTML=`<div style="padding:12px;text-align:left;color:var(--red);font-size:12px;font-weight:600;">⚠️ ${nombre} fichó fuera de zona (${dist}m)</div>`;
+}
+
+function resolveAlert(id){
+  const el=document.getElementById(id);if(!el)return;
+  el.style.opacity='.4';
+  const badge=el.querySelector('.badge');if(badge){badge.className='badge b-ok';badge.textContent='RESUELTO';}
+  el.querySelectorAll('.btn-resolve').forEach(b=>b.disabled=true);
+  const cnt=document.getElementById('alert-count');const kv=document.getElementById('kv-alerts');
+  if(cnt)cnt.textContent=Math.max(0,parseInt(cnt.textContent)-1);
+  if(kv)kv.textContent=Math.max(0,parseInt(kv.textContent)-1);
+  showToast('✓ Alerta resuelta','ok');
+}
+
+// ── PIN LOGIN ──
+const PIN='0000';let pinVal='';
+function pk(d){if(pinVal.length>=4)return;pinVal+=d;updDots();if(pinVal.length===4)setTimeout(checkPin,200);}
+function pkDel(){pinVal=pinVal.slice(0,-1);updDots();document.getElementById('pin-err').textContent='';}
+function updDots(){for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('on',i<pinVal.length);}
+function checkPin(){
+  if(pinVal===PIN){document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';initApp();}
+  else{document.getElementById('pin-err').textContent='PIN incorrecto.';document.getElementById('pin-pad').classList.add('shake');setTimeout(()=>document.getElementById('pin-pad').classList.remove('shake'),450);pinVal='';updDots();}
+}
+function logout(){pinVal='';updDots();document.getElementById('pin-err').textContent='';document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';}
+
+// ── RELOJ ──
+function tick(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleTimeString('es-ES');document.getElementById('tb-date').textContent=n.toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long'});}
+setInterval(tick,1000);tick();
+
+// ── PÁGINAS ──
+const TITLES={dashboard:'Tablero',jornada:'Resumen de jornada',operarios:'Operarios',alertas:'Alertas',extras:'Horas extras',horas:'Horas trabajadas',tareas:'Tareas',whatsapp:'WhatsApp',gestion:'Alta de operarios',asistente:'Asistente IA',consentimientos:'Consentimientos RGPD',obras:'Obras',informes:'📄 Informes de jornada'};
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('ni-'+name).classList.add('active');
+  document.getElementById('topbar-title').textContent=TITLES[name]||name;
+  // ✅ Scroll al top siempre al cambiar de página
+  window.scrollTo({top:0,behavior:'instant'});
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  document.querySelector('.main-content')&&(document.querySelector('.main-content').scrollTop=0);
+  setTimeout(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;},50);
+  if(name==='operarios')renderWorkers();
+  if(name==='jornada')renderJornada();
+  if(name==='horas'){renderHours();initCalendario();setTimeout(()=>renderCalendario(),800);}
+  if(name==='informes')initInformes();
+  if(name==='tareas')renderTaskLog();
+  if(name==='gestion'){if(!OBRAS||!OBRAS.length)cargarObras();renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
+  if(name==='extras')updateExtraSelect();
+  if(name==='consentimientos')cargarConsentimientos();
+  if(name==='obras'){cargarObras();renderObrasList();}
+  if(name==='gestion'){if(!OBRAS||!OBRAS.length)cargarObras();renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
+  if(name==='jornada'){renderJornada();mostrarFichajeManual&&document.getElementById('fichaje-manual-panel')&&(document.getElementById('fichaje-manual-panel').style.display='none');}
+}
+
+// ── INIT ──
+function initApp(){
+  loadWorkersFromFirebase();
+  setTimeout(()=>{
+    animKPI('kv-total',WORKERS.length);animKPI('kv-in',WORKERS.filter(w=>w.status==='in').length);
+    animKPI('kv-alerts',0);animKPI('kv-extras',0);
+    renderTaskLog();updateExtraSelect();updateTaskSelect();
+    const sel=document.getElementById('task-to');
+    sel.innerHTML='<option value="all">Todos los operarios</option>';
+    WORKERS.forEach(w=>{const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();sel.innerHTML+=`<option value="${doc}">${w.nombre} ${w.apellidos}</option>`;});
+    document.getElementById('jornada-date').textContent=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long'});
+    startFirebaseListener();
+    cargarObras();
+    // Comprobar horario cada 5 minutos
+    setTimeout(checkHorarioAlertas, 8000);
+    setInterval(checkHorarioAlertas, 5 * 60 * 1000);
+    // Coordenadas directas desde Google Maps — sin geocodificación
+  },1500);
+}
+
+function animKPI(id,target,dur=1300){
+  const el=document.getElementById(id);if(!el)return;
+  const start=performance.now();
+  (function s(now){const p=Math.min((now-start)/dur,1),e=1-Math.pow(1-p,4);el.textContent=Math.round(e*target);if(p<1)requestAnimationFrame(s);})(performance.now());
+}
+
+// ── JORNADA ──
+
+
+// ── OPERARIOS ──
+function renderWorkers(){
+  const tb=document.getElementById('op-tbody');if(!tb)return;
+  const q=(document.getElementById('op-search')?.value||'').toLowerCase();
+  const cnt=document.getElementById('op-count');
+  const filtered=WORKERS.filter(w=>`${w.nombre} ${w.apellidos} ${w.dni} ${w.nie}`.toLowerCase().includes(q)||!q);
+  if(cnt)cnt.textContent=filtered.length+' de '+WORKERS.length+' operarios';
+  const sb={in:'<span class="pill p-in">✅ En obra</span>',out:'<span class="pill p-out">🔴 Fuera</span>',pending:'<span class="pill p-pend">⏳ Sin fichar</span>'};
+  tb.innerHTML=filtered.map((w,i)=>`<tr>
+    <td style="font-weight:700;color:var(--text3)">${i+1}</td>
+    <td><div class="w-name">${w.nombre} ${w.apellidos}</div><div class="w-doc">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''}</div>${w._lat&&w._lng?'<a href="https://www.google.com/maps?q='+w._lat+','+w._lng+'" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:#E8F1FB;border:1px solid #D0DDF0;border-radius:5px;font-size:9px;color:#2563AE;font-weight:700;text-decoration:none;margin-top:3px;">📍 Ver en Maps</a>':''}</td>
+
+
+
+
+    <td style="font-size:11px">${w.dni||w.nie||'—'}</td>
+    <td style="font-size:11px;color:var(--text3)">${w.obra||'—'}</td>
+    <td><span style="font-family:'Montserrat';font-weight:800;font-size:16px;color:var(--blue2);letter-spacing:3px">${w.pin}</span></td>
+    <td>${sb[w.status]||'—'}</td>
+    <td>${(()=>{const c=w.ciudad_gps?w.ciudad_gps.split(',')[0]:'';const dok=(w.dist_obra||0)<100000;return w.en_zona===true?`<span class="pill p-in">✅ En zona${c?' · '+c:''}</span>`:w.en_zona===false&&dok?`<span class="pill p-warn">⚠️ ${Math.round(w.dist_obra||0)}m${c?' · '+c:''}</span>`:w.en_zona===false?`<span class="pill p-pend">📍 ${c||'—'}</span>`:'<span class="pill p-pend">—</span>';})()}</td>
+    <td><button class="btn-edit" onclick="editWorker(${w.id})">✏️</button> <button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️</button></td>
+  </tr>`).join('');
+}
+
+function renderHours(){
+  const list=document.getElementById('hours-list');if(!list)return;
+  const diasList=document.getElementById('horas-dias-list');
+  const resumenEl=document.getElementById('horas-resumen');
+  const periodo=(document.getElementById('horas-periodo')||{value:'hoy'}).value;
+  // ✅ MEJORA 2: Horas por días + acumulado mensual desde Firebase/fichajes
+  const hoy=new Date();
+  const hoyStr=hoy.toISOString().split('T')[0];
+  // Calcular rango de fechas según período
+  let fechas=[];
+  if(periodo==='hoy'){fechas=[hoyStr];}
+  else if(periodo==='semana'){
+    const lunes=new Date(hoy);lunes.setDate(hoy.getDate()-hoy.getDay()+1);
+    for(let i=0;i<7;i++){const d=new Date(lunes);d.setDate(lunes.getDate()+i);fechas.push(d.toISOString().split('T')[0]);}
+  } else {
+    const primeroDeMes=new Date(hoy.getFullYear(),hoy.getMonth(),1);
+    const diasMes=new Date(hoy.getFullYear(),hoy.getMonth()+1,0).getDate();
+    for(let i=0;i<diasMes;i++){const d=new Date(primeroDeMes);d.setDate(i+1);fechas.push(d.toISOString().split('T')[0]);}
+  }
+  // Mostrar horas de hoy (datos en memoria WORKERS) en tabla principal
+  list.innerHTML=WORKERS.map(w=>`<div style="display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--border);">
+    <div style="width:140px;flex-shrink:0"><span style="font-size:13px;font-weight:600">${w.nombre}</span><br><small style="color:var(--text3)">${w.apellidos}</small></div>
+    <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;"><div style="width:${Math.min((w.h/9*100),100).toFixed(0)}%;height:100%;background:linear-gradient(90deg,var(--blue2),var(--blue3));border-radius:3px;"></div></div>
+    <div style="text-align:right;width:48px"><div style="font-family:'Montserrat';font-weight:800;font-size:17px;color:var(--blue2)">${w.h}h</div></div>
+  </div>`).join('');
+  // Cargar fichajes históricos de Firebase para el período
+  if(diasList){diasList.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">⏳ Cargando histórico...</div>';}
+  // Fechas a consultar: solo las pasadas + hoy (no futuras)
+  const fechasConsultar=fechas.filter(f=>f<=hoyStr);
+  if(!fechasConsultar.length){if(diasList)diasList.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">Sin datos para este período.</div>';return;}
+  Promise.all(fechasConsultar.map(fecha=>
+    fetch(`${FB_URL}/fichajes/${fecha}.json`).then(r=>r.json()).then(d=>({fecha,data:d})).catch(()=>({fecha,data:null}))
+  )).then(resultados=>{
+    // Acumular horas por operario y por día
+    const horasPorDia={}; // {fecha: {doc: {nombre,horas}}}
+    const horasAcum={}; // {doc: {nombre,total}}
+    resultados.forEach(({fecha,data})=>{
+      if(!data)return;
+      Object.values(data).forEach(f=>{
+        if(!f||!f.doc)return;
+        const doc=f.doc;
+        const nombre=f.nombre||doc;
+        let mins=0;
+        if(f.tipo==='salida'&&f.hora&&f.hora_entrada){
+          const[eh,em]=f.hora_entrada.split(':').map(Number);
+          const[sh,sm]=f.hora.split(':').map(Number);
+          mins=(sh*60+sm)-(eh*60+em);
+        } else if(f.tipo==='entrada'&&f.hora&&fecha===hoyStr){
+          // Si es entrada de hoy, calcular hasta ahora
+          const[eh,em]=f.hora.split(':').map(Number);
+          const now=new Date();mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);
+        }
+        if(mins<=0)return;
+        const h=redondearMediaHora(mins/60);
+        if(!horasPorDia[fecha])horasPorDia[fecha]={};
+        if(!horasPorDia[fecha][doc])horasPorDia[fecha][doc]={nombre,h:0};
+        horasPorDia[fecha][doc].h+=h;
+        if(!horasAcum[doc])horasAcum[doc]={nombre,total:0};
+        horasAcum[doc].total+=h;
+      });
+    });
+    // Resumen acumulado (kpis)
+    const totalH=Object.values(horasAcum).reduce((a,v)=>a+v.total,0).toFixed(1);
+    const diasConFichaje=Object.keys(horasPorDia).length;
+    if(resumenEl)resumenEl.innerHTML=`
+      <div style="background:var(--blue-pale);border-radius:8px;padding:8px 14px;font-size:11px;"><div style="font-family:'Montserrat';font-weight:800;font-size:18px;color:var(--blue2)">${totalH}h</div><div style="color:var(--text3)">Total período</div></div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px 14px;font-size:11px;"><div style="font-family:'Montserrat';font-weight:800;font-size:18px;color:var(--text)">${diasConFichaje}</div><div style="color:var(--text3)">Días con fichajes</div></div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px 14px;font-size:11px;"><div style="font-family:'Montserrat';font-weight:800;font-size:18px;color:var(--green)">${diasConFichaje>0?(totalH/diasConFichaje).toFixed(1):0}h</div><div style="color:var(--text3)">Media por día</div></div>`;
+    // Desglose por días (más reciente primero)
+    if(diasList){
+      const diasOrdenados=Object.keys(horasPorDia).sort((a,b)=>b.localeCompare(a));
+      if(!diasOrdenados.length){diasList.innerHTML='<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">Sin fichajes en este período.</div>';return;}
+      diasList.innerHTML=diasOrdenados.map(fecha=>{
+        const ops=Object.values(horasPorDia[fecha]);
+        const totalDia=ops.reduce((a,v)=>a+v.h,0).toFixed(1);
+        const fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-ES',{weekday:'short',day:'2-digit',month:'short'});
+        return `<div style="border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--bg);">
+            <span style="font-family:'Montserrat';font-size:11px;font-weight:700;color:var(--text);text-transform:capitalize">${fechaFmt}</span>
+            <span style="font-family:'Montserrat';font-size:13px;font-weight:800;color:var(--blue2)">${totalDia}h total</span>
+          </div>
+          ${ops.sort((a,b)=>b.h-a.h).map(op=>`<div style="display:flex;justify-content:space-between;padding:6px 24px;font-size:11px;border-top:1px solid var(--border);">
+            <span style="color:var(--text2)">${op.nombre}</span>
+            <span style="font-weight:600;color:var(--blue2)">${op.h.toFixed(1)}h</span>
+          </div>`).join('')}
+        </div>`;
+      }).join('');
+    }
+  }).catch(()=>{if(diasList)diasList.innerHTML='<div style="padding:16px;text-align:center;color:var(--red);font-size:12px">⚠️ Error al cargar histórico.</div>';});
+}
+
+function updateExtraSelect(){const sel=document.getElementById('ex-worker');if(!sel)return;sel.innerHTML=WORKERS.map(w=>`<option value="${w.id}">${w.nombre} ${w.apellidos}</option>`).join('');}
+function addExtra(){
+  const wid=parseInt(document.getElementById('ex-worker').value);
+  const start=document.getElementById('ex-start').value;
+  const end=document.getElementById('ex-end').value;
+  const reason=document.getElementById('ex-reason').value.trim();
+  if(!start||!end){showToast('Indica hora de inicio y fin','err');return;}
+  const[sh,sm]=start.split(':').map(Number);const[eh,em]=end.split(':').map(Number);
+  const totalMin=(eh*60+em)-(sh*60+sm);
+  if(totalMin<=0){showToast('Hora fin debe ser posterior al inicio','err');return;}
+  const totalH=(totalMin/60).toFixed(1);
+  const w=WORKERS.find(w=>w.id===wid);
+  const name=w?`${w.nombre} ${w.apellidos}`:'Desconocido';
+  if(w)w.extras=(parseFloat(w.extras||0)+parseFloat(totalH)).toFixed(1)*1;
+  extras.push({wid,name,start,end,totalH,reason,time:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})});
+  saveW();renderExtrasList();
+  animKPI('kv-extras',extras.reduce((a,e)=>a+parseFloat(e.totalH),0).toFixed(1)*1);
+  document.getElementById('ex-start').value='';document.getElementById('ex-end').value='';document.getElementById('ex-reason').value='';
+  showToast(`✅ ${totalH}h extras para ${name}`,'ok');
+}
+function renderExtrasList(){
+  const list=document.getElementById('extras-list');if(!list)return;
+  if(!extras.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin horas extras hoy.</div>';return;}
+  list.innerHTML=extras.map(e=>`<div class="extra-item"><div class="extra-badge">+${e.totalH}h</div><div style="flex:1"><div style="font-weight:600;font-size:13px">${e.name}</div><div style="font-size:11px;color:var(--text3)">${e.start} – ${e.end} · ${e.reason||'—'}</div></div><div style="font-size:10px;color:var(--text3)">${e.time}</div></div>`).join('');
+}
+
+// ── GESTIÓN OPERARIOS ──
+function renderGestionList(){
+  const list=document.getElementById('gestion-list');if(!list)return;
+  const q=(document.getElementById('g-search')?.value||'').toLowerCase();
+  const filtroEstado=(document.getElementById('g-filtro-estado')?.value||'activos');
+  const cnt=document.getElementById('g-count');
+  // ✅ MEJORA 3: Filtrar por activos/inactivos
+  let filtered=WORKERS.filter(w=>`${w.nombre} ${w.apellidos} ${w.dni} ${w.nie}`.toLowerCase().includes(q));
+  if(filtroEstado==='activos') filtered=filtered.filter(w=>!w.inactivo);
+  else if(filtroEstado==='inactivos') filtered=filtered.filter(w=>w.inactivo);
+  const activos=WORKERS.filter(w=>!w.inactivo).length;
+  const inactivos=WORKERS.filter(w=>w.inactivo).length;
+  if(cnt)cnt.textContent=`${activos} activos${inactivos?' · '+inactivos+' pausados':''}`;
+  if(!filtered.length){list.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px">'+( filtroEstado==='inactivos'?'Sin operarios pausados.':'Sin operarios.')+ '</div>';return;}
+  list.innerHTML=filtered.map(w=>{
+    const inactivo=!!w.inactivo;
+    const avatarBg=inactivo?'var(--border)':'var(--blue-light)';
+    const avatarColor=inactivo?'var(--text3)':'var(--blue2)';
+    const nombreColor=inactivo?'var(--text3)':'var(--text)';
+    const btnPausa=inactivo
+      ?`<button onclick="toggleInactivoWorker(${w.id},false)" style="padding:5px 8px;border-radius:6px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);color:var(--green);font-size:11px;cursor:pointer;" title="Reactivar">▶️</button>`
+      :`<button onclick="toggleInactivoWorker(${w.id},true)" style="padding:5px 8px;border-radius:6px;background:#FEF3C7;border:1px solid rgba(217,119,6,.25);color:var(--amber);font-size:11px;cursor:pointer;" title="Pausar/Desactivar">⏸</button>`;
+    const badgeInactivo=inactivo?'<span style="font-size:9px;background:#FEF3C7;color:var(--amber);border-radius:4px;padding:1px 5px;margin-left:5px;font-weight:600;">PAUSADO</span>':''  ;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);${inactivo?'opacity:0.65;':''}" >
+      <div style="width:36px;height:36px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;font-size:11px;color:${avatarColor};flex-shrink:0;">${(w.nombre[0]||'')+( w.apellidos[0]||'')} </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:13px;color:${nombreColor}">${w.nombre} ${w.apellidos}${badgeInactivo}</div>
+        <div style="font-size:10px;color:var(--text3)">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''} · PIN: <strong style="color:var(--blue2)">${w.pin}</strong>${w.tel?' · 📱 '+w.tel:''}</div>
+
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        ${!inactivo?`<button onclick="sendWaOperario(${w.id})" style="padding:5px 8px;border-radius:6px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);color:var(--green);font-size:11px;cursor:pointer;">📱</button>`:''}
+        ${btnPausa}
+        <button class="btn-edit" onclick="editWorker(${w.id})">✏️</button>
+        <button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Asignar obra directamente desde la lista de operarios
+function asignarObraDesdeLista(id){
+  const w=WORKERS.find(x=>x.id===id);if(!w)return;
+  if(!OBRAS||!OBRAS.length){showToast('⚠️ Primero crea obras en el apartado Obras','err');return;}
+  const activas=OBRAS.filter(o=>o.estado!=='terminada');
+  if(!activas.length){showToast('⚠️ No hay obras activas','err');return;}
+  const opciones=activas.map((o,i)=>`${i+1}. ${o.nombre}${o.cliente?' · '+o.cliente:''}${o.lat?' ✅':' ⚠️'}`).join('\n');
+  const actual=w.obra?`\nActual: ${w.obra}`:'';
+  const idx=prompt(`Asignar obra a ${w.nombre} ${w.apellidos}${actual}\n\n${opciones}\n\nEscribe el número (0 para quitar obra):`);
+  if(idx===null)return;
+  const num=parseInt(idx);
+  let obraSelec=null;
+  if(num===0){w.obra='';w.obra_lat=null;w.obra_lng=null;}
+  else if(num>=1&&num<=activas.length){
+    obraSelec=activas[num-1];
+    w.obra=obraSelec.nombre;
+    if(obraSelec.lat&&obraSelec.lng){w.obra_lat=parseFloat(obraSelec.lat);w.obra_lng=parseFloat(obraSelec.lng);}
+  } else {showToast('⚠️ Número no válido','err');return;}
+  // Guardar en Firebase
+  const docKey=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+  if(docKey){
+    const upd={obra:w.obra||'',obra_lat:w.obra_lat||null,obra_lng:w.obra_lng||null};
+    fetch(`${FB_URL}/operarios_registro/${docKey}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(upd)}).catch(()=>{});
+    // También actualizar en activos si está fichado
+    fetch(`${FB_URL}/operarios_activos/${docKey}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(upd)}).catch(()=>{});
+  }
+  saveW();renderGestionList();
+  showToast(w.obra?`✅ ${w.nombre} → ${w.obra}`:`✅ ${w.nombre} sin obra`,'ok');
+}
+
+// ✅ MEJORA 3: Activar/Desactivar operario
+function toggleInactivoWorker(id, pausar){
+  const w=WORKERS.find(x=>x.id===id);if(!w)return;
+  const accion=pausar?'pausar':'reactivar';
+  const msg=pausar?`¿Pausar a ${w.nombre} ${w.apellidos}? No aparecerá en fichajes ni jornada mientras esté pausado.`:
+    `¿Reactivar a ${w.nombre} ${w.apellidos}?`;
+  if(!confirm(msg))return;
+  w.inactivo=pausar;
+  // Guardar en Firebase
+  const docKey=(w.dni||w.nie||''). replace(/[^A-Z0-9]/gi,'').toUpperCase();
+  if(docKey){
+    fetch(`${FB_URL}/operarios_registro/${docKey}/inactivo.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(pausar)}).catch(()=>{});
+  }
+  saveW();
+  renderGestionList();
+  renderJornada();
+  renderWorkers();
+  showToast(pausar?`⏸ ${w.nombre} pausado`:`▶️ ${w.nombre} reactivado`,'ok');
+}
+
+function renderPinTable(){
+  const tb=document.getElementById('pin-tbody');if(!tb)return;
+  const sb={in:'<span class="pill p-in">✅ En obra</span>',out:'<span class="pill p-out">🔴 Fuera</span>',pending:'<span class="pill p-pend">⏳ Sin fichar</span>'};
+  tb.innerHTML=WORKERS.map((w,i)=>{
+    return `<tr>
+      <td style="font-weight:700;color:var(--text3)">${i+1}</td>
+      <td><div class="w-name">${w.nombre} ${w.apellidos}</div></td>
+      <td style="font-size:11px">${w.dni||w.nie||'—'}</td>
+      <td style="font-size:11px;color:var(--text3)">${w.obra||'—'}</td>
+      <td><span style="font-family:'Montserrat';font-size:20px;font-weight:900;color:var(--blue2);letter-spacing:4px">${w.pin}</span></td>
+      <td>${sb[w.status]||'—'}</td>
+      <td><button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️ Eliminar</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function saveWorker(){
+  const id=document.getElementById('edit-id').value;
+  const nombre=document.getElementById('g-nombre').value.trim();
+  const apellidos=document.getElementById('g-apellidos').value.trim();
+  const dni=document.getElementById('g-dni').value.trim().toUpperCase();
+  const nie=document.getElementById('g-nie').value.trim().toUpperCase();
+  const tel=document.getElementById('g-tel').value.trim();
+  const obra=document.getElementById('g-obra').value.trim();
+  const pin=document.getElementById('g-pin').value.trim();
+  const status=document.getElementById('g-status').value;
+  const idioma=document.getElementById('g-idioma')?.value||'es';
+  if(!nombre){showToast('Escribe el nombre','err');return;}
+  if(!apellidos){showToast('Escribe los apellidos','err');return;}
+  if(!dni&&!nie){showToast('Introduce DNI o NIE','err');return;}
+  if(pin.length!==4||isNaN(pin)){showToast('PIN debe tener 4 dígitos','err');return;}
+  const pinDup=WORKERS.find(w=>w.pin===pin&&w.id!=id);
+  if(pinDup){showToast(`❌ PIN ${pin} ya asignado a ${pinDup.nombre}`,'err');return;}
+
+  if(id){
+    // ── EDITAR OPERARIO EXISTENTE ──
+    const w=WORKERS.find(w=>w.id==id);
+    if(w){
+      const pinChanged=w.pin!==pin;
+      const obraChanged=w.obra!==obra;
+      Object.assign(w,{nombre,apellidos,dni,nie,tel,obra,pin,status,idioma});
+      // Guardar coordenadas si se geocodificó nueva zona
+      if(_obraLat&&_obraLng){w.obra_lat=_obraLat;w.obra_lng=_obraLng;_obraLat=null;_obraLng=null;}
+      else if(obraChanged){w.obra_lat=null;w.obra_lng=null;}
+      fbSyncWorker(w,pinChanged);
+      if(pinChanged){
+        showToast('🔐 PIN cambiado — el operario deberá crear uno nuevo al abrir la app','inf');
+      } else {
+        showToast('✅ Operario actualizado','ok');
+      }
+      // Si cambió la obra y tenemos coordenadas, actualizar zona en activos
+      if(obraChanged&&w.obra_lat&&w.obra_lng){
+        // Actualizar obra_lat/obra_lng en el registro de activos del operario
+        const docKey=(w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+        if(docKey){
+          // Leer activo actual y recalcular zona
+          fetch(`${FB_URL}/operarios_activos/${docKey}.json`)
+            .then(r=>r.json())
+            .then(activo=>{
+              if(!activo||!activo.lat||!activo.lng)return;
+              const dist=calcDist(activo.lat,activo.lng,w.obra_lat,w.obra_lng);
+              const enZona=dist<=500;
+              fetch(`${FB_URL}/operarios_activos/${docKey}.json`,{
+                method:'PATCH',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({en_zona:enZona,dist_obra:dist,obra_lat:w.obra_lat,obra_lng:w.obra_lng})
+              }).then(()=>{
+                showToast(enZona?`✅ ${w.nombre} ahora está EN ZONA (${dist}m)`:`📍 Zona actualizada — ${w.nombre} a ${dist}m`,'ok');
+              }).catch(()=>{});
+            }).catch(()=>{});
+        }
+      }
+    }
+  } else {
+    // ── NUEVO OPERARIO ──
+    const ni=Math.max(0,...WORKERS.map(w=>w.id))+1;
+    const nw={id:ni,nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,
+              arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,
+              obra_lat:_obraLat||null,obra_lng:_obraLng||null};
+    _obraLat=null;_obraLng=null;
+    WORKERS.push(nw);
+    lastWorkerAdded=nw;
+    fbSyncWorker(nw,false);
+    // Guardar consentimiento inicial en Firebase
+    const docKeyC=(nw.dni||nw.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+    if(docKeyC){
+      const cdI={doc:docKeyC,nombre:nw.nombre+' '+nw.apellidos,
+        fecha:new Date().toISOString().split('T')[0],
+        hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
+        timestamp:Date.now(),idioma:nw.idioma||'es',
+        rgpd_aceptado:false,gps_aceptado:false,estado:'pendiente_aceptacion',version:'1.0'};
+      fetch(`${FB_URL}/consentimientos/${docKeyC}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cdI)}).catch(()=>{});
+    }
+    // Mostrar WhatsApp
+    const waDiv=document.getElementById('wa-generado');
+    const waPreview=document.getElementById('wa-preview');
+    if(waDiv&&waPreview){waPreview.textContent=generarMsgWA(nw);waDiv.style.display='block';}
+    showToast(`✅ ${nombre} ${apellidos} dado de alta`,'ok');
+    animKPI('kv-total',WORKERS.length);
+  }
+
+  saveW();
+  resetForm();
+  renderGestionList();
+  renderPinTable();
+  renderWorkers();
+  updateTaskSelect();
+}
+
+
+function editWorker(id){
+  const w=WORKERS.find(w=>w.id===id);if(!w)return;
+  document.getElementById('edit-id').value=id;
+  document.getElementById('g-nombre').value=w.nombre;
+  document.getElementById('g-apellidos').value=w.apellidos;
+  document.getElementById('g-dni').value=w.dni||'';
+  document.getElementById('g-nie').value=w.nie||'';
+  document.getElementById('g-tel').value=w.tel||'';
+  document.getElementById('g-obra').value=w.obra||'';
+  document.getElementById('g-pin').value=w.pin;
+  document.getElementById('g-status').value=w.status;
+  const idEl=document.getElementById('g-idioma');if(idEl&&w.idioma)idEl.value=w.idioma;
+  const btnG=document.getElementById('btn-geo');if(btnG)btnG.textContent=w.obra_lat?'✅ OK':'📍 Zona';
+  document.getElementById('g-btn').textContent='💾 Guardar cambios';
+  document.getElementById('gestion-title').textContent='✏️ Editar operario';
+  showPage('gestion');
+}
+
+function deleteWorker(id){
+  const w=WORKERS.find(w=>w.id===id);if(!w)return;
+  if(!confirm(`¿Eliminar a ${w.nombre} ${w.apellidos}?`))return;
+  addToDeletedList(w.nombre,w.apellidos);
+  const doc=(w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(doc)fetch(`${FB_URL}/operarios_registro/${doc}.json`,{method:'DELETE'}).catch(()=>{});
+  WORKERS=WORKERS.filter(w=>w.id!==id);saveW();
+  renderGestionList();renderPinTable();renderWorkers();
+  if(document.getElementById('page-jornada').classList.contains('active'))renderJornada();
+  animKPI('kv-total',WORKERS.length);
+  showToast(`✅ ${w.nombre} eliminado`,'ok');
+}
+
+function resetForm(){
+  document.getElementById('edit-id').value='';
+  ['g-nombre','g-apellidos','g-dni','g-nie','g-tel','g-pin','g-obra'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  let autoPin;const usedPins=WORKERS.map(w=>w.pin);
+  do{autoPin=String(Math.floor(1000+Math.random()*9000));}while(usedPins.includes(autoPin));
+  document.getElementById('g-pin').value=autoPin;
+  document.getElementById('g-status').value='pending';
+  document.getElementById('g-btn').textContent='+ Dar de alta';
+  document.getElementById('gestion-title').textContent='➕ Alta de operario';
+  const waDiv=document.getElementById('wa-generado');if(waDiv)waDiv.style.display='none';
+  const geoRes=document.getElementById('geo-result');if(geoRes)geoRes.style.display='none';
+  const btnGeo=document.getElementById('btn-geo');if(btnGeo)btnGeo.textContent='📍 Zona';
+  _obraLat=null;_obraLng=null;
+  lastWorkerAdded=null;
+}
+
+// ✅ Capitalizar cada palabra automáticamente
+function capitalizarCampo(el){
+  const pos=el.selectionStart;
+  const val=el.value.replace(/\b\w/g,c=>c.toUpperCase());
+  el.value=val;
+  el.setSelectionRange(pos,pos);
+}
+
+function generarPinUnico(){
+  const usedPins=WORKERS.map(w=>w.pin);let pin;
+  do{pin=String(Math.floor(1000+Math.random()*9000));}while(usedPins.includes(pin));
+  document.getElementById('g-pin').value=pin;showToast(`🔐 PIN ${pin} generado`,'ok');
+}
+
+let lastWorkerAdded=null;
+let selectedSO='android';
+function selectSO(so){
+  selectedSO=so;
+  const ba=document.getElementById('so-android');const bi=document.getElementById('so-iphone');
+  if(so==='android'){ba.style.borderColor='var(--green)';ba.style.background='rgba(56,224,123,.08)';ba.style.color='var(--green)';bi.style.borderColor='var(--border)';bi.style.background='var(--card)';bi.style.color='var(--text3)';}
+  else{bi.style.borderColor='var(--text)';bi.style.background='rgba(0,0,0,.05)';bi.style.color='var(--text)';ba.style.borderColor='var(--border)';ba.style.background='var(--card)';ba.style.color='var(--text3)';}
+}
+
+function generarMsgWA(w){
+  const doc=w.dni||w.nie||'';
+  const so=selectedSO||'android';
+  const inst=so==='iphone'?`📲 *INSTALAR EN IPHONE:*\
+1️⃣ Abre en *Safari*\
+2️⃣ Pulsa *Compartir* ⬆️\
+3️⃣ *"Añadir a pantalla de inicio"*`:`📲 *INSTALAR EN ANDROID:*\
+1️⃣ Abre en Chrome\
+2️⃣ Pulsa los *3 puntos* ⋮\
+3️⃣ *"Añadir a pantalla de inicio"*`;
+  return `🏗️ *CONSTRUCCIONES LANCE 2024 SL*\
+\
+Hola ${w.nombre} ${w.apellidos} 👋\
+\
+📱 Enlace de la app:\
+👉 ${APP_URL}\
+\
+📄 Tu DNI/NIE: *${doc}*\
+🔐 Tu PIN inicial: *${w.pin}*\
+_(Podrás cambiarlo al entrar)_\
+\
+📋 *PASOS PARA FICHAR:*\
+1️⃣ Abre el enlace\
+2️⃣ Elige tu idioma\
+3️⃣ Acepta el consentimiento\
+4️⃣ Introduce tu DNI o NIE\
+5️⃣ Introduce el PIN\
+6️⃣ Crea tu PIN personal\
+7️⃣ ¡Ficha tu entrada!\
+\
+${inst}\
+\
+📍 Obra asignada:\
+${w.obra||'Consulta con el encargado'}\
+\
+_ObraControl GPS · Construcciones Lance 2024 SL_`;
+}
+
+function sendWaAlta(){
+  if(!lastWorkerAdded)return;
+  const msg=encodeURIComponent(generarMsgWA(lastWorkerAdded));
+  const phone=(lastWorkerAdded.tel||'').replace(/[\s\-\(\)]/g,'');
+  let cp=phone.replace(/^\+/,'');if(cp&&!cp.startsWith('34'))cp='34'+cp;
+  const url=cp?`https://wa.me/${cp}?text=${msg}`:`https://wa.me/?text=${msg}`;
+  showToast('📱 Abriendo WhatsApp...','ok');
+  setTimeout(()=>window.open(url,'_blank'),500);
+}
+
+function sendWaOperario(id){
+  const w=WORKERS.find(w=>w.id===id);if(!w)return;
+  const msg=encodeURIComponent(generarMsgWA(w));
+  const phone=(w.tel||'').replace(/[\s\-\(\)]/g,'');
+  let cp=phone.replace(/^\+/,'');if(cp&&!cp.startsWith('34'))cp='34'+cp;
+  const url=cp?`https://wa.me/${cp}?text=${msg}`:`https://wa.me/?text=${msg}`;
+  showToast(`📱 Abriendo WhatsApp para ${w.nombre}`,'ok');
+  setTimeout(()=>window.open(url,'_blank'),500);
+}
+
+// ── TAREAS ──
+function renderTaskLog(){
+  const log=document.getElementById('task-log');if(!log)return;
+  fetch(`${FB_URL}/tareas.json`).then(r=>r.json()).then(data=>{
+    if(!data){log.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin tareas enviadas aún.</div>';return;}
+    const fbTasks=Object.values(data).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+    log.innerHTML=fbTasks.map(t=>`<div class="wp-item"><div class="wp-av" style="background:linear-gradient(135deg,var(--blue),var(--blue3))">📋</div><div style="flex:1"><div class="wp-n">${t.toNombre||t.to||'Todos'}</div><div class="wp-m">${(t.msg||'').slice(0,55)}${(t.msg||'').length>55?'...':''}</div><div style="font-size:9px;color:${t.completada?'var(--green)':'var(--amber)'};margin-top:2px;">${t.completada?'✅ Completada':'⏳ Pendiente'}</div></div><div class="wp-t">${t.time||''}<br><span style="font-size:9px">${t.fecha||''}</span></div></div>`).join('');
+  }).catch(()=>{log.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin tareas enviadas aún.</div>';});
+}
+
+function sendTask(){
+  const to=document.getElementById('task-to');
+  const prio=document.getElementById('task-prio');
+  const msg=document.getElementById('task-msg').value.trim();
+  if(!msg){showToast('Escribe la descripción','err');return;}
+  const now=new Date();
+  const toName=to.options[to.selectedIndex].text;
+  const toDoc=to.value;
+  const tareaData={to:toDoc==='all'?'todos los operarios':toDoc,toNombre:toName,msg,prioridad:prio.options[prio.selectedIndex].text,time:now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),fecha:now.toISOString().split('T')[0],timestamp:now.getTime(),enviadaPor:'Oficina',completada:false};
+  fetch(`${FB_URL}/tareas/tarea_${now.getTime()}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(tareaData)}).then(()=>{showToast(`✅ Tarea enviada a ${toName}`,'ok');renderTaskLog();}).catch(()=>showToast('⚠️ Error al enviar','err'));
+  document.getElementById('task-msg').value='';
+}
+
+function renderWP(){
+  const log=document.getElementById('wp-log');if(!log)return;
+  if(!wpLog.length){log.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin mensajes WhatsApp hoy.</div>';return;}
+  log.innerHTML=wpLog.map(w=>`<div class="wp-item"><div class="wp-av">💬</div><div><div class="wp-n">${w.name}</div><div class="wp-m">${w.msg.slice(0,55)}</div></div><div class="wp-t">${w.time}</div></div>`).join('');
+}
+
+function closeWP(){document.getElementById('wp-overlay').classList.remove('show');}
+function sendWP(){const name=document.getElementById('wp-name').textContent;const msg=document.getElementById('wp-ta').value;wpLog.push({name,msg,time:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})});closeWP();showToast(`✅ WhatsApp enviado a ${name}`,'ok');}
+
+// ── ASISTENTE ──
+function quickChat(msg){document.getElementById('chat-input').value=msg;sendChat();}
+function sendChat(){
+  const input=document.getElementById('chat-input');const msg=input.value.trim();if(!msg)return;
+  input.value='';addChatMsg(msg,'user');
+  setTimeout(()=>addChatMsg(responderAsistente(msg),'bot'),600);
+}
+function addChatMsg(txt,who){
+  const msgs=document.getElementById('chat-messages');if(!msgs)return;
+  const div=document.createElement('div');
+  div.style.cssText=who==='user'?'background:var(--blue2);color:#fff;border-radius:12px 12px 0 12px;padding:10px 14px;margin-bottom:10px;max-width:85%;margin-left:auto;font-size:13px;':'background:var(--blue-light);border-radius:12px 12px 12px 0;padding:12px 16px;margin-bottom:10px;max-width:85%;font-size:13px;color:var(--text);';
+  div.innerHTML=txt;msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+}
+function responderAsistente(msg){
+  const q=msg.toLowerCase();
+  const hoy=DAYS_CAP[new Date().getDay()];
+  const enObra=WORKERS.filter(w=>w.status==='in');
+  const sinFichar=WORKERS.filter(w=>w.status==='pending');
+  const fueraZona=WORKERS.filter(w=>w.en_zona===false);
+  if(q.includes('fuera de zona')||q.includes('zona')){
+    if(!fueraZona.length)return '✅ Todos los operarios ficharon dentro de su zona de obra.';
+    return `⚠️ <strong>${fueraZona.length} ficharon fuera de zona:</strong><br>${fueraZona.map(w=>`• ${w.nombre} ${w.apellidos} — ${Math.round(w.dist_obra||0)}m`).join('<br>')}`;
+  }
+  if(q.includes('no ha fichado')||q.includes('sin fichar')){if(!sinFichar.length)return '✅ Todos han fichado hoy.';return `❌ <strong>${sinFichar.length} sin fichar:</strong><br>${sinFichar.map(w=>`• ${w.nombre} ${w.apellidos}`).join('<br>')}`;}
+  if(q.includes('cuántos')||q.includes('en obra'))return `📍 <strong>${enObra.length} en obra</strong> ahora.<br>${enObra.map(w=>`• ${w.nombre} ${w.apellidos}`).join('<br>')}`;
+  if(q.includes('resumen')){const horas=WORKERS.reduce((a,w)=>a+parseFloat(w.h||0),0).toFixed(1);return `📊 <strong>Resumen — ${hoy}</strong><br><br>👷 Plantilla: ${WORKERS.length}<br>✅ En obra: ${enObra.length}<br>❌ Sin fichar: ${sinFichar.length}<br>⚠️ Fuera de zona: ${fueraZona.length}<br>⏱ Horas: ${horas}h`;}
+  if(q.includes('whatsapp')||q.includes('enviar')){sendResumenWA();return '📱 Abriendo WhatsApp...';}
+  return `Prueba con:<br>• "¿Quién no ha fichado?"<br>• "¿Quién fichó fuera de zona?"<br>• "Resumen del día"`;
+}
+
+function sendResumenWA(){
+  const hoy=DAYS_CAP[new Date().getDay()];
+  const enObra=WORKERS.filter(w=>w.status==='in');
+  const sinFichar=WORKERS.filter(w=>w.status==='pending');
+  const fueraZona=WORKERS.filter(w=>w.en_zona===false);
+  const horas=WORKERS.reduce((a,w)=>a+parseFloat(w.h||0),0).toFixed(1);
+  const msg=encodeURIComponent(`🏗️ *OBRACONTROL GPS — RESUMEN ${hoy.toUpperCase()}*\
+📅 ${new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'})}\
+\
+👷 Plantilla: ${WORKERS.length}\
+✅ En obra: ${enObra.length}\
+❌ Sin fichar: ${sinFichar.length}${sinFichar.length?'\
+'+sinFichar.map(w=>`   • ${w.nombre} ${w.apellidos}`).join('\
+'):''}\
+⚠️ Fuera de zona: ${fueraZona.length}${fueraZona.length?'\
+'+fueraZona.map(w=>`   • ${w.nombre} ${w.apellidos} (${Math.round(w.dist_obra||0)}m)`).join('\
+'):''}\
+⏱ Horas: ${horas}h\
+\
+_construcciones LANCE 2024 SL · ObraControl GPS_`);
+  window.open(`https://wa.me/${ENCARGADO_WA}?text=${msg}`,'_blank');
+  showToast('📱 Abriendo WhatsApp...','ok');
+}
+
+// ── TOAST ──
+let _obraLat=null,_obraLng=null;
+function geocodificarObra(){
+  const obra=document.getElementById('g-obra')?.value.trim();
+  if(!obra){showToast('Escribe la dirección primero','err');return;}
+  const btn=document.getElementById('btn-geo');const res=document.getElementById('geo-result');
+  if(btn)btn.textContent='⏳...';
+  fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(obra+', España')+'&format=json&limit=1')
+    .then(r=>r.json()).then(data=>{
+      if(data&&data[0]){
+        _obraLat=parseFloat(data[0].lat);_obraLng=parseFloat(data[0].lon);
+        if(btn)btn.textContent='✅ OK';
+        if(res){res.textContent='📍 '+_obraLat.toFixed(4)+', '+_obraLng.toFixed(4)+' · radio 500m';res.style.display='block';}
+        showToast('✅ Zona geocodificada','ok');
+      } else {if(btn)btn.textContent='❌';showToast('⚠️ No encontrado','err');}
+    }).catch(()=>{if(btn)btn.textContent='📍 Zona';showToast('⚠️ Error','err');});
+}
+
+const RGPD_WA={
+  es:"🔒 PROTECCIÓN DE DATOS\n\nConstrucciones Lance 2024 SL recogerá tu nombre, DNI/NIE, horas de entrada/salida y ubicación GPS solo al fichar. Datos en servidores europeos (Firebase, Bélgica). Acceso/eliminación: luis@construccioneslance.com\n\n📍 GPS: La app accede a tu ubicación SOLO al fichar, nunca en segundo plano.\n\nAl usar la app aceptas estas condiciones.",
+  ca:"🔒 PROTECCIÓ DE DADES\n\nConstruccions Lance 2024 SL recollirà el teu nom, DNI/NIE, hores d'entrada/sortida i GPS només en fitxar. Servidors europeus (Firebase, Bèlgica). Accés/eliminació: luis@construccioneslance.com\n\n📍 GPS: L'app accedeix al GPS NOMÉS en fitxar.",
+  ro:"🔒 PROTECTIA DATELOR\n\nConstrucciones Lance 2024 SL va inregistra datele la pontaj. Servere europene (Firebase, Belgia). Acces: luis@construccioneslance.com\n\n📍 GPS: Aplicatia acceseaza GPS-ul DOAR la pontaj.",
+  ar:"🔒 حماية البيانات\n\nسيتم تسجيل بياناتك عند الحضور فقط. خوادم أوروبية. الوصول: luis@construccioneslance.com\n\n📍 GPS: يُستخدم فقط لحظة التسجيل.",
+  fr:"🔒 PROTECTION DES DONNÉES\n\nConstrucciones Lance 2024 SL collectera tes données au pointage. Serveurs européens. Accès: luis@construccioneslance.com\n\n📍 GPS: Utilisé UNIQUEMENT au pointage.",
+  en:"🔒 DATA PROTECTION\n\nConstrucciones Lance 2024 SL will collect your data only when clocking. European servers. Access: luis@construccioneslance.com\n\n📍 GPS: Used ONLY when clocking in."
+};
+
+function imprimirConsentimiento(doc,nombre,fecha,hora,idioma){
+  const rgpd=(RGPD_WA[idioma]||RGPD_WA.es).replace(/\n/g,'<br>');
+  const flags={es:'Español',ca:'Català',ro:'Română',ar:'العربية',fr:'Français',en:'English'};
+  const flagEmoji={es:'🇪🇸',ca:'🏴',ro:'🇷🇴',ar:'🇲🇦',fr:'🇫🇷',en:'🇬🇧'};
+  const hoy=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
+  const css='body{font-family:Arial,sans-serif;max-width:740px;margin:30px auto;padding:20px;color:#1a2840;font-size:12px;line-height:1.6;}h1{font-size:16px;color:#1B4F8C;border-bottom:3px solid #1B4F8C;padding-bottom:8px;margin-bottom:16px;}h2{font-size:12px;color:#1B4F8C;margin:18px 0 6px;border-left:4px solid #1B4F8C;padding-left:10px;}table{width:100%;border-collapse:collapse;margin-bottom:14px;}td{padding:6px 10px;border:1px solid #ddd;vertical-align:top;}td:first-child{font-weight:700;background:#f4f7fc;width:36%;color:#1B4F8C;}.check{color:#16A34A;font-weight:700;}.firma-bloque{background:#f0f6ff;border:1px solid #1B4F8C;border-radius:6px;padding:12px;margin:16px 0;font-size:11px;line-height:1.6;}.firmas{display:flex;gap:40px;margin-top:14px;}.firma{flex:1;text-align:center;}.firma-linea{border-top:1px solid #333;margin-top:50px;padding-top:6px;font-size:10px;color:#444;}.legal-box{background:#fffbf0;border:1px solid #d4a017;border-radius:6px;padding:12px;margin:10px 0;font-size:11px;line-height:1.7;}.pie{text-align:center;margin-top:20px;font-size:10px;color:#999;border-top:1px solid #eee;padding-top:10px;}@media print{.no-print{display:none!important}}';
+  const body='<div style="font-size:11px;color:#666;margin-bottom:14px;"><strong>Construcciones Lance 2024 SL</strong> · luis@construccioneslance.com</div>'
+    +'<h1>Consentimiento Informado · Protección de Datos · Registro Horario · GPS</h1>'
+    +'<h2>Datos del operario</h2><table>'
+    +'<tr><td>Nombre completo</td><td><strong>'+nombre+'</strong></td></tr>'
+    +'<tr><td>DNI / NIE</td><td><strong>'+doc+'</strong></td></tr>'
+    +'<tr><td>Fecha de alta</td><td><strong>'+fecha+'</strong></td></tr>'
+    +'<tr><td>Hora</td><td><strong>'+hora+'</strong></td></tr>'
+    +'<tr><td>Idioma</td><td>'+flagEmoji[idioma]+' '+(flags[idioma]||idioma)+'</td></tr>'
+    +'<tr><td>RGPD informado</td><td><span class="check">✅ Sí — al recibir credenciales por WhatsApp</span></td></tr>'
+    +'<tr><td>Consentimiento GPS</td><td><span class="check">✅ Sí — aceptado en primera apertura de app</span></td></tr>'
+    +'<tr><td>Registro horario digital</td><td><span class="check">✅ Sí — informado y conforme</span></td></tr>'
+    +'</table>'
+    +'<h2>Texto de protección de datos (idioma del operario)</h2>'
+    +'<div style="background:#f8faff;border:1px solid #1B4F8C;border-radius:6px;padding:12px;font-size:11px;line-height:1.8;">'+rgpd+'</div>'
+    +'<h2>Marco legal aplicable</h2>'
+    +'<div class="legal-box"><strong>📌 Protección de Datos:</strong> Reglamento (UE) 2016/679 (RGPD) · Ley Orgánica 3/2018 LOPDGDD (BOE nº 294, 06/12/2018)<br><br><strong>📌 Registro Horario Digital:</strong> Real Decreto-ley 8/2019 · Real Decreto Registro Horario Digital 2026 (BOE nº 61, 12/03/2019)</div>'
+    +'<h2>Declaración</h2>'
+    +'<div class="firma-bloque">El/La trabajador/a <strong>'+nombre+'</strong>, con DNI/NIE <strong>'+doc+'</strong>, ha sido informado/a el <strong>'+fecha+'</strong> sobre el tratamiento de sus datos en ObraControl GPS de Construcciones Lance 2024 SL.<br><br>El consentimiento GPS queda registrado digitalmente en la primera apertura de la app. Validez: eIDAS art.25 · Ley 6/2020.</div>'
+    +'<div class="firmas"><div class="firma"><div class="firma-linea">Firma del trabajador/a<br><strong>'+nombre+'</strong><br>DNI/NIE: '+doc+'</div></div>'
+    +'<div class="firma"><div class="firma-linea">Sello y firma empresa<br><strong>Construcciones Lance 2024 SL</strong><br>Luis Campaña — Encargado</div></div></div>'
+    +'<div class="pie">ObraControl GPS · Construcciones Lance 2024 SL · luis@construccioneslance.com · Generado: '+hoy+'</div>'
+    +'<br><button class="no-print" onclick="window.print()" style="padding:12px 28px;background:#1B4F8C;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">🖨️ Imprimir / Guardar PDF</button>'
+    +'<button class="no-print" onclick="window.close()" style="padding:12px 20px;background:#f4f7fc;color:#1B4F8C;border:1px solid #1B4F8C;border-radius:8px;cursor:pointer;font-size:12px;margin-left:8px;">✕ Cerrar</button>';
+  const w=window.open('','_blank','width=820,height=1000');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Consentimiento — '+nombre+'</title><style>'+css+'</style></head><body>'+body+'</body></html>');
+  w.document.close();
+}
+function imprimirConsentimientoIdx(i){const c=_consentData[i];if(!c)return;imprimirConsentimiento(c.doc||'',c.nombre||'',c.fecha||'',c.hora||'',c.idioma||'es');}
+
+// ── CONSENTIMIENTOS ──
+let _consentData=[];
+function cargarConsentimientos(){
+  const tb=document.getElementById('consent-tbody');if(!tb)return;
+  tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text3)">⏳ Cargando...</td></tr>';
+  fetch(`${FB_URL}/consentimientos.json`).then(r=>r.json()).then(data=>{
+    if(!data||!Object.keys(data).length){
+      tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text3)">Sin consentimientos aún. Se generan al dar de alta operarios.</td></tr>';
+      return;
+    }
+    const flags={es:'🇪🇸',ca:'🏴',ro:'🇷🇴',ar:'🇲🇦',fr:'🇫🇷',en:'🇬🇧'};
+    const langNames={es:'Español',ca:'Català',ro:'Română',ar:'العربية',fr:'Français',en:'English'};
+    _consentData=Object.values(data).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+    tb.innerHTML=_consentData.map((c,i)=>{
+      const rgpdOk=c.rgpd_aceptado===true;
+      const gpsOk=c.gps_aceptado===true;
+      const estado=c.estado==='pendiente_aceptacion'?'<span class="pill p-pend">⏳ Pendiente</span>':'<span class="pill p-in">✅ Aceptado</span>';
+      return '<tr>'
+        +'<td style="font-weight:600">'+(c.nombre&&c.nombre.trim()?c.nombre:'<span style="color:var(--red);font-style:italic">Sin nombre ('+( c.doc||'?')+')</span>')+'</td>'
+        +'<td style="font-size:11px">'+(c.doc||'—')+'</td>'
+        +'<td>'+(c.fecha||'—')+'</td>'
+        +'<td>'+(c.hora||'—')+'</td>'
+        +'<td>'+(flags[c.idioma]||'🇪🇸')+' '+(langNames[c.idioma]||'Español')+'</td>'
+        +'<td>'+(rgpdOk?'<span class="pill p-in">✅</span>':estado)+'</td>'
+        +'<td>'+(gpsOk?'<span class="pill p-in">✅</span>':estado)+'</td>'
+        +'<td style="display:flex;gap:4px;">'
+        +'<button class="btn-edit" onclick="imprimirConsentimientoIdx('+i+')">🖨️</button>'
+        +'<button class="btn-danger" onclick="borrarConsentimiento(\''+( c.doc||'')+'\')">🗑️</button>'
+        +'</td></tr>';
+    }).join('');
+  }).catch(()=>{tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--red)">Error al cargar.</td></tr>';});
+}
+
+function generarConsentimientosDesdeOperarios(){
+  showToast('⏳ Generando consentimientos...','inf');
+  fetch(`${FB_URL}/operarios_registro.json`).then(r=>r.json()).then(ops=>{
+    if(!ops){showToast('⚠️ No hay operarios en Firebase','err');return;}
+    const entries=Object.entries(ops);
+    let count=0;
+    const promises=entries.map(([key,op])=>{
+      if(!op||!op.nombre)return Promise.resolve();
+      // Comprobar si ya existe consentimiento
+      return fetch(`${FB_URL}/consentimientos/${key}.json`)
+        .then(r=>r.json())
+        .then(existing=>{
+          if(existing&&existing.doc&&existing.nombre&&existing.nombre.trim()){return;} // Ya existe con nombre OK
+          // Si existe pero sin nombre, reparar — si no existe, crear
+          const nombreCompleto=(op.nombre||'')+(op.apellidos?' '+op.apellidos:'');
+          if(existing&&existing.doc&&(!existing.nombre||!existing.nombre.trim())){
+            count++;
+            return fetch(`${FB_URL}/consentimientos/${key}/nombre.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(nombreCompleto)});
+          }
+          // Crear consentimiento pendiente
+          const cd={
+            doc:key,
+            nombre:(op.nombre||'')+(op.apellidos?' '+op.apellidos:''),
+            fecha:new Date().toISOString().split('T')[0],
+            hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
+            timestamp:Date.now(),
+            idioma:op.idioma||'es',
+            rgpd_aceptado:false,
+            gps_aceptado:false,
+            estado:'pendiente_aceptacion',
+            version:'1.0'
+          };
+          count++;
+          return fetch(`${FB_URL}/consentimientos/${key}.json`,{
+            method:'PUT',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(cd)
+          });
+        }).catch(()=>{
+          // Si no existe, crear
+          const cd={doc:key,nombre:(op.nombre||'')+(op.apellidos?' '+op.apellidos:''),fecha:new Date().toISOString().split('T')[0],hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),timestamp:Date.now(),idioma:op.idioma||'es',rgpd_aceptado:false,gps_aceptado:false,estado:'pendiente_aceptacion',version:'1.0'};
+          count++;
+          return fetch(`${FB_URL}/consentimientos/${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(cd)});
+        });
+    });
+    Promise.all(promises).then(()=>{
+      showToast(`✅ ${count} consentimientos generados`,'ok');
+      setTimeout(()=>cargarConsentimientos(),800);
+    });
+  }).catch(()=>showToast('⚠️ Error al leer operarios','err'));
+}
+
+function borrarConsentimiento(doc){
+  if(!doc||!confirm('¿Eliminar consentimiento de '+doc+'?'))return;
+  fetch(`${FB_URL}/consentimientos/${doc}.json`,{method:'DELETE'})
+    .then(()=>{showToast('✅ Eliminado','ok');cargarConsentimientos();})
+    .catch(()=>showToast('⚠️ Error','err'));
+}
+function borrarTodosConsentimientos(){
+  if(!confirm('¿Eliminar TODOS los consentimientos?'))return;
+  fetch(`${FB_URL}/consentimientos.json`,{method:'DELETE'})
+    .then(()=>{showToast('✅ Todos eliminados','ok');cargarConsentimientos();})
+    .catch(()=>showToast('⚠️ Error','err'));
+}
+
+// ── FICHAJE MANUAL ──
+function mostrarFichajeManual(){
+  const panel=document.getElementById('fichaje-manual-panel');
+  if(!panel)return;
+  const visible=panel.style.display!=='none';
+  panel.style.display=visible?'none':'block';
+  if(!visible){
+    // Rellenar selector de operarios
+    const sel=document.getElementById('fm-worker');
+    if(sel){sel.innerHTML=WORKERS.map(w=>`<option value="${(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()}">${w.nombre} ${w.apellidos}</option>`).join('');}
+    // Rellenar selector de obras
+    const selObra=document.getElementById('fm-obra');
+    if(selObra){
+      selObra.innerHTML='<option value="">— Obra actual —</option>';
+      OBRAS.filter(o=>o.estado!=='terminada').forEach(o=>{
+        selObra.innerHTML+=`<option value="${o.id}">${o.nombre}${o.cliente?' · '+o.cliente:''}</option>`;
+      });
+    }
+    // Poner hora actual por defecto
+    const now=new Date();
+    const hEl=document.getElementById('fm-hora');
+    if(hEl)hEl.value=now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}).replace(':',':');
+  }
+}
+
+function guardarFichajeManual(){
+  const docKey=document.getElementById('fm-worker')?.value;
+  const tipo=document.getElementById('fm-tipo')?.value;
+  const hora=document.getElementById('fm-hora')?.value;
+  const nota=document.getElementById('fm-nota')?.value||'';
+  if(!docKey||!hora){showToast('Selecciona operario y hora','err');return;}
+  const w=WORKERS.find(x=>(x.dni||x.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()===docKey);
+  const nombre=w?`${w.nombre} ${w.apellidos}`:'Operario';
+  const now=new Date();
+  const dateStr=now.toISOString().split('T')[0];
+  // Construir datos del fichaje
+  const obraId=document.getElementById('fm-obra')?.value;
+  const obraSelec=obraId?OBRAS.find(o=>o.id===obraId):null;
+  const ciudadFichaje=obraSelec?obraSelec.nombre:(nota||'Fichaje manual consola');
+  const fichajeData={
+    nombre,doc:docKey,tipo,hora,
+    hora_entrada:tipo==='entrada'?hora:(w?.arrival||null),
+    fecha:dateStr,
+    ciudad:ciudadFichaje,
+    provincia:'',
+    lat:obraSelec?.lat||0,
+    lng:obraSelec?.lng||0,
+    timestamp:now.getTime(),
+    en_zona:obraSelec?true:true,
+    dist_obra:0,
+    manual:true,
+    nota_manual:nota||obraSelec?.nombre||'',
+    obra_id:obraId||''
+  };
+  // Actualizar en Firebase activos
+  const actData={...fichajeData,activo:tipo==='entrada'};
+  fetch(`${FB_URL}/operarios_activos/${docKey}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(actData)})
+    .then(()=>{
+      // También guardar en fichajes
+      fetch(`${FB_URL}/fichajes/${dateStr}/${docKey}_manual.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(fichajeData)}).catch(()=>{});
+      // Si cambia la obra, actualizar en registro del operario
+      if(obraSelec&&w){
+        w.obra=obraSelec.direccion||obraSelec.nombre;
+        if(obraSelec.lat&&obraSelec.lng){w.obra_lat=obraSelec.lat;w.obra_lng=obraSelec.lng;}
+        fbSyncWorker(w,false);
+      }
+      // Actualizar worker local
+      if(w){
+        if(tipo==='entrada'){w.arrival=hora;w.status='in';w.en_zona=true;w.dist_obra=0;}
+        else{w.dep=hora;w.status='out';}
+        if(obraSelec)w.ciudad_gps=obraSelec.nombre;
+        saveW();
+      }
+      const obraMsg=obraSelec?` · ${obraSelec.nombre}`:'';
+      showToast(`✅ Fichaje manual: ${nombre} — ${tipo} ${hora}${obraMsg}`,'ok');
+      document.getElementById('fichaje-manual-panel').style.display='none';
+      document.getElementById('fm-nota').value='';
+      renderJornada();
+    }).catch(()=>showToast('⚠️ Error al guardar','err'));
+}
+
+// ── UBICACIÓN EXACTA EN JORNADA ──
+function renderJornada(){
+  const tb=document.getElementById('jornada-tbody');if(!tb)return;
+  // ✅ MEJORA 1: Corte por día + orden de llegada
+  // Fichados hoy = tienen arrival o dep (status in/out). Sin fichar = status pending
+  const hoyJornada=new Date().toISOString().split('T')[0];
+  // ✅ FIX DEFINITIVO P1: solo son "de hoy" los que tienen _fechaFichaje===hoy O no tienen fecha (recién dados de alta)
+  const fichadosHoy=WORKERS.filter(w=>{
+    if(w.inactivo)return false;
+    if(!w._fechaFichaje)return false; // sin ningún fichaje → al grupo pendientes
+    return w._fechaFichaje===hoyJornada && (w.arrival||w.dep);
+  });
+  const sinFicharHoy=WORKERS.filter(w=>{
+    if(w.inactivo)return false;
+    // Sin fichaje de hoy: sin fecha, fecha anterior, o status pending
+    return !w._fechaFichaje || w._fechaFichaje!==hoyJornada;
+  });
+  // Ordenar fichados de hoy por hora de entrada (primero quien llegó antes)
+  fichadosHoy.sort((a,b)=>(a.arrival||a.dep||'99:99').localeCompare(b.arrival||b.dep||'99:99'));
+  // Ordenar pendientes: primero los que tienen fichaje reciente (fecha más reciente primero), luego los sin fichaje
+  sinFicharHoy.sort((a,b)=>{
+    if(a._fechaFichaje&&!b._fechaFichaje)return -1;
+    if(!a._fechaFichaje&&b._fechaFichaje)return 1;
+    if(a._fechaFichaje&&b._fechaFichaje)return b._fechaFichaje.localeCompare(a._fechaFichaje);
+    return (a.nombre||'').localeCompare(b.nombre||'');
+  });
+  const todosOrdenados=[...fichadosHoy,...sinFicharHoy];
+  const sepIdx=fichadosHoy.length;
+  tb.innerHTML=todosOrdenados.map((w,idx)=>{
+    // Separador visual antes del primer operario sin fichar
+    const hayFichajesAnteriores=sinFicharHoy.some(w=>w._fechaFichaje&&w._fechaFichaje!==hoyJornada);
+    const textoSep=hayFichajesAnteriores
+      ?'⏳ Sin fichar hoy · Los siguientes tienen fichajes de días anteriores'
+      :'⏳ Pendientes de fichar hoy';
+    const separador=(idx===sepIdx&&sinFicharHoy.length>0&&fichadosHoy.length>0)
+      ?`<tr><td colspan="6" style="padding:6px 14px;background:var(--bg);border-bottom:1px solid var(--border);font-family:'Montserrat';font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);">${textoSep}</td></tr>`
+      :'';
+    const ciudad=w.ciudad_gps?w.ciudad_gps.split(',')[0]:'';
+    const distOk=(w.dist_obra||0)<100000;
+    const zonaCell=w.en_zona===true
+      ?`<span class="pill p-in">✅ En zona${ciudad?' · '+ciudad:''}</span>`
+      :w.en_zona===false&&distOk
+        ?`<span class="pill p-out">⚠️ ${Math.round(w.dist_obra||0)}m${ciudad?' · '+ciudad:''}</span>`
+        :w.en_zona===false
+          ?`<span class="pill p-pend" title="Zona no definida">📍 ${ciudad||'—'}</span>`
+          :ciudad
+            ?`<span class="pill p-pend">📍 ${ciudad}</span>`
+            :'<span class="pill p-pend" title="Sin coordenadas de obra configuradas">—</span>';
+    let estadoLabel;
+    if(w.status==='pending')estadoLabel='<span style="font-size:10px;color:var(--red);font-weight:600">Sin fichar</span>';
+    else if(w.status==='in')estadoLabel='<span style="font-size:10px;color:var(--green);font-weight:600">En obra</span>';
+    else estadoLabel='<span style="font-size:10px;color:var(--amber);font-weight:600">Salida</span>';
+    const gmUrl=w._lat&&w._lng?`https://www.google.com/maps?q=${w._lat},${w._lng}`:'';
+    const gmBtn=gmUrl?`<a href="${gmUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:#E8F1FB;border:1px solid #D0DDF0;border-radius:5px;font-size:10px;color:#2563AE;font-weight:700;text-decoration:none;margin-top:3px;">📍 Maps</a>`:'';
+    const ubicacion=w.ciudad_gps?`<div style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:6px;">${w.ciudad_gps}${gmBtn}</div>`:gmBtn?`<div>${gmBtn}</div>`:'';
+    // Número de orden solo para fichados (1, 2, 3...)
+    const numOrden=idx<sepIdx?`<span style="font-family:'Montserrat';font-size:9px;font-weight:700;color:var(--text3);margin-right:6px;">#${idx+1}</span>`:''
+    // ✅ FIX 1: Badge de fecha si el fichaje es de un día anterior
+    const hoyCheck=new Date().toISOString().split('T')[0];
+    const fechaFichaje=w._fechaFichaje||null;
+    const esAnterior=fechaFichaje&&fechaFichaje!==hoyCheck;
+    const fechaFmt=esAnterior?new Date(fechaFichaje+'T12:00:00').toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'}):'';
+    const ultimoFichaje=w.dep?`Salida ${w.dep}`:w.arrival?`Entrada ${w.arrival}`:'';
+    const fechaBadge=esAnterior
+      ?`<span style="display:inline-block;margin-left:6px;font-size:9px;background:#FEF3C7;color:#92400E;border-radius:3px;padding:1px 6px;font-weight:700;" title="Último fichaje: ${fechaFmt} ${ultimoFichaje}">📅 Últ. fichaje: ${fechaFmt}</span>`
+      :'';;
+    return separador+`<tr>
+      <td><div style="font-weight:600">${numOrden}${w.nombre} ${w.apellidos}${fechaBadge}</div>${ubicacion}</td>
+      <td style="font-weight:600">${esAnterior?'—':w.arrival||'—'}</td>
+      <td style="color:var(--red)">${esAnterior?'—':w.dep||'—'}</td>
+      <td style="font-family:'Montserrat';font-weight:800;color:var(--blue2)">${(+w.h).toLocaleString('es-ES')}h</td>
+      <td>${zonaCell}</td>
+      <td>${estadoLabel}${w.manual?'<div style="font-size:9px;color:var(--orange);margin-top:2px;">✏️ Manual</div>':''}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── UPDATE TASK SELECT ──
+function updateTaskSelect(){
+  const sel=document.getElementById('task-to');if(!sel)return;
+  sel.innerHTML='<option value="all">Todos los operarios</option>';
+  WORKERS.forEach(w=>{const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();sel.innerHTML+=`<option value="${doc}">${w.nombre} ${w.apellidos}</option>`;});
+}
+
+function borrarTodasTareas(){
+  if(!confirm('¿Eliminar TODAS las tareas enviadas?'))return;
+  fetch(`${FB_URL}/tareas.json`,{method:'DELETE'})
+    .then(()=>{showToast('✅ Tareas eliminadas','ok');renderTaskLog();})
+    .catch(()=>showToast('⚠️ Error','err'));
+}
+
+// ══════════════════════════════════════
+// GESTOR DE OBRAS
+// ══════════════════════════════════════
+let OBRAS = [];
+let _obraFormLat = null, _obraFormLng = null;
+
+function cargarObras(){
+  fetch(`${FB_URL}/obras.json`).then(r=>r.json()).then(data=>{
+    if(!data){OBRAS=[];renderObrasList();return;}
+    OBRAS=Object.entries(data).map(([id,o])=>({id,...o}));
+    OBRAS.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
+    renderObrasList();
+    updateObrasSelect();
+    showToast(`✅ ${OBRAS.length} obras cargadas`,'ok');
+  }).catch(()=>{OBRAS=[];renderObrasList();});
+}
+
+function renderObrasList(){
+  const list=document.getElementById('obras-list');
+  const cnt=document.getElementById('obras-count');
+  if(!list)return;
+  const activas=OBRAS.filter(o=>o.estado!=='terminada');
+  if(cnt)cnt.textContent=OBRAS.length+' obras';
+  if(!OBRAS.length){list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin obras. Crea la primera.</div>';return;}
+  const colEstado={'activa':'p-in','pausada':'p-pend','terminada':'p-out'};
+  const txtEstado={'activa':'🟢 Activa','pausada':'🟡 Pausada','terminada':'🔴 Terminada'};
+  list.innerHTML=OBRAS.map(o=>`
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+        <div>
+          <div style="font-weight:700;font-size:13px;color:var(--text)">${o.nombre||'Sin nombre'}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:1px;">${o.cliente||'—'}</div>
+        </div>
+        <span class="pill ${colEstado[o.estado]||'p-pend'}">${txtEstado[o.estado]||o.estado}</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;">📍 ${o.direccion||'—'}</div>
+      ${o.lat?`<div style="font-size:10px;color:var(--green);margin-bottom:8px;">✅ Zona geocodificada · Radio ${o.radio||500}m</div>`:`<div style="font-size:10px;color:var(--amber);margin-bottom:8px;">⚠️ Sin zona GPS — pulsa 📍 Zona al editar</div>`}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn-edit" onclick="editObra('${o.id}')">✏️ Editar</button>
+        <button onclick="asignarObraRapida('${o.id}')" style="padding:6px 10px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;">👷 Asignar a operario</button>
+        <button class="btn-danger" onclick="deleteObra('${o.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateObrasSelect(){
+  const sel=document.getElementById('g-obra-select');
+  if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">— Sin obra asignada —</option>';
+  OBRAS.filter(o=>o.estado!=='terminada').forEach(o=>{
+    sel.innerHTML+=`<option value="${o.id}">${o.nombre}${o.cliente?' · '+o.cliente:''}</option>`;
+  });
+  if(current)sel.value=current;
+}
+
+function seleccionarObraEnAlta(){
+  const sel=document.getElementById('g-obra-select');
+  const obraId=sel.value;
+  const info=document.getElementById('g-obra-info');
+  const obraHidden=document.getElementById('g-obra');
+  if(!obraId){
+    if(info)info.style.display='none';
+    if(obraHidden)obraHidden.value='';
+    _obraLat=null;_obraLng=null;
+    return;
+  }
+  const obra=OBRAS.find(o=>o.id===obraId);
+  if(!obra)return;
+  if(obraHidden)obraHidden.value=obra.direccion||obra.nombre||'';
+  if(obra.lat&&obra.lng){_obraLat=obra.lat;_obraLng=obra.lng;}
+  if(info){
+    info.textContent=`📍 ${obra.direccion||''}${obra.lat?' · Zona ✅':' · ⚠️ Sin zona GPS'}`;
+    info.style.display='block';
+  }
+}
+
+function parsearCoordsObra(val){
+  if(!val)return;
+  // Acepta formatos: "37.3201, -5.4067" o "37.3201,-5.4067" o "37°19'12.5N 5°24'24.2W"
+  const clean=val.replace(/[°'"NnSsEeWwOo]/g,' ').trim();
+  const parts=clean.split(/[\s,;]+/).filter(p=>p&&!isNaN(parseFloat(p)));
+  if(parts.length>=2){
+    const lat=parseFloat(parts[0]);
+    const lng=parseFloat(parts[1]);
+    if(lat>=-90&&lat<=90&&lng>=-180&&lng<=180){
+      _obraFormLat=lat;
+      _obraFormLng=lng;
+      const res=document.getElementById('geo-obra-result');
+      if(res){
+        res.textContent='✅ Coordenadas válidas · '+lat.toFixed(5)+', '+lng.toFixed(5);
+        res.style.color='var(--green)';
+        res.style.display='block';
+      }
+      // Actualizar botón
+      const btn=document.getElementById('btn-geo-obra');
+      if(btn)btn.textContent='✅ OK';
+    } else {
+      _obraFormLat=null;_obraFormLng=null;
+      const res=document.getElementById('geo-obra-result');
+      if(res){res.textContent='⚠️ Coordenadas fuera de rango';res.style.color='var(--red)';res.style.display='block';}
+    }
+  } else if(val.length>3){
+    const res=document.getElementById('geo-obra-result');
+    if(res){res.textContent='⚠️ Formato: 37.3201432, -5.4067291';res.style.color='var(--amber)';res.style.display='block';}
+  }
+}
+
+function abrirGoogleMaps(){
+  window.open('https://maps.google.com','_blank');
+}
+
+function geocodificarObraForm(){
+  const calle=(document.getElementById('obra-calle')?.value||'').trim();
+  const cp=(document.getElementById('obra-cp')?.value||'').trim();
+  const localidad=(document.getElementById('obra-localidad')?.value||'').trim();
+  if(!localidad&&!cp){showToast('Introduce al menos la localidad o código postal','err');return;}
+  // Combinar dirección completa
+  const dirCompleta=[calle,cp,localidad].filter(Boolean).join(', ');
+  // Guardar en campo hidden
+  const hiddenDir=document.getElementById('obra-direccion');
+  if(hiddenDir)hiddenDir.value=dirCompleta;
+  const btn=document.getElementById('btn-geo-obra');
+  const res=document.getElementById('geo-obra-result');
+  if(btn)btn.textContent='⏳...';
+  // Geocodificar con más precisión: CP + localidad primero
+  const query=cp&&localidad?`${cp} ${localidad}, España`:`${dirCompleta}, España`;
+  fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(query)+'&format=json&limit=1')
+    .then(r=>r.json()).then(data=>{
+      if(data&&data[0]){
+        _obraFormLat=parseFloat(data[0].lat);
+        _obraFormLng=parseFloat(data[0].lon);
+        if(btn)btn.textContent='✅ OK';
+        if(res){res.textContent=`📍 ${_obraFormLat.toFixed(4)}, ${_obraFormLng.toFixed(4)} · ${data[0].display_name?.split(',').slice(0,2).join(',')||''}`;res.style.display='block';}
+        showToast('✅ Zona geocodificada correctamente','ok');
+      } else {
+        if(btn)btn.textContent='❌';
+        showToast('⚠️ Dirección no encontrada — prueba solo con CP y localidad','err');
+      }
+    }).catch(()=>{if(btn)btn.textContent='📍 Zona';showToast('⚠️ Error de red','err');});
+}
+
+function saveObra(){
+  const nombre=document.getElementById('obra-nombre')?.value.trim();
+  const cliente=document.getElementById('obra-cliente')?.value.trim();
+  const direccion=(document.getElementById('obra-direccion')?.value||'').trim();
+  const radio=parseInt(document.getElementById('obra-radio')?.value)||500;
+  const estado=document.getElementById('obra-estado')?.value||'activa';
+  const editId=document.getElementById('obra-edit-id')?.value;
+  if(!nombre){showToast('Escribe el nombre de la obra','err');return;}
+  const obraData={nombre,cliente:cliente||'',direccion:direccion||'',radio,estado,
+    lat:_obraFormLat||null,lng:_obraFormLng||null,
+    fecha:new Date().toISOString().split('T')[0]};
+  const key=editId||'obra_'+Date.now();
+  fetch(`${FB_URL}/obras/${key}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(obraData)})
+    .then(()=>{
+      showToast(`✅ Obra "${nombre}" guardada`,'ok');
+      resetObraForm();
+      cargarObras();
+    }).catch(()=>showToast('⚠️ Error al guardar','err'));
+}
+
+function editObra(id){
+  const o=OBRAS.find(o=>o.id===id);if(!o)return;
+  document.getElementById('obra-edit-id').value=id;
+  document.getElementById('obra-nombre').value=o.nombre||'';
+  document.getElementById('obra-cliente').value=o.cliente||'';
+  document.getElementById('obra-direccion').value=o.direccion||'';
+  // Mostrar coordenadas si las tiene
+  const coordsEl=document.getElementById('obra-coords');
+  if(coordsEl&&o.lat&&o.lng){
+    coordsEl.value=o.lat.toFixed(7)+', '+o.lng.toFixed(7);
+    const res=document.getElementById('geo-obra-result');
+    if(res){res.textContent='✅ Coordenadas cargadas · Radio '+( o.radio||500)+'m';res.style.color='var(--green)';res.style.display='block';}
+  }
+  document.getElementById('obra-radio').value=o.radio||500;
+  document.getElementById('obra-estado').value=o.estado||'activa';
+  document.getElementById('obra-form-title').textContent='✏️ Editar obra';
+  document.getElementById('obra-btn').textContent='💾 Guardar cambios';
+  _obraFormLat=o.lat||null;_obraFormLng=o.lng||null;
+  const res=document.getElementById('geo-obra-result');
+  const btn=document.getElementById('btn-geo-obra');
+  if(o.lat&&o.lng){
+    if(res){res.textContent='📍 '+o.lat.toFixed(4)+', '+o.lng.toFixed(4);res.style.display='block';}
+    if(btn)btn.textContent='✅ OK';
+  }
+  showPage('obras');
+  window.scrollTo(0,0);
+}
+
+function deleteObra(id){
+  const o=OBRAS.find(o=>o.id===id);if(!o)return;
+  if(!confirm(`¿Eliminar obra "${o.nombre}"?`))return;
+  fetch(`${FB_URL}/obras/${id}.json`,{method:'DELETE'})
+    .then(()=>{showToast(`✅ Obra eliminada`,'ok');cargarObras();})
+    .catch(()=>showToast('⚠️ Error','err'));
+}
+
+function resetObraForm(){
+  document.getElementById('obra-edit-id').value='';
+  ['obra-nombre','obra-cliente','obra-direccion','obra-coords'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('obra-radio').value=500;
+  document.getElementById('obra-estado').value='activa';
+  document.getElementById('obra-form-title').textContent='🏗️ Nueva obra';
+  document.getElementById('obra-btn').textContent='+ Crear obra';
+  const res=document.getElementById('geo-obra-result');if(res)res.style.display='none';
+  const btn=document.getElementById('btn-geo-obra');if(btn)btn.textContent='📍 Zona';
+  _obraFormLat=null;_obraFormLng=null;
+}
+
+// Asignar obra a operario directamente desde la sección Obras
+let _obraRapidaId=null;
+function asignarObraRapida(obraId){
+  const o=OBRAS.find(o=>o.id===obraId);if(!o)return;
+  _obraRapidaId=obraId;
+  // Mostrar lista de operarios para elegir
+  const nombres=WORKERS.map((w,i)=>`${i+1}. ${w.nombre} ${w.apellidos} (${w.dni||w.nie||'—'})`).join('\n');
+  const idx=prompt(`Asignar obra "${o.nombre}" a:\n\n${nombres}\n\nEscribe el número del operario:`);
+  if(!idx)return;
+  const w=WORKERS[parseInt(idx)-1];if(!w){showToast('Operario no válido','err');return;}
+  if(!confirm(`¿Asignar "${o.nombre}" a ${w.nombre} ${w.apellidos}?`))return;
+  // Actualizar operario
+  const doc=(w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  w.obra=o.direccion||o.nombre;
+  if(o.lat&&o.lng){w.obra_lat=o.lat;w.obra_lng=o.lng;}
+  fbSyncWorker(w,false);
+  // Recalcular zona en activos si tiene ubicación
+  if(w._lat&&w._lng&&o.lat&&o.lng){
+    const dist=calcDist(w._lat,w._lng,o.lat,o.lng);
+    const enZona=dist<=(o.radio||500);
+    fetch(`${FB_URL}/operarios_activos/${doc}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({en_zona:enZona,dist_obra:dist,obra_lat:o.lat,obra_lng:o.lng})}).catch(()=>{});
+    showToast(`✅ ${w.nombre} asignado a "${o.nombre}" · ${enZona?'✅ En zona':'⚠️ '+dist+'m fuera'}`,'ok');
+  } else {
+    showToast(`✅ ${w.nombre} asignado a "${o.nombre}"`,'ok');
+  }
+  saveW();renderWorkers();
+}
+
+// ══════════════════════════════════════
+// ALERTAS DE HORARIO — Sin fichar
+// ══════════════════════════════════════
+let _horarioAlertasGeneradas = {};
+
+function checkHorarioAlertas(){
+  const ahora = new Date();
+  const hoy = DAYS_CAP[ahora.getDay()];
+  const jor = JORNADA[hoy];
+  if(!jor) return; // Fin de semana — sin alertas
+
+  const hh = ahora.getHours();
+  const mm = ahora.getMinutes();
+  const minActual = hh * 60 + mm;
+
+  // Hora de entrada: 08:00 → alerta a partir de 08:15
+  const [h1e, m1e] = jor.t1s.split(':').map(Number);
+  const minEntrada = h1e * 60 + m1e + 15;
+
+  // Hora de salida: fin de jornada + 15min
+  const horaFinStr = jor.t2e || jor.t1e;
+  const [hFin, mFin] = horaFinStr.split(':').map(Number);
+  const minSalida = hFin * 60 + mFin + 15;
+
+  // Comprobar operarios sin fichar entrada
+  if(minActual >= minEntrada){
+    const sinEntrada = WORKERS.filter(w => w.status === 'pending');
+    sinEntrada.forEach(w => {
+      const key = 'entrada_' + (w.dni||w.nie||w.id) + '_' + ahora.toISOString().split('T')[0];
+      if(!_horarioAlertasGeneradas[key]){
+        _horarioAlertasGeneradas[key] = true;
+        addHorarioAlerta(w, 'entrada', jor.t1s);
+      }
+    });
+  }
+
+  // Comprobar operarios sin fichar salida
+  if(minActual >= minSalida){
+    const sinSalida = WORKERS.filter(w => w.status === 'in' && w.arrival && !w.dep);
+    sinSalida.forEach(w => {
+      const key = 'salida_' + (w.dni||w.nie||w.id) + '_' + ahora.toISOString().split('T')[0];
+      if(!_horarioAlertasGeneradas[key]){
+        _horarioAlertasGeneradas[key] = true;
+        addHorarioAlerta(w, 'salida', horaFinStr);
+      }
+    });
+  }
+}
+
+function addHorarioAlerta(w, tipo, horaEsperada){
+  const list = document.getElementById('alerts-list');
+  if(!list) return;
+  const empty = list.querySelector('[style*="padding:32px"]');
+  if(empty) empty.remove();
+
+  // Actualizar badge y contador
+  const hdr = document.getElementById('alertas-hdr-status');
+  if(hdr){hdr.textContent='⚠️ Alertas activas';hdr.style.color='var(--red)';}
+  const cnt = document.getElementById('alert-count');
+  const kv = document.getElementById('kv-alerts');
+  if(cnt){cnt.style.display='inline';cnt.textContent=parseInt(cnt.textContent||0)+1;}
+  if(kv)kv.textContent=parseInt(kv.textContent||0)+1;
+
+  const id = 'al_horario_' + Date.now();
+  const icono = tipo==='entrada' ? '⏰' : '🔴';
+  const msg = tipo==='entrada'
+    ? `No ha fichado entrada — debía entrar a las ${horaEsperada}`
+    : `No ha fichado salida — debía salir a las ${horaEsperada}`;
+
+  const div = document.createElement('div');
+  div.className = 'alert-item ai-warn';
+  div.id = id;
+  div.innerHTML = `
+    <div class="al-icon">${icono}</div>
+    <div style="flex:1">
+      <div class="al-name">${w.nombre} ${w.apellidos}</div>
+      <div class="al-desc">${msg}</div>
+      <div class="al-time">${new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})} · Detectado por control horario</div>
+      <div class="al-actions">
+        <span class="badge b-warn">${tipo==='entrada'?'SIN ENTRADA':'SIN SALIDA'}</span>
+        <button onclick="fichajeManualDesdeAlerta('${(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()}','${tipo}')" class="btn-edit" style="font-size:10px;">✏️ Fichar ahora</button>
+        <button class="btn-resolve" onclick="resolveAlert('${id}')">✓ Resolver</button>
+      </div>
+    </div>`;
+  list.insertBefore(div, list.firstChild);
+
+  // Preview en dashboard
+  const preview = document.getElementById('dashboard-alerts-preview');
+  if(preview) preview.innerHTML += `<div style="padding:8px 12px;text-align:left;color:var(--amber);font-size:12px;font-weight:600;">${icono} ${w.nombre} ${w.apellidos} — ${msg}</div>`;
+}
+
+function fichajeManualDesdeAlerta(docKey, tipo){
+  // Ir a Resumen Jornada y abrir el panel de fichaje manual
+  showPage('jornada');
+  setTimeout(()=>{
+    mostrarFichajeManual();
+    const selW = document.getElementById('fm-worker');
+    const selT = document.getElementById('fm-tipo');
+    if(selW) selW.value = docKey;
+    if(selT) selT.value = tipo;
+    const now = new Date();
+    const hEl = document.getElementById('fm-hora');
+    if(hEl) hEl.value = now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+    showToast('✏️ Completa el fichaje manual y pulsa Guardar','inf');
+  }, 300);
+}
+
+let toastTimer;
+function showToast(msg,tipo){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${tipo}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ══════════════════════════════════════════════════════════
+// MÓDULO CALENDARIO DE ASISTENCIA
+// ══════════════════════════════════════════════════════════
+
+function initCalendario(){
+  // Poblar selector de meses (últimos 6 meses)
+  const sel=document.getElementById('cal-mes');
+  if(!sel)return;
+  sel.innerHTML='';
+  const hoy=new Date();
+  for(let i=0;i<6;i++){
+    const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1);
+    const val=d.toISOString().slice(0,7);
+    const lbl=d.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+    sel.innerHTML+=`<option value="${val}"${i===0?' selected':''}>${lbl.charAt(0).toUpperCase()+lbl.slice(1)}</option>`;
+  }
+  // Poblar selector de operarios
+  const selOp=document.getElementById('cal-operario');
+  if(selOp){
+    selOp.innerHTML='<option value="todos">👷 Todos</option>';
+    WORKERS.filter(w=>!w.inactivo).forEach(w=>{
+      const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      selOp.innerHTML+=`<option value="${doc}">${w.nombre} ${w.apellidos}</option>`;
+    });
+  }
+}
+
+async function renderCalendario(){
+  const cont=document.getElementById('cal-container');
+  if(!cont)return;
+  const mes=document.getElementById('cal-mes')?.value;
+  const filtroOp=document.getElementById('cal-operario')?.value||'todos';
+  if(!mes)return;
+
+  cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;">⏳ Cargando fichajes del mes...</div>';
+  if(!WORKERS||!WORKERS.length){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--amber);font-size:12px;">⚠️ Espera que se carguen los operarios e inténtalo de nuevo.</div>';return;}
+
+  const[y,m]=mes.split('-').map(Number);
+  const diasMes=new Date(y,m,0).getDate();
+  const hoyStr=new Date().toISOString().split('T')[0];
+
+  // Generar lista de fechas del mes
+  const fechas=[];
+  for(let i=1;i<=diasMes;i++){
+    const d=new Date(y,m-1,i);
+    fechas.push({fecha:`${mes}-${String(i).padStart(2,'0')}`,dia:i,dow:d.getDay()});
+  }
+
+  // Cargar todos los fichajes del mes en paralelo
+  const resultados=await Promise.all(fechas.map(({fecha})=>
+    fetch(`${FB_URL}/fichajes/${fecha}.json`).then(r=>r.json()).then(d=>({fecha,data:d})).catch(()=>({fecha,data:null}))
+  ));
+
+  // Agrupar fichajes por fecha y operario
+  const porFechaOp={}; // {fecha: {doc: {entrada,salida}}}
+  resultados.forEach(({fecha,data})=>{
+    if(!data)return;
+    porFechaOp[fecha]={};
+    Object.values(data).forEach(f=>{
+      if(!f||!f.doc)return;
+      const doc=f.doc.replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      if(filtroOp!=='todos'&&doc!==filtroOp)return;
+      if(!porFechaOp[fecha][doc])porFechaOp[fecha][doc]={entrada:null,salida:null,nombre:f.nombre||doc};
+      if(f.tipo==='entrada')porFechaOp[fecha][doc].entrada=f.hora;
+      if(f.tipo==='salida')porFechaOp[fecha][doc].salida=f.hora;
+    });
+  });
+
+  // Operarios a mostrar
+  const ops=filtroOp==='todos'
+    ?WORKERS.filter(w=>!w.inactivo)
+    :WORKERS.filter(w=>!w.inactivo&&(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()===filtroOp);
+
+  if(!ops.length){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;">Sin operarios.</div>';return;}
+
+  // Construir HTML del calendario
+  const dias=['L','M','X','J','V','S','D'];
+  let html='';
+
+  if(filtroOp==='todos'){
+    // Vista resumen: tabla con operarios en filas y días en columnas
+    html+=`<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:10px;min-width:100%;">`;
+    html+=`<thead><tr><th style="padding:6px 10px;text-align:left;background:var(--bg);position:sticky;left:0;z-index:2;min-width:140px;">Operario</th>`;
+    fechas.forEach(({dia,dow})=>{
+      const esFS=dow===0||dow===6;
+      const fechaStr=`${mes}-${String(dia).padStart(2,'0')}`;
+      const esHoy=fechaStr===hoyStr;
+      html+=`<th style="padding:4px 2px;text-align:center;background:${esHoy?'var(--blue2)':esFS?'var(--bg)':'var(--white)'};color:${esHoy?'#fff':esFS?'var(--text3)':'var(--text)'};min-width:32px;border-left:1px solid var(--border);">
+        <div style="font-weight:700">${dia}</div>
+        <div style="font-size:8px;opacity:.7">${dias[(dow+6)%7]}</div>
+      </th>`;
+    });
+    html+=`<th style="padding:6px 8px;background:var(--bg);text-align:center;">Total</th></tr></thead><tbody>`;
+
+    ops.forEach(w=>{
+      const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      let diasCompletos=0,diasParciales=0,diasSinFichar=0;
+      html+=`<tr><td style="padding:6px 10px;font-weight:600;font-size:11px;border-bottom:1px solid var(--border);position:sticky;left:0;background:var(--white);z-index:1;">${w.nombre} ${w.apellidos.split(' ')[0]}</td>`;
+      fechas.forEach(({fecha,dow})=>{
+        const esFS=dow===0||dow===6;
+        const esFutura=fecha>hoyStr;
+        const esHoy=fecha===hoyStr;
+        const fData=porFechaOp[fecha]?.[doc];
+        let color,emoji,title;
+        if(esFS){color='var(--bg)';emoji='';title='Fin de semana';}
+        else if(esFutura){color='var(--white)';emoji='';title='';}
+        else if(!fData||(!fData.entrada&&!fData.salida)){
+          color='#FEE2E2';emoji='🔴';title='No fichó';diasSinFichar++;
+        } else if(fData.entrada&&fData.salida){
+          color='#DCFCE7';emoji='🟢';title=`${fData.entrada}→${fData.salida}`;diasCompletos++;
+        } else {
+          color='#FEF3C7';emoji='🟡';title=fData.entrada?`Entrada ${fData.entrada}`:`Salida ${fData.salida}`;diasParciales++;
+        }
+        html+=`<td style="text-align:center;background:${color};border:1px solid var(--border);border-collapse:collapse;padding:2px;" title="${title}">${emoji}</td>`;
+      });
+      const totalL=diasCompletos+diasParciales;
+      html+=`<td style="padding:4px 8px;text-align:center;font-family:'Montserrat';font-weight:700;font-size:11px;background:var(--bg);border-left:2px solid var(--border);">
+        <div style="color:var(--green)">${diasCompletos}✅</div>
+        ${diasParciales?`<div style="color:var(--amber)">${diasParciales}⚠️</div>`:''}
+        ${diasSinFichar?`<div style="color:var(--red)">${diasSinFichar}❌</div>`:''}
+      </td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  } else {
+    // Vista detalle de un operario: calendario visual por semanas
+    const doc=filtroOp;
+    const op=ops[0];
+    html+=`<div style="font-weight:700;font-size:13px;margin-bottom:12px;">${op?.nombre} ${op?.apellidos}</div>`;
+    // Cabecera días
+    html+=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">`;
+    dias.forEach(d=>html+=`<div style="text-align:center;font-size:10px;font-weight:700;color:var(--text3);">${d}</div>`);
+    html+=`</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">`;
+    // Espacios vacíos antes del día 1
+    const primerDow=(new Date(y,m-1,1).getDay()+6)%7;
+    for(let i=0;i<primerDow;i++)html+=`<div></div>`;
+    // Días
+    fechas.forEach(({fecha,dia,dow})=>{
+      const esFS=dow===0||dow===6;
+      const esFutura=fecha>hoyStr;
+      const esHoy=fecha===hoyStr;
+      const fData=porFechaOp[fecha]?.[doc];
+      let bg,border,txt='',subtxt='';
+      if(esHoy){bg='var(--blue2)';border='var(--blue2)';txt='color:#fff';}
+      else if(esFS){bg='var(--bg)';border='var(--border)';}
+      else if(esFutura){bg='var(--white)';border='var(--border)';}
+      else if(!fData||(!fData.entrada&&!fData.salida)){bg='#FEE2E2';border='#FCA5A5';subtxt='No fichó';}
+      else if(fData.entrada&&fData.salida){bg='#DCFCE7';border='#86EFAC';subtxt=`${fData.entrada}-${fData.salida}`;}
+      else{bg='#FEF3C7';border='#FCD34D';subtxt=fData.entrada?`E:${fData.entrada}`:`S:${fData.salida}`;}
+      html+=`<div style="background:${bg};border:1px solid ${border};border-radius:6px;padding:4px 2px;text-align:center;min-height:44px;">
+        <div style="font-family:'Montserrat';font-weight:800;font-size:13px;${txt}">${dia}</div>
+        <div style="font-size:7px;color:${esHoy?'rgba(255,255,255,.8)':'var(--text3)'};line-height:1.2;margin-top:2px;">${subtxt}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  cont.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════════════════
+// MÓDULO INFORMES DE JORNADA — RD 8/2019
+// ══════════════════════════════════════════════════════════
+let _informeHTML = '';
+
+function initInformes(){
+  // Poblar select de operarios
+  const sel=document.getElementById('inf-operario');
+  if(sel){
+    sel.innerHTML='<option value="todos">👷 Todos los operarios</option>';
+    WORKERS.filter(w=>!w.inactivo).forEach(w=>{
+      const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      sel.innerHTML+=`<option value="${doc}">${w.nombre} ${w.apellidos}</option>`;
+    });
+  }
+  // Defaults de fecha
+  const hoy=new Date().toISOString().split('T')[0];
+  const mes=hoy.substring(0,7);
+  if(document.getElementById('inf-fecha'))document.getElementById('inf-fecha').value=hoy;
+  if(document.getElementById('inf-semana-ini'))document.getElementById('inf-semana-ini').value=getLunes(new Date()).toISOString().split('T')[0];
+  if(document.getElementById('inf-mes'))document.getElementById('inf-mes').value=mes;
+  document.getElementById('inf-preview-wrap').style.display='none';
+  document.getElementById('inf-empty').style.display='block';
+}
+
+function getLunes(d){
+  const day=d.getDay();const diff=d.getDate()-day+(day===0?-6:1);
+  return new Date(d.setDate(diff));
+}
+
+function onChangeTipoInforme(){
+  const tipo=document.getElementById('inf-tipo').value;
+  document.getElementById('inf-ctrl-fecha').style.display=tipo==='diario'?'':'none';
+  document.getElementById('inf-ctrl-semana').style.display=tipo==='semanal'?'':'none';
+  document.getElementById('inf-ctrl-mes').style.display=tipo==='mensual'?'':'none';
+}
+
+function getFechasRango(){
+  const tipo=document.getElementById('inf-tipo').value;
+  let fechas=[];
+  if(tipo==='diario'){
+    const f=document.getElementById('inf-fecha').value;
+    if(f)fechas=[f];
+  } else if(tipo==='semanal'){
+    const ini=new Date(document.getElementById('inf-semana-ini').value+'T12:00:00');
+    for(let i=0;i<7;i++){const d=new Date(ini);d.setDate(ini.getDate()+i);fechas.push(d.toISOString().split('T')[0]);}
+  } else {
+    const mes=document.getElementById('inf-mes').value;
+    if(mes){
+      const [y,m]=mes.split('-').map(Number);
+      const dias=new Date(y,m,0).getDate();
+      for(let i=1;i<=dias;i++){const d=new Date(y,m-1,i);fechas.push(d.toISOString().split('T')[0]);}
+    }
+  }
+  return fechas;
+}
+
+// Formatea horas: 1.5 → "1,5", 2.0 → "2", 0.5 → "0,5"
+function formatH(h){
+  if(!h||h===0)return '0';
+  const redondeado=redondearMediaHora(h);
+  return redondeado%1===0?String(redondeado):redondeado.toFixed(1).replace('.',',');
+}
+
+async function generarInforme(){
+  const fechas=getFechasRango();
+  if(!fechas.length){showToast('⚠️ Selecciona un período válido','err');return;}
+  const filtroDoc=document.getElementById('inf-operario').value;
+  const tipo=document.getElementById('inf-tipo').value;
+  showToast('⏳ Cargando datos...','inf');
+
+  // Cargar fichajes de todas las fechas en paralelo
+  const resultados=await Promise.all(fechas.map(fecha=>
+    fetch(`${FB_URL}/fichajes/${fecha}.json`).then(r=>r.json()).then(d=>({fecha,data:d})).catch(()=>({fecha,data:null}))
+  ));
+
+  // También cargar operarios_activos para el día de hoy (si está en el rango)
+  const hoy=new Date().toISOString().split('T')[0];
+
+  // Agrupar por fecha y por operario
+  // estructura: {fecha: {doc: {nombre,dni,obra,fichajes:[{tipo,hora,lat,lng,ciudad,en_zona,dist_obra,manual}], entrada, salida, horas}}}
+  const porFecha={};
+  resultados.forEach(({fecha,data})=>{
+    if(!data)return;
+    porFecha[fecha]={};
+    Object.values(data).forEach(f=>{
+      if(!f||!f.doc)return;
+      const doc=f.doc.replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      if(filtroDoc!=='todos'&&doc!==filtroDoc)return;
+      if(!porFecha[fecha][doc])porFecha[fecha][doc]={
+        nombre:f.nombre||doc,doc,dni:f.doc||'',
+        obra:f.obra||'',fichajes:[],entrada:null,salida:null,horas:0,
+        en_zona:null,ciudad:''
+      };
+      const op=porFecha[fecha][doc];
+      op.fichajes.push(f);
+      if(f.tipo==='entrada'){op.entrada=f.hora||null;op.en_zona=f.en_zona;op.ciudad=f.ciudad||'';}
+      if(f.tipo==='salida'){op.salida=f.hora||null;}
+    });
+    // Calcular horas para cada operario del día
+    Object.values(porFecha[fecha]).forEach(op=>{
+      if(op.entrada&&op.salida){
+        const[eh,em]=op.entrada.split(':').map(Number);
+        const[sh,sm]=op.salida.split(':').map(Number);
+        const mins=(sh*60+sm)-(eh*60+em);
+        op.horas=mins>0?redondearMediaHora(mins/60):0;
+      } else if(op.entrada&&fecha===hoy){
+        const[eh,em]=op.entrada.split(':').map(Number);
+        const now=new Date();
+        const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);
+        op.horas=mins>0?redondearMediaHora(mins/60):0;
+      }
+    });
+  });
+
+  // Construir HTML del informe
+  const empresa='Construcciones Lance 2024 SL';
+  const cif='';
+  const encargado='Luis Campaña';
+  const genDate=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
+  const periodoLabel=getTipoPeriodoLabel();
+
+  // Calcular totales globales
+  let totalHorasGlobal=0;
+  let totalRegistrosGlobal=0;
+  const acumPorOperario={};
+
+  Object.entries(porFecha).forEach(([fecha,ops])=>{
+    Object.values(ops).forEach(op=>{
+      totalHorasGlobal+=op.horas;
+      totalRegistrosGlobal++;
+      if(!acumPorOperario[op.doc])acumPorOperario[op.doc]={nombre:op.nombre,dni:op.dni,total:0,dias:0};
+      acumPorOperario[op.doc].total+=op.horas;
+      acumPorOperario[op.doc].dias++;
+    });
+  });
+
+  const css=`
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,sans-serif;font-size:11px;color:#1a2840;background:#fff;padding:20px;}
+    .cabecera{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1B4F8C;padding-bottom:12px;margin-bottom:16px;}
+    .logo-empresa{font-family:'Arial Black',Arial,sans-serif;font-size:16px;font-weight:900;color:#1B4F8C;}
+    .sub-empresa{font-size:10px;color:#666;margin-top:3px;}
+    .meta-informe{text-align:right;font-size:10px;color:#444;}
+    .meta-informe strong{color:#1B4F8C;font-size:13px;display:block;margin-bottom:4px;}
+    .resumen-global{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+    .kpi-box{border:1px solid #D0DDF0;border-radius:6px;padding:8px 14px;background:#F4F7FC;min-width:100px;}
+    .kpi-val{font-size:18px;font-weight:900;color:#1B4F8C;font-family:'Arial Black',Arial,sans-serif;}
+    .kpi-lbl{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:1px;}
+    h2{font-size:12px;color:#1B4F8C;border-left:4px solid #1B4F8C;padding-left:8px;margin:16px 0 8px;text-transform:uppercase;letter-spacing:1px;}
+    h3{font-size:11px;color:#333;margin:12px 0 6px;font-weight:700;}
+    table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:10px;}
+    th{background:#1B4F8C;color:#fff;padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:0.8px;}
+    td{padding:5px 8px;border-bottom:1px solid #E8EDF5;vertical-align:top;}
+    tr:nth-child(even) td{background:#F9FAFB;}
+    .pill-ok{background:#DCFCE7;color:#16A34A;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;}
+    .pill-out{background:#FEE2E2;color:#DC2626;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;}
+    .pill-pend{background:#FEF3C7;color:#D97706;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;}
+    .pill-man{background:#EDE9FE;color:#7C3AED;padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;}
+    .total-row td{font-weight:700;background:#EBF0FA;color:#1B4F8C;}
+    .acum-section{margin-top:16px;}
+    .pie{text-align:center;margin-top:20px;padding-top:10px;border-top:1px solid #eee;font-size:9px;color:#aaa;}
+    .dia-header{background:#EBF0FA;padding:6px 8px;font-weight:700;color:#1B4F8C;font-size:10px;border-radius:4px;margin:10px 0 4px;}
+    .sin-datos{color:#aaa;font-style:italic;font-size:10px;padding:6px 8px;}
+    @media print{
+      body{padding:10px;}
+      button{display:none!important;}
+      .no-print{display:none!important;}
+    }
+    .btn-print{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#1B4F8C;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:Arial,sans-serif;margin-bottom:16px;}
+    .btn-print:hover{background:#1a3d6e;}
+    .print-bar{padding:12px 0;border-bottom:2px solid #EBF0FA;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  `;
+
+  // Construir secciones de días
+  let seccionesDias='';
+  const fechasConDatos=Object.keys(porFecha).sort();
+  
+  if(fechasConDatos.length===0){
+    seccionesDias='<div class="sin-datos">No se encontraron fichajes en el período seleccionado.</div>';
+  } else {
+    fechasConDatos.forEach(fecha=>{
+      const ops=Object.values(porFecha[fecha]);
+      const fechaFmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+      const totalDia=redondearMediaHora(ops.reduce((a,v)=>a+v.horas,0)).toFixed(2);
+      ops.sort((a,b)=>(a.entrada||'99:99').localeCompare(b.entrada||'99:99'));
+      seccionesDias+=`<div class="dia-header">📅 ${fechaFmt.charAt(0).toUpperCase()+fechaFmt.slice(1)} — ${ops.length} operario${ops.length!==1?'s':''} · ${formatH(parseFloat(totalDia))}h total</div>`;
+      if(ops.length===0){seccionesDias+='<div class="sin-datos">Sin fichajes registrados.</div>';return;}
+      seccionesDias+=`<table>
+        <thead><tr>
+          <th>#</th><th>Operario</th><th>DNI/NIE</th><th>Obra</th>
+          <th>Entrada</th><th>Salida</th><th>Horas</th>
+          <th>GPS entrada</th><th>Zona</th><th>Registro</th>
+        </tr></thead><tbody>`;
+      ops.forEach((op,i)=>{
+        const zonaLabel=op.en_zona===true?'<span class="pill-ok">En zona</span>':op.en_zona===false?'<span class="pill-out">Fuera zona</span>':'<span class="pill-pend">—</span>';
+        const manualLabel=op.fichajes.some(f=>f.manual)?'<span class="pill-man">Manual</span>':'<span class="pill-ok">App</span>';
+        const gpsLabel=op.ciudad||'—';
+        const salidaLabel=op.salida||'<span class="pill-pend">En curso</span>';
+        seccionesDias+=`<tr>
+          <td style="font-weight:700;color:#aaa">${i+1}</td>
+          <td style="font-weight:600">${op.nombre}</td>
+          <td style="font-size:9px">${op.dni||'—'}</td>
+          <td style="font-size:9px">${op.obra||'—'}</td>
+          <td style="font-weight:700;color:#1B4F8C">${op.entrada||'—'}</td>
+          <td style="color:#DC2626">${salidaLabel}</td>
+          <td style="font-weight:900;color:#1B4F8C">${op.horas>0?formatH(op.horas):'—'}</td>
+          <td style="font-size:9px">${gpsLabel}</td>
+          <td>${zonaLabel}</td>
+          <td>${manualLabel}</td>
+        </tr>`;
+      });
+      seccionesDias+=`<tr class="total-row"><td colspan="6" style="text-align:right;">TOTAL DÍA:</td><td>${totalDia}h</td><td colspan="3"></td></tr>`;
+      seccionesDias+='</tbody></table>';
+    });
+  }
+
+  // Tabla acumulado por operario
+  let tablaAcum='';
+  const opAcumList=Object.values(acumPorOperario).sort((a,b)=>b.total-a.total);
+  if(opAcumList.length>0){
+    tablaAcum=`<h2>Resumen acumulado por operario</h2>
+    <table><thead><tr><th>#</th><th>Operario</th><th>DNI/NIE</th><th>Días trabajados</th><th>Total horas</th><th>Media h/día</th></tr></thead><tbody>`;
+    opAcumList.forEach((op,i)=>{
+      const media=op.dias>0?formatH(redondearMediaHora(op.total/op.dias)):0;
+      tablaAcum+=`<tr><td>${i+1}</td><td style="font-weight:600">${op.nombre}</td><td style="font-size:9px">${op.dni||'—'}</td><td style="text-align:center">${op.dias}</td><td style="font-weight:900;color:#1B4F8C">${redondearMediaHora(op.total).toFixed(2)}h</td><td>${media}h</td></tr>`;
+    });
+    tablaAcum+=`<tr class="total-row"><td colspan="3">TOTAL PERÍODO:</td><td style="text-align:center">${fechasConDatos.length} días</td><td>${redondearMediaHora(totalHorasGlobal).toFixed(2)}h</td><td>—</td></tr>`;
+    tablaAcum+='</tbody></table>';
+  }
+
+  _informeHTML=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe Jornada — ${empresa}</title><style>${css}</style></head><body>
+    <div class="print-bar no-print">
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <span style="font-size:10px;color:#888;">En el di&aacute;logo de impresi&oacute;n selecciona <strong>Guardar como PDF</strong> como destino</span>
+    </div>
+    <div class="cabecera">
+      <div>
+        <div class="logo-empresa">${empresa}</div>
+        <div class="sub-empresa">Registro de jornada laboral · RD Ley 8/2019</div>
+        ${encargado?'<div class="sub-empresa">Responsable: '+encargado+'</div>':''}
+      </div>
+      <div class="meta-informe">
+        <strong>INFORME ${tipo.toUpperCase()}</strong>
+        Período: ${periodoLabel}<br>
+        Generado: ${genDate}<br>
+        ${filtroDoc!=='todos'?'Operario: '+( WORKERS.find(w=>(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()===filtroDoc)||{nombre:filtroDoc}).nombre:'Todos los operarios'}
+      </div>
+    </div>
+    <div class="resumen-global">
+      <div class="kpi-box"><div class="kpi-val">${totalHorasGlobal.toFixed(1)}h</div><div class="kpi-lbl">Total horas</div></div>
+      <div class="kpi-box"><div class="kpi-val">${fechasConDatos.length}</div><div class="kpi-lbl">Días con fichajes</div></div>
+      <div class="kpi-box"><div class="kpi-val">${opAcumList.length}</div><div class="kpi-lbl">Operarios</div></div>
+      <div class="kpi-box"><div class="kpi-val">${totalRegistrosGlobal}</div><div class="kpi-lbl">Registros totales</div></div>
+    </div>
+    <h2>Detalle por días</h2>
+    ${seccionesDias}
+    ${tablaAcum}
+    <div class="pie">Documento generado automáticamente por ObraControl GPS · Construcciones Lance 2024 SL · ${genDate} · Cumplimiento RD Ley 8/2019 art. 34.9</div>
+  </body></html>`;
+
+  // Mostrar preview
+  const iframe=document.createElement('iframe');
+  iframe.style.cssText='width:100%;height:560px;border:none;border-radius:8px;';
+  const wrap=document.getElementById('inf-preview');
+  wrap.innerHTML='';wrap.appendChild(iframe);
+  iframe.srcdoc=_informeHTML;
+  document.getElementById('inf-preview-wrap').style.display='block';
+  document.getElementById('inf-empty').style.display='none';
+  showToast(`✅ Informe generado — ${totalRegistrosGlobal} registros, ${totalHorasGlobal.toFixed(1)}h`,'ok');
+}
+
+function getTipoPeriodoLabel(){
+  const tipo=document.getElementById('inf-tipo').value;
+  if(tipo==='diario'){
+    const f=document.getElementById('inf-fecha').value;
+    return f?new Date(f+'T12:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}):'—';
+  } else if(tipo==='semanal'){
+    const ini=document.getElementById('inf-semana-ini').value;
+    if(!ini)return '—';
+    const fin=new Date(ini+'T12:00:00');fin.setDate(fin.getDate()+6);
+    return new Date(ini+'T12:00:00').toLocaleDateString('es-ES',{day:'2-digit',month:'short'})+' – '+fin.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});
+  } else {
+    const m=document.getElementById('inf-mes').value;
+    return m?new Date(m+'-01T12:00:00').toLocaleDateString('es-ES',{month:'long',year:'numeric'}):'—';
+  }
+}
+
+function imprimirInforme(){
+  if(!_informeHTML){showToast('⚠️ Primero genera el informe','err');return;}
+  const w=window.open('','_blank','width=900,height=700');
+  w.document.write(_informeHTML);
+  w.document.close();
+  setTimeout(()=>w.print(),600);
+}
+
+function descargarInformeHTML(){
+  if(!_informeHTML){showToast('⚠️ Primero genera el informe','err');return;}
+  const tipo=document.getElementById('inf-tipo').value;
+  const fecha=new Date().toISOString().split('T')[0];
+  const nombre=`informe-jornada-lance-${tipo}-${fecha}.html`;
+  const blob=new Blob([_informeHTML],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nombre;a.click();
+  showToast('✅ Archivo descargado','ok');
+}
+
+</script>
+</body>
+</html>
