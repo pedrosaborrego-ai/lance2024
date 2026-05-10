@@ -478,6 +478,10 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
         <div class="card-hdr">
           <div class="card-title">📆 Control de asistencia mensual</div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="cal-modo" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderCalendario()">
+              <option value="semana">📅 Esta semana</option>
+              <option value="mes">🗓️ Mes completo</option>
+            </select>
             <select id="cal-mes" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderCalendario()"></select>
             <select id="cal-operario" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderCalendario()">
               <option value="todos">👷 Todos</option>
@@ -1035,7 +1039,7 @@ function renderHours(){
   const periodo=(document.getElementById('horas-periodo')||{value:'hoy'}).value;
   // ✅ MEJORA 2: Horas por días + acumulado mensual desde Firebase/fichajes
   const hoy=new Date();
-  const hoyStr=hoy.toISOString().split('T')[0];
+  const hoyStr=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
   // Calcular rango de fechas según período
   let fechas=[];
   if(periodo==='hoy'){fechas=[hoyStr];}
@@ -2251,12 +2255,21 @@ function initCalendario(){
   if(!sel)return;
   sel.innerHTML='';
   const hoy=new Date();
+  const anioActual=hoy.getFullYear();
+  const mesActual=hoy.getMonth(); // 0-11
   for(let i=0;i<6;i++){
-    const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1);
-    const val=d.toISOString().slice(0,7);
+    // Calcular año y mes correctamente sin usar toISOString (evita desfase UTC)
+    let mesIdx=mesActual-i;
+    let anio=anioActual;
+    while(mesIdx<0){mesIdx+=12;anio--;}
+    const val=`${anio}-${String(mesIdx+1).padStart(2,'0')}`;
+    const d=new Date(anio,mesIdx,1);
     const lbl=d.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
     sel.innerHTML+=`<option value="${val}"${i===0?' selected':''}>${lbl.charAt(0).toUpperCase()+lbl.slice(1)}</option>`;
   }
+  // Default: semana si hay selector de modo
+  const modo=document.getElementById('cal-modo');
+  if(modo&&!modo.value)modo.value='semana';
   // Poblar selector de operarios
   const selOp=document.getElementById('cal-operario');
   if(selOp){
@@ -2273,20 +2286,38 @@ async function renderCalendario(){
   if(!cont)return;
   const mes=document.getElementById('cal-mes')?.value;
   const filtroOp=document.getElementById('cal-operario')?.value||'todos';
+  const modo=document.getElementById('cal-modo')?.value||'semana';
   if(!mes)return;
 
-  cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;">⏳ Cargando fichajes del mes...</div>';
-  if(!WORKERS||!WORKERS.length){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--amber);font-size:12px;">⚠️ Espera que se carguen los operarios e inténtalo de nuevo.</div>';return;}
+  cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;">⏳ Cargando...</div>';
+  if(!WORKERS||!WORKERS.length){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--amber);font-size:12px;">⚠️ Espera que carguen los operarios e inténtalo de nuevo.</div>';return;}
 
   const[y,m]=mes.split('-').map(Number);
   const diasMes=new Date(y,m,0).getDate();
-  const hoyStr=new Date().toISOString().split('T')[0];
+  const hoy=new Date();
+  const hoyStr=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
 
-  // Generar lista de fechas del mes
-  const fechas=[];
-  for(let i=1;i<=diasMes;i++){
-    const d=new Date(y,m-1,i);
-    fechas.push({fecha:`${mes}-${String(i).padStart(2,'0')}`,dia:i,dow:d.getDay()});
+  // Generar lista de fechas según modo
+  let fechas=[];
+  if(modo==='semana'){
+    // Semana actual (lunes a domingo) — usando fecha LOCAL para evitar desfase UTC
+    const dayOfWeek=hoy.getDay(); // 0=domingo, 1=lunes...6=sábado
+    const diffLunes=dayOfWeek===0?-6:1-dayOfWeek; // días hasta el lunes
+    const lunes=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()+diffLunes);
+    for(let i=0;i<7;i++){
+      const d=new Date(lunes.getFullYear(),lunes.getMonth(),lunes.getDate()+i);
+      const fechaStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      fechas.push({fecha:fechaStr,dia:d.getDate(),dow:d.getDay(),
+        label:d.toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'short'})});
+    }
+  } else {
+    // Mes completo
+    for(let i=1;i<=diasMes;i++){
+      const d=new Date(y,m-1,i);
+      // Usar fecha local directamente sin toISOString
+      const fechaStr=`${y}-${String(m).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+      fechas.push({fecha:fechaStr,dia:i,dow:d.getDay()});
+    }
   }
 
   // Cargar todos los fichajes del mes en paralelo
@@ -2295,17 +2326,22 @@ async function renderCalendario(){
   ));
 
   // Agrupar fichajes por fecha y operario
-  const porFechaOp={}; // {fecha: {doc: {entrada,salida}}}
+  // ✅ Agrupa correctamente entradas y salidas aunque vengan de registros separados
+  const porFechaOp={}; // {fecha: {doc: {entrada,salida,nombre,manual}}}
   resultados.forEach(({fecha,data})=>{
     if(!data)return;
-    porFechaOp[fecha]={};
+    if(!porFechaOp[fecha])porFechaOp[fecha]={};
     Object.values(data).forEach(f=>{
       if(!f||!f.doc)return;
       const doc=f.doc.replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      if(!doc)return;
       if(filtroOp!=='todos'&&doc!==filtroOp)return;
-      if(!porFechaOp[fecha][doc])porFechaOp[fecha][doc]={entrada:null,salida:null,nombre:f.nombre||doc};
-      if(f.tipo==='entrada')porFechaOp[fecha][doc].entrada=f.hora;
-      if(f.tipo==='salida')porFechaOp[fecha][doc].salida=f.hora;
+      if(!porFechaOp[fecha][doc])porFechaOp[fecha][doc]={entrada:null,salida:null,nombre:f.nombre||doc,manual:false};
+      if(f.tipo==='entrada'&&(!porFechaOp[fecha][doc].entrada||f.manual))
+        porFechaOp[fecha][doc].entrada=f.hora;
+      if(f.tipo==='salida'&&(!porFechaOp[fecha][doc].salida||f.manual))
+        porFechaOp[fecha][doc].salida=f.hora;
+      if(f.manual)porFechaOp[fecha][doc].manual=true;
     });
   });
 
@@ -2320,7 +2356,63 @@ async function renderCalendario(){
   const dias=['L','M','X','J','V','S','D'];
   let html='';
 
-  if(filtroOp==='todos'){
+  if(modo==='semana'){
+    // ✅ VISTA SEMANA: tabla clara con todos los operarios y los 7 días
+    html+=`<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:11px;width:100%;">`;
+    html+=`<thead><tr><th style="padding:8px 12px;text-align:left;background:var(--bg);min-width:160px;font-weight:700;color:var(--text2);">Operario</th>`;
+    fechas.forEach(({fecha,label,dow})=>{
+      const esFS=dow===0||dow===6;
+      const esHoy=fecha===hoyStr;
+      const fmtLabel=label||fecha;
+      html+=`<th style="padding:8px 6px;text-align:center;background:${esHoy?'var(--blue2)':esFS?'var(--bg)':'var(--white)'};color:${esHoy?'#fff':esFS?'var(--text3)':'var(--text)'};min-width:80px;border-left:1px solid var(--border);font-weight:${esHoy?'700':'500'};font-size:10px;">${fmtLabel}</th>`;
+    });
+    html+=`<th style="padding:8px;background:var(--bg);text-align:center;font-size:10px;min-width:70px;">Resumen</th></tr></thead><tbody>`;
+
+    const ops2=WORKERS.filter(w=>!w.inactivo);
+    ops2.forEach(w=>{
+      const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      let diasOk=0,diasParc=0,diasNo=0,totalH=0;
+      html+=`<tr><td style="padding:8px 12px;font-weight:600;font-size:12px;border-bottom:1px solid var(--border);">${w.nombre}<br><span style="font-size:9px;color:var(--text3);font-weight:400">${w.apellidos}</span></td>`;
+      fechas.forEach(({fecha,dow})=>{
+        const esFS=dow===0||dow===6;
+        const esFutura=fecha>hoyStr;
+        const esHoy=fecha===hoyStr;
+        const fData=porFechaOp[fecha]?.[doc];
+        let bg,contenido,title;
+        if(esFS){bg='var(--bg)';contenido='';title='Fin de semana';}
+        else if(esFutura){bg='var(--white)';contenido='';title='';}
+        else if(!fData||(!fData.entrada&&!fData.salida)){
+          bg='#FEE2E2';diasNo++;
+          contenido='<div style="font-size:18px">🔴</div><div style="font-size:9px;color:#DC2626;margin-top:2px">Sin fichar</div>';
+          title='No fichó';
+        } else if(fData.entrada&&fData.salida){
+          bg='#DCFCE7';diasOk++;
+          const[eh,em]=fData.entrada.split(':').map(Number);
+          const[sh,sm]=fData.salida.split(':').map(Number);
+          const h=redondearMediaHora(Math.max(0,(sh*60+sm)-(eh*60+em))/60);
+          totalH+=h;
+          contenido=`<div style="font-size:18px">🟢</div><div style="font-size:9px;color:#16A34A;margin-top:1px">${fData.entrada}→${fData.salida}</div><div style="font-family:'Montserrat';font-weight:800;font-size:11px;color:#16A34A">${formatH(h)}h</div>`;
+          title=`Entrada: ${fData.entrada} · Salida: ${fData.salida} · ${formatH(h)}h${fData.manual?' (manual)':''}`;
+        } else {
+          bg='#FEF3C7';diasParc++;
+          const hora=fData.entrada||fData.salida;
+          const tipo=fData.entrada?'Entrada':'Salida';
+          contenido=`<div style="font-size:18px">🟡</div><div style="font-size:9px;color:#D97706;margin-top:1px">${tipo}: ${hora}</div>`;
+          title=`Parcial — ${tipo}: ${hora}`;
+        }
+        html+=`<td style="text-align:center;background:${bg};border:1px solid var(--border);padding:6px 4px;" title="${title}">${contenido}</td>`;
+      });
+      // Columna resumen
+      const trabajados=diasOk+diasParc;
+      html+=`<td style="padding:6px 8px;text-align:center;background:var(--bg);border-left:2px solid var(--border);font-size:10px;">
+        <div style="font-family:'Montserrat';font-weight:800;font-size:14px;color:var(--blue2)">${formatH(totalH)}h</div>
+        <div style="color:var(--green);font-size:9px">${diasOk}✅${diasParc?` ${diasParc}⚠️`:''}</div>
+        ${diasNo?`<div style="color:var(--red);font-size:9px">${diasNo}❌</div>`:''}
+      </td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+
+  } else if(filtroOp==='todos'){
     // Vista resumen: tabla con operarios en filas y días en columnas
     html+=`<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:10px;min-width:100%;">`;
     html+=`<thead><tr><th style="padding:6px 10px;text-align:left;background:var(--bg);position:sticky;left:0;z-index:2;min-width:140px;">Operario</th>`;
@@ -2397,6 +2489,7 @@ async function renderCalendario(){
     html+=`</div>`;
   }
 
+  } // fin modo semana/mes
   cont.innerHTML=html;
 }
 
