@@ -2337,11 +2337,20 @@ async function renderCalendario(){
       if(!doc)return;
       if(filtroOp!=='todos'&&doc!==filtroOp)return;
       if(!porFechaOp[fecha][doc])porFechaOp[fecha][doc]={entrada:null,salida:null,nombre:f.nombre||doc,manual:false};
-      if(f.tipo==='entrada'&&(!porFechaOp[fecha][doc].entrada||f.manual))
-        porFechaOp[fecha][doc].entrada=f.hora;
-      if(f.tipo==='salida'&&(!porFechaOp[fecha][doc].salida||f.manual))
-        porFechaOp[fecha][doc].salida=f.hora;
-      if(f.manual)porFechaOp[fecha][doc].manual=true;
+      const op=porFechaOp[fecha][doc];
+      // ✅ FIX: el registro de salida incluye hora_entrada — recuperarla
+      if(f.tipo==='entrada'){
+        if(!op.entrada)op.entrada=f.hora;
+      } else if(f.tipo==='salida'){
+        if(!op.salida)op.salida=f.hora;
+        // Si el registro de salida tiene hora_entrada guardada, usarla
+        if(!op.entrada&&f.hora_entrada)op.entrada=f.hora_entrada;
+      }
+      // También cubrir caso donde solo hay un registro con ambas horas
+      if(f.hora_entrada&&!op.entrada)op.entrada=f.hora_entrada;
+      if(f.manual)op.manual=true;
+      // Actualizar nombre si está disponible
+      if(f.nombre&&f.nombre.trim())op.nombre=f.nombre;
     });
   });
 
@@ -2489,7 +2498,6 @@ async function renderCalendario(){
     html+=`</div>`;
   }
 
-  } // fin modo semana/mes
   cont.innerHTML=html;
 }
 
