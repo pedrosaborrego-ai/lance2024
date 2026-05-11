@@ -577,6 +577,14 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
             <div class="form-row">
               <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
               <div class="form-g">
+                <label class="form-lbl">🤖 API Key CallMeBot <span style="font-size:9px;color:var(--text3);font-weight:400;">(el operario la activa 1 vez)</span></label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input class="form-ctrl" id="g-callmebot" type="text" placeholder="Ej: 123456" style="letter-spacing:2px;font-family:'Montserrat',sans-serif;font-weight:700;flex:1;">
+                  <button type="button" onclick="enviarInstruccionesCallMeBot()" style="padding:9px 10px;background:var(--green-light);border:1px solid var(--green);border-radius:9px;cursor:pointer;font-size:13px;" title="Enviar instrucciones de activación al operario">📲</button>
+                </div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px;">Sin API Key → el aviso no llegará automático. <a href="#" onclick="mostrarAyudaCallMeBot();return false;" style="color:var(--blue2);">¿Cómo activarlo?</a></div>
+              </div>
+              <div class="form-g">
                 <label class="form-lbl">Obra asignada</label>
                 <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
                   <option value="">— Sin obra asignada —</option>
@@ -1224,6 +1232,7 @@ function saveWorker(){
   const dobleTurno=document.getElementById('g-doble-turno')?.checked||false;
   const horaEntrada2=dobleTurno?(document.getElementById('g-hora-entrada2')?.value||''):'';
   const horaSalida2=dobleTurno?(document.getElementById('g-hora-salida2')?.value||''):'';
+  const callmebot=document.getElementById('g-callmebot')?.value.trim()||'';
   if(!nombre){showToast('Escribe el nombre','err');return;}
   if(!apellidos){showToast('Escribe los apellidos','err');return;}
   if(!dni&&!nie){showToast('Introduce DNI o NIE','err');return;}
@@ -1237,7 +1246,7 @@ function saveWorker(){
     if(w){
       const pinChanged=w.pin!==pin;
       const obraChanged=w.obra!==obra;
-      Object.assign(w,{nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,horaEntrada,horaSalida,dobleTurno,horaEntrada2,horaSalida2});
+      Object.assign(w,{nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,horaEntrada,horaSalida,dobleTurno,horaEntrada2,horaSalida2,callmebot});
       // Guardar coordenadas si se geocodificó nueva zona
       if(_obraLat&&_obraLng){w.obra_lat=_obraLat;w.obra_lng=_obraLng;_obraLat=null;_obraLng=null;}
       else if(obraChanged){w.obra_lat=null;w.obra_lng=null;}
@@ -1274,7 +1283,7 @@ function saveWorker(){
     // ── NUEVO OPERARIO ──
     const ni=Math.max(0,...WORKERS.map(w=>w.id))+1;
     const nw={id:ni,nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,
-              horaEntrada,horaSalida,dobleTurno,horaEntrada2,horaSalida2,
+              horaEntrada,horaSalida,dobleTurno,horaEntrada2,horaSalida2,callmebot,
               arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,
               obra_lat:_obraLat||null,obra_lng:_obraLng||null};
     _obraLat=null;_obraLng=null;
@@ -2156,8 +2165,83 @@ function checkHorarioAlertas(){
   });
 }
 
-// ── ENVÍO WHATSAPP AL OPERARIO ──
+// ── ENVÍO WHATSAPP AUTOMÁTICO VIA CALLMEBOT ──
 function enviarWAAviso(w, tipo, horaEsperada){
+  if(!w.tel) return;
+
+  const nombre = w.nombre + ' ' + w.apellidos;
+  const ahora = new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  const obra = w.obra || 'la obra';
+
+  let msg = '';
+  if(tipo === 'entrada'){
+    msg = '🚨 AVISO OBRACONTROL GPS\n\n'
+        + '⏰ Son las ' + ahora + '\n\n'
+        + 'Hola ' + nombre + ',\n\n'
+        + '❗ Debías fichar entrada a las ' + horaEsperada + ' en ' + obra + ' y aún NO lo has hecho.\n\n'
+        + '📱 FICHA AHORA:\n'
+        + APP_URL + '\n\n'
+        + 'Si ya estás en la obra, abre la app y ficha inmediatamente.\n\n'
+        + '— Construcciones Lance 2024';
+  } else {
+    msg = '🔴 AVISO SALIDA — OBRACONTROL GPS\n\n'
+        + '⏰ Son las ' + ahora + '\n\n'
+        + 'Hola ' + nombre + ',\n\n'
+        + '❗ Debías fichar SALIDA a las ' + horaEsperada + ' y aún NO lo has hecho.\n\n'
+        + '📱 FICHA TU SALIDA:\n'
+        + APP_URL + '\n\n'
+        + '— Construcciones Lance 2024';
+  }
+
+  const tel = w.tel.replace(/[\s\-\(\)]/g,'');
+
+  // ── OPCIÓN A: CallMeBot (automático, sin intervención) ──
+  if(w.callmebot){
+    const urlCMB = 'https://api.callmebot.com/whatsapp.php'
+      + '?phone=' + encodeURIComponent(tel)
+      + '&text=' + encodeURIComponent(msg)
+      + '&apikey=' + w.callmebot;
+    fetch(urlCMB)
+      .then(r => r.text())
+      .then(resp => {
+        if(resp.includes('Message Sent') || resp.includes('OK')){
+          showToast('✅ WhatsApp automático enviado a ' + w.nombre, 'ok');
+        } else {
+          showToast('⚠️ Error CallMeBot — abriendo WA manual', 'warn');
+          abrirWAManual(tel, msg);
+        }
+      })
+      .catch(() => {
+        showToast('⚠️ Sin conexión CallMeBot — abriendo WA manual', 'warn');
+        abrirWAManual(tel, msg);
+      });
+  } else {
+    // ── OPCIÓN B: WhatsApp Web (fallback si no tiene CallMeBot) ──
+    abrirWAManual(tel, msg);
+    showToast('📱 WA manual — ' + w.nombre + ' no tiene CallMeBot activado', 'warn');
+  }
+
+  // Guardar aviso en Firebase
+  const docKey = (w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(docKey){
+    fetch(`${FB_URL}/avisos_horario/${docKey}_${Date.now()}.json`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        tipo, horaEsperada,
+        horaAviso: ahora,
+        fecha: new Date().toISOString().split('T')[0],
+        timestamp: Date.now(),
+        metodo: w.callmebot ? 'callmebot' : 'manual'
+      })
+    }).catch(()=>{});
+  }
+}
+
+function abrirWAManual(tel, msg){
+  const telLimpio = tel.startsWith('+') ? tel.slice(1) : tel;
+  window.open('https://wa.me/' + telLimpio + '?text=' + encodeURIComponent(msg), '_blank');
+}
   if(!w.tel) return; // Sin teléfono, no se puede enviar
 
   const nombre = w.nombre + ' ' + w.apellidos;

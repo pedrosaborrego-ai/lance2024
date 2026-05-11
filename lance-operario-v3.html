@@ -191,6 +191,62 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}
   </div>
 </div>
 
+<!-- ══ PANTALLA ACTIVACIÓN CALLMEBOT ══ -->
+<div class="screen hidden" id="s-callmebot">
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:48px;margin-bottom:8px;">📱</div>
+    <div style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px;">Activar avisos WhatsApp</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.6;">Solo tienes que hacer esto <strong>una vez</strong>.<br>Después recibirás avisos automáticos.</div>
+  </div>
+
+  <!-- PASO 1 -->
+  <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;color:#fff;font-size:14px;flex-shrink:0;">1</div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:var(--text);">Guarda este contacto en tu móvil</div>
+    </div>
+    <div style="background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:9px;padding:12px;text-align:center;">
+      <div style="font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;color:#25d366;letter-spacing:1px;">+34 644 60 49 16</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px;">Guárdalo como "CallMeBot" o similar</div>
+    </div>
+    <button onclick="copiarTelCallMeBot()" style="width:100%;margin-top:9px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;" id="btn-copiar-tel">📋 Copiar número</button>
+  </div>
+
+  <!-- PASO 2 -->
+  <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;color:#fff;font-size:14px;flex-shrink:0;">2</div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:var(--text);">Envíale este mensaje por WhatsApp</div>
+    </div>
+    <div style="background:rgba(37,211,102,.1);border:1px dashed rgba(37,211,102,.4);border-radius:9px;padding:12px;text-align:center;margin-bottom:8px;">
+      <div style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#25d366;">I allow callmebot to send me messages</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:3px;">Escribe exactamente este texto</div>
+    </div>
+    <button onclick="abrirWACallMeBot()" style="width:100%;padding:12px;background:#25d366;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;color:#fff;cursor:pointer;">
+      💬 Abrir WhatsApp y enviar
+    </button>
+  </div>
+
+  <!-- PASO 3 -->
+  <div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:800;color:#fff;font-size:14px;flex-shrink:0;">3</div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;color:var(--text);">Introduce la API Key que recibirás</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:9px;line-height:1.5;">CallMeBot te responderá con un número (tu API Key). Introdúcelo aquí:</div>
+    <input type="number" id="callmebot-key-input" placeholder="Ej: 123456" maxlength="8"
+      style="width:100%;border:2px solid #25d366;border-radius:9px;padding:13px;font-family:'Montserrat',sans-serif;font-size:22px;font-weight:800;text-align:center;letter-spacing:3px;color:var(--text);background:var(--bg);outline:none;">
+    <div style="font-size:10px;color:var(--muted);margin-top:5px;text-align:center;">Si no recibes respuesta espera 1 minuto e inténtalo de nuevo</div>
+  </div>
+
+  <button onclick="activarCallMeBot()" style="width:100%;padding:15px;background:#25d366;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:800;letter-spacing:.5px;color:white;cursor:pointer;margin-bottom:10px;">
+    ✅ Activado — Continuar
+  </button>
+  <button onclick="saltarCallMeBot()" style="width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--muted);cursor:pointer;">
+    Saltar por ahora (sin avisos automáticos)
+  </button>
+</div>
+
 <div class="screen" id="s-lang">
   <div class="logo-wrap">
     <svg class="logo-img" viewBox="0 0 400 280" xmlns="http://www.w3.org/2000/svg">
@@ -424,11 +480,6 @@ function checkRGPD(){
           setupVerifyCompanyPin();showScreen('s-pin');
         } else if(savedPin){
           myPin=savedPin;setupLoginPin();showScreen('s-pin');
-        } else if(data.pin_personal){
-          // ✅ FIX SAFARI: recuperar PIN personal desde Firebase si localStorage está vacío
-          myPin=data.pin_personal;
-          localStorage.setItem('pin_'+savedDoc,myPin);
-          setupLoginPin();showScreen('s-pin');
         } else {
           setupVerifyCompanyPin();showScreen('s-pin');
         }
@@ -464,7 +515,12 @@ function acceptRGPD(){
   if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(()=>{},()=>{},{enableHighAccuracy:true,timeout:5000,maximumAge:0});
   }
-  goTo('s-name');
+  // Si ya activó CallMeBot → saltar directamente a nombre
+  if(localStorage.getItem('lance_callmebot_key')){
+    goTo('s-name');
+  } else {
+    goTo('s-callmebot');
+  }
 }
 function rejectRGPD(){const r=RGPD_TX[lang]||RGPD_TX.es;const msg=document.getElementById('rgpd-reject-msg');msg.textContent=r.reject_msg;msg.style.display='block';}
 function requestGPSPermission(){
@@ -517,7 +573,65 @@ OUT",tasks:"MY TASKS",no_tasks:"No tasks.",wa_share:"Share app",change_pin:"🔐
 function t(k){return (TX[lang]&&TX[lang][k])||TX.es[k]||k;}
 
 function selLang(l,el){lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');document.body.style.direction=l==='ar'?'rtl':'ltr';document.getElementById('lt').textContent=t('lang_select');}
-function continuarDesdeIdioma(){if(localStorage.getItem('lance_rgpd_accepted')==='1'){goTo('s-name');}else{showRGPD();}}
+function continuarDesdeIdioma(){
+  if(localStorage.getItem('lance_rgpd_accepted')==='1'){
+    // RGPD ya aceptado — ir a CallMeBot si no activado, si no a nombre
+    if(localStorage.getItem('lance_callmebot_key')){
+      goTo('s-name');
+    } else {
+      goTo('s-callmebot');
+    }
+  } else {
+    showRGPD();
+  }
+}
+
+// ══ CALLMEBOT ══
+function copiarTelCallMeBot(){
+  navigator.clipboard.writeText('+34644604916').then(function(){
+    var btn=document.getElementById('btn-copiar-tel');
+    btn.textContent='✅ Copiado';
+    setTimeout(function(){btn.textContent='📋 Copiar número';},2000);
+  });
+}
+function abrirWACallMeBot(){
+  var msg='I allow callmebot to send me messages';
+  window.open('https://wa.me/34644604916?text='+encodeURIComponent(msg),'_blank');
+}
+function activarCallMeBot(){
+  var key=document.getElementById('callmebot-key-input').value.trim();
+  if(!key||key.length<4){
+    document.getElementById('callmebot-key-input').style.borderColor='var(--red)';
+    setTimeout(function(){document.getElementById('callmebot-key-input').style.borderColor='#25d366';},2000);
+    return;
+  }
+  localStorage.setItem('lance_callmebot_key', key);
+  // Guardar en Firebase asociado al doc del operario si ya lo sabemos
+  var savedDoc=localStorage.getItem('lance_doc');
+  if(savedDoc){
+    var FB_URL_local='https://lance-a99b4-default-rtdb.europe-west1.firebasedatabase.app';
+    fetch(FB_URL_local+'/operarios_registro/'+savedDoc+'.json',{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({callmebot_key:key})
+    }).catch(function(){});
+  }
+  // Enviar WA de prueba
+  enviarWAPrueba(key);
+  goTo('s-name');
+}
+function saltarCallMeBot(){
+  localStorage.setItem('lance_callmebot_key','sin_activar');
+  goTo('s-name');
+}
+function enviarWAPrueba(key){
+  // Enviar mensaje de prueba via CallMeBot para confirmar que funciona
+  var tel=localStorage.getItem('lance_tel')||'';
+  if(!tel)return;
+  var msg='✅ ObraControl GPS activado. Recibirás avisos automáticos cuando no fiches a tu hora. — Construcciones Lance 2024';
+  var url='https://api.callmebot.com/whatsapp.php?phone='+tel.replace(/[^0-9+]/g,'')+'&text='+encodeURIComponent(msg)+'&apikey='+key;
+  fetch(url).catch(function(){});
+}
 function switchLang(l){lang=l;document.querySelectorAll('.ls-btn').forEach(b=>b.classList.remove('active'));document.querySelector(`[data-lang="${l}"]`).classList.add('active');document.body.style.direction=l==='ar'?'rtl':'ltr';applyAppLang();}
 function applyAppLang(){
   const s=id=>document.getElementById(id);
@@ -586,8 +700,7 @@ function spp(d){
   if(setPinVal.length>=4)return;
   setPinVal+=d;updateSetDots();
   if(setPinVal.length===4){setTimeout(()=>{myPin=setPinVal;localStorage.setItem('pin_'+workerDoc,myPin);
-    // ✅ FIX SAFARI: guardar PIN personal en Firebase para recuperarlo si Safari borra localStorage
-    fetch(`${FB_URL}/operarios_registro/${workerDoc}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin_personal:myPin,pin_reset:false})}).catch(()=>{});
+    fetch(`${FB_URL}/operarios_registro/${workerDoc}/pin_reset.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:'false'}).catch(()=>{});
     showToast(t('toast_pin'),'ok');if(changingPin){goTo('s-app');}else{setupLoginPin();goTo('s-pin');}},180);}
 }
 function sppDel(){setPinVal=setPinVal.slice(0,-1);updateSetDots();}
