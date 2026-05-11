@@ -186,620 +186,6 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
 </style>
 </head>
 <body>
-
-<div id="login-screen">
-  <div class="login-card">
-    <svg class="login-logo-svg" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
-      <rect x="148" y="20" width="104" height="140" fill="#1B4F8C"/>
-      <rect x="245" y="55" width="70" height="105" fill="none" stroke="#1B4F8C" stroke-width="8"/>
-      <rect x="85" y="75" width="63" height="85" fill="none" stroke="#1B4F8C" stroke-width="8"/>
-      <rect x="170" y="32" width="60" height="55" fill="none" stroke="#E8F1FB" stroke-width="6"/>
-      <line x1="60" y1="160" x2="340" y2="160" stroke="#1B4F8C" stroke-width="7"/>
-      <text x="200" y="190" text-anchor="middle" font-family="Montserrat,Arial" font-size="24" font-weight="400" fill="#1B4F8C" letter-spacing="2">construcciones</text>
-      <text x="200" y="232" text-anchor="middle" font-family="Montserrat,Arial" font-size="52" font-weight="900" fill="#1B4F8C" letter-spacing="4">LANCE</text>
-    </svg>
-    <div class="login-badge">🏢 PANEL DE OFICINA · ENCARGADO</div>
-    <div class="login-title">Acceso restringido</div>
-    <div class="login-sub">Introduce tu PIN de encargado para continuar</div>
-    <div class="pin-dots">
-      <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
-      <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
-    </div>
-    <div class="pin-pad" id="pin-pad">
-      <div class="pk" onclick="pk('1')">1</div><div class="pk" onclick="pk('2')">2</div><div class="pk" onclick="pk('3')">3</div>
-      <div class="pk" onclick="pk('4')">4</div><div class="pk" onclick="pk('5')">5</div><div class="pk" onclick="pk('6')">6</div>
-      <div class="pk" onclick="pk('7')">7</div><div class="pk" onclick="pk('8')">8</div><div class="pk" onclick="pk('9')">9</div>
-      <div class="pk del" onclick="pkDel()">⌫</div><div class="pk zero" onclick="pk('0')">0</div>
-    </div>
-    <div class="pin-err" id="pin-err"></div>
-    <div class="pin-demo">PIN: <strong>0000</strong></div>
-  </div>
-</div>
-
-<div id="app">
-  <aside class="sidebar">
-    <div class="sb-logo">
-      <svg class="sb-logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
-        <rect x="60" y="5" width="55" height="75" fill="white"/>
-        <rect x="110" y="20" width="38" height="60" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
-        <rect x="30" y="30" width="33" height="50" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
-        <line x1="15" y1="80" x2="165" y2="80" stroke="white" stroke-width="5"/>
-        <text x="185" y="45" font-family="Montserrat,Arial" font-size="15" font-weight="400" fill="rgba(255,255,255,.65)" letter-spacing="2">construcciones</text>
-        <text x="185" y="80" font-family="Montserrat,Arial" font-size="34" font-weight="900" fill="white" letter-spacing="3">LANCE</text>
-        <text x="185" y="100" font-family="Montserrat,Arial" font-size="10" font-weight="500" fill="rgba(255,255,255,.4)" letter-spacing="2">2024 SL</text>
-      </svg>
-      <div class="sb-tagline">ObraControl GPS</div>
-    </div>
-    <nav class="sb-nav">
-      <div class="sb-lbl">Principal</div>
-      <div class="nav-item active" onclick="showPage('dashboard')" id="ni-dashboard">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
-        Tablero
-      </div>
-      <div class="nav-item" onclick="showPage('jornada')" id="ni-jornada">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2m6-2v2M2 6h12"/></svg>
-        Resumen jornada
-      </div>
-      <div class="nav-item" onclick="showPage('operarios')" id="ni-operarios">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
-        Operarios
-      </div>
-      <div class="sb-lbl">Control</div>
-      <div class="nav-item" onclick="showPage('alertas')" id="ni-alertas">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
-        Alertas <span class="n-badge" id="alert-count" style="display:none">0</span>
-      </div>
-      <div class="nav-item" onclick="showPage('extras')" id="ni-extras">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
-        Horas extras
-      </div>
-      <div class="nav-item" onclick="showPage('horas')" id="ni-horas">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
-        Horas trabajadas
-      </div>
-      <div class="sb-lbl">Comunicación</div>
-      <div class="nav-item" onclick="showPage('tareas')" id="ni-tareas">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
-        Tareas
-      </div>
-      <div class="nav-item" onclick="showPage('whatsapp')" id="ni-whatsapp">
-        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8 1C4.1 1 1 4.1 1 8c0 1.2.3 2.4.9 3.4L1 15l3.7-.9C5.7 14.7 6.8 15 8 15c3.9 0 7-3.1 7-7S11.9 1 8 1z"/></svg>
-        WhatsApp
-      </div>
-      <div class="sb-lbl">Administración</div>
-      <div class="nav-item" onclick="showPage('obras')" id="ni-obras">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="8" width="6" height="7" rx="1"/><rect x="9" y="4" width="6" height="11" rx="1"/><path d="M4 8V5l4-4 4 4v1"/></svg>
-        Obras <span style="background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:8px;margin-left:4px;font-family:'Montserrat',sans-serif;letter-spacing:1px;">NUEVO</span>
-      </div>
-      <div class="nav-item" onclick="showPage('gestion')" id="ni-gestion">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="6" cy="4" r="2.5"/><path d="M1 13c0-2.5 2.2-4.5 5-4.5"/><path d="M10 9v4m-2-2h4"/></svg>
-        Alta de operarios
-      </div>
-      <div class="nav-item" onclick="showPage('asistente')" id="ni-asistente">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6 6.5c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.5-1.2 1.8L8 9v1"/><circle cx="8" cy="11.5" r=".5" fill="currentColor"/></svg>
-        Asistente IA
-      </div>
-      <div class="nav-item" onclick="showPage('consentimientos')" id="ni-consentimientos">📋 Consentimientos</div>
-      <div class="nav-item" onclick="showPage('informes')" id="ni-informes">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/></svg>
-        Informes de jornada
-      </div>
-    </nav>
-    <div class="sb-footer">
-      <div class="sb-user">
-        <div class="sb-avatar">JM</div>
-        <div>
-          <div class="sb-user-name">Luis Campaña</div>
-          <div class="sb-user-role">Encargado · Lance 2024</div>
-        </div>
-      </div>
-      <button onclick="sendResumenWA()" style="width:100%;margin-top:6px;padding:8px;background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:#25d366;font-size:10px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📱 Resumen a mi WhatsApp</button>
-      <button class="sb-logout" onclick="logout()">↩ Cerrar sesión</button>
-    </div>
-  </aside>
-
-  <div class="main-content">
-    <div class="topbar">
-      <div class="topbar-title" id="topbar-title">Tablero</div>
-      <div class="topbar-right">
-        <div class="live-pill"><div class="live-dot"></div>EN VIVO</div>
-        <div id="fb-live-badge" style="font-size:10px;color:var(--green);font-weight:600;display:none;"></div>
-        <div><div class="tb-clock" id="clock">--:--:--</div><div class="tb-date" id="tb-date"></div></div>
-      </div>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="kpi-grid">
-        <div class="kpi-card kc-blue" onclick="showPage('operarios')" style="cursor:pointer">
-          <div class="kpi-header"><span class="kpi-label">Operarios</span><div class="kpi-icon"><svg fill="none" stroke="var(--blue2)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></div></div>
-          <div class="kpi-val" id="kv-total">0</div>
-          <div class="kpi-sub">Plantilla completa</div>
-        </div>
-        <div class="kpi-card kc-green" onclick="showPage('jornada')" style="cursor:pointer">
-          <div class="kpi-header"><span class="kpi-label">En obra · GPS</span><div class="kpi-icon"><svg fill="none" stroke="var(--green)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z"/></svg></div></div>
-          <div class="kpi-val" id="kv-in">0</div>
-          <div class="kpi-sub">Fichados hoy</div>
-        </div>
-        <div class="kpi-card kc-red" onclick="showPage('alertas')" style="cursor:pointer">
-          <div class="kpi-header"><span class="kpi-label">Alertas</span><div class="kpi-icon"><svg fill="none" stroke="var(--red)" stroke-width="1.8" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg></div></div>
-          <div class="kpi-val" id="kv-alerts">0</div>
-          <div class="kpi-sub">Requieren atención</div>
-        </div>
-        <div class="kpi-card kc-purple" onclick="showPage('extras')" style="cursor:pointer">
-          <div class="kpi-header"><span class="kpi-label">Horas extras</span><div class="kpi-icon" style="background:var(--purple-l)"><svg fill="none" stroke="var(--purple)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg></div></div>
-          <div class="kpi-val" id="kv-extras">0</div>
-          <div class="kpi-sub">Horas extra hoy</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
-        <button onclick="showPage('jornada')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📅</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">JORNADA</div></button>
-        <button onclick="showPage('operarios')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">👷</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">OPERARIOS</div></button>
-        <button onclick="showPage('tareas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📋</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">TAREAS</div></button>
-        <button onclick="showPage('alertas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🚨</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALERTAS</div></button>
-        <button onclick="showPage('gestion')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">➕</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALTA</div></button>
-        <button onclick="showPage('horas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">⏱</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">HORAS</div></button>
-        <button onclick="showPage('whatsapp')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='#25d366'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">💬</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">WHATSAPP</div></button>
-        <button onclick="showPage('asistente')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🤖</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ASISTENTE</div></button>
-      </div>
-      <div class="jornada-info">
-        <div class="jor-badge"><strong>Lun – Jue</strong>08:00–13:00 · 14:00–18:00 (9h)</div>
-        <div class="jor-badge"><strong>Viernes</strong>08:00–14:00 (6h)</div>
-        <div class="jor-badge" style="background:var(--purple-l);border-color:rgba(124,58,237,.2);color:var(--purple)"><strong>Semana</strong>42h totales</div>
-      </div>
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">🚨 Alertas del día</div><button onclick="showPage('alertas')" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">Ver todas →</button></div>
-        <div id="dashboard-alerts-preview" style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">✅ Sin alertas activas hoy.</div>
-      </div>
-    </div>
-
-    <!-- RESUMEN JORNADA -->
-    <div class="page" id="page-jornada">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">📅 Resumen de jornada — Hoy</div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <button onclick="mostrarFichajeManual()" style="font-size:10px;background:var(--orange-l);border:1px solid rgba(232,98,26,.3);color:var(--orange);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">✏️ Fichaje manual</button>
-            <button onclick="showPage('informes')" style="font-size:10px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">🖨️ Informe</button>
-            <span id="jornada-date" style="font-size:10px;color:var(--text3)"></span></div></div>
-        <div id="fichaje-manual-panel" style="display:none;background:var(--orange-l);border:1px solid rgba(232,98,26,.25);border-radius:12px;padding:16px;margin-bottom:16px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--orange);margin-bottom:12px;">✏️ FICHAJE MANUAL — Añadir/modificar hora</div>
-          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end;">
-            <div>
-              <label class="form-lbl">Operario</label>
-              <select class="form-ctrl" id="fm-worker" style="border-color:rgba(232,98,26,.3);"></select>
-            </div>
-            <div>
-              <label class="form-lbl">Tipo</label>
-              <select class="form-ctrl" id="fm-tipo" style="border-color:rgba(232,98,26,.3);">
-                <option value="entrada">✅ Entrada</option>
-                <option value="salida">🔴 Salida</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-lbl">Hora</label>
-              <input class="form-ctrl" id="fm-hora" type="time" style="border-color:rgba(232,98,26,.3);">
-            </div>
-            <div>
-              <label class="form-lbl">Obra</label>
-              <select class="form-ctrl" id="fm-obra" style="border-color:rgba(232,98,26,.3);">
-                <option value="">— Obra actual —</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-lbl">Nota</label>
-              <input class="form-ctrl" id="fm-nota" type="text" placeholder="Médico, transporte..." style="border-color:rgba(232,98,26,.3);">
-            </div>
-            <div>
-              <button onclick="guardarFichajeManual()" style="padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Guardar</button>
-            </div>
-          </div>
-          <div style="margin-top:8px;font-size:10px;color:var(--text3);">ℹ️ El fichaje manual sobreescribe el fichaje del operario en Firebase para hoy.</div>
-        </div>
-        <table class="jornada-table">
-          <thead><tr><th>Operario</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Zona</th><th>Estado</th></tr></thead>
-          <tbody id="jornada-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- OPERARIOS -->
-    <div class="page" id="page-operarios">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">👷 Operarios registrados</div><span id="op-count" style="font-size:10px;color:var(--text3)"></span></div>
-        <div style="padding:16px 20px 0;">
-          <div class="search-wrap">
-            <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
-            <input class="search-inp" id="op-search" placeholder="Buscar por nombre, DNI o NIE..." oninput="renderWorkers()">
-          </div>
-        </div>
-        <table class="wtbl">
-          <thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Zona GPS</th><th>Acción</th></tr></thead>
-          <tbody id="op-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ALERTAS -->
-    <div class="page" id="page-alertas">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">Centro de alertas</div><span id="alertas-hdr-status" style="font-size:10px;color:var(--green);font-weight:700">✅ Sin alertas activas</span></div>
-        <div id="alerts-list">
-          <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">✅ No hay alertas activas hoy.<br><br><span style="font-size:11px;">Las alertas aparecerán cuando un operario fiche fuera de su zona de obra.</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- HORAS EXTRAS -->
-    <div class="page" id="page-extras">
-      <div class="row-3">
-        <div class="card">
-          <div class="card-hdr"><div class="card-title">➕ Registrar horas extras</div></div>
-          <div class="card-body">
-            <div class="extra-form">
-              <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="ex-worker" style="border-color:rgba(124,58,237,.3);"></select></div>
-              <div class="form-row">
-                <div class="form-g"><label class="form-lbl">Hora inicio</label><input class="form-ctrl" id="ex-start" type="time" style="border-color:rgba(124,58,237,.3);"></div>
-                <div class="form-g"><label class="form-lbl">Hora fin</label><input class="form-ctrl" id="ex-end" type="time" style="border-color:rgba(124,58,237,.3);"></div>
-              </div>
-              <div class="form-g"><label class="form-lbl">Motivo</label><input class="form-ctrl" id="ex-reason" type="text" placeholder="Ej: Acabar tabiquería" style="border-color:rgba(124,58,237,.3);"></div>
-            </div>
-            <button class="btn-primary" style="background:var(--purple);" onclick="addExtra()">+ Registrar horas extras</button>
-          </div>
-        </div>
-        <div class="card"><div class="card-hdr"><div class="card-title">📋 Horas extras hoy</div></div><div id="extras-list"><div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin horas extras hoy.</div></div></div>
-      </div>
-    </div>
-
-    <!-- HORAS TRABAJADAS -->
-    <div class="page" id="page-horas">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-hdr">
-          <div class="card-title">⏱ Horas trabajadas</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <select id="horas-periodo" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderHours()">
-              <option value="hoy">Hoy</option>
-              <option value="semana">Esta semana</option>
-              <option value="mes" selected>Este mes</option>
-            </select>
-            <button onclick="renderHours()" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;">🔄 Actualizar</button>
-            <button onclick="showPage('informes')" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;font-weight:700;color:var(--blue2);">🖨️ Informe</button>
-          </div>
-        </div>
-        <div id="horas-resumen" style="display:flex;gap:10px;padding:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);"></div>
-        <div id="hours-list"></div>
-      </div>
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">📅 Desglose por días</div></div>
-        <div id="horas-dias-list" style="max-height:400px;overflow-y:auto;"></div>
-      </div>
-    </div>
-
-    <!-- TAREAS -->
-    <div class="page" id="page-tareas">
-      <div class="row-2-eq">
-        <div class="card">
-          <div class="card-hdr"><div class="card-title">📤 Enviar tarea</div></div>
-          <div class="card-body">
-            <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="task-to"><option value="all">Todos los operarios</option></select></div>
-            <div class="form-g"><label class="form-lbl">Prioridad</label><select class="form-ctrl" id="task-prio"><option>🟡 Normal</option><option>🔴 Urgente</option><option>🔵 Informativa</option></select></div>
-            <div class="form-g"><label class="form-lbl">Descripción</label><textarea class="form-ctrl" id="task-msg" placeholder="Describe el trabajo a realizar..."></textarea></div>
-            <button class="btn-primary" onclick="sendTask()">Enviar tarea →</button>
-          </div>
-        </div>
-        <div class="card"><div class="card-hdr"><div class="card-title">Tareas enviadas</div><button onclick="borrarTodasTareas()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todas</button></div><div id="task-log" style="max-height:420px;overflow-y:auto;"></div></div>
-      </div>
-    </div>
-
-    <!-- WHATSAPP -->
-    <div class="page" id="page-whatsapp">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">💬 Mensajes WhatsApp</div></div>
-        <div id="wp-log"></div>
-      </div>
-    </div>
-
-    <!-- OBRAS -->
-    <div class="page" id="page-obras">
-      <div class="row-2">
-        <div class="card">
-          <div class="card-hdr">
-            <div class="card-title" id="obra-form-title">🏗️ Nueva obra</div>
-            <button onclick="resetObraForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">✕ Limpiar</button>
-          </div>
-          <div class="card-body">
-            <input type="hidden" id="obra-edit-id">
-            <div class="form-g">
-              <label class="form-lbl">Nombre de la obra</label>
-              <input class="form-ctrl" id="obra-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Nave Industrial Almacelles">
-            </div>
-            <div class="form-g">
-              <label class="form-lbl">Cliente / Empresa</label>
-              <input class="form-ctrl" id="obra-cliente" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Excavaciones Barroso SL">
-            </div>
-            <div class="form-g">
-              <label class="form-lbl">Descripción / Referencia</label>
-              <input class="form-ctrl" id="obra-direccion" type="text" placeholder="Ej: Nave Polígono Industrial, Almacelles">
-            </div>
-            <div class="form-g">
-              <label class="form-lbl">📍 Coordenadas GPS <span style="font-weight:400;color:var(--text3)">(copia desde Google Maps)</span></label>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input class="form-ctrl" id="obra-coords" type="text" placeholder="37.3201432, -5.4067291" oninput="parsearCoordsObra(this.value)" style="flex:1;font-family:'Montserrat',sans-serif;letter-spacing:0.5px;">
-                <button type="button" onclick="abrirGoogleMaps()" style="padding:10px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:11px;white-space:nowrap;">🌍 Maps</button>
-              </div>
-              <div id="geo-obra-result" style="font-size:10px;margin-top:5px;display:none;"></div>
-              <div style="font-size:10px;color:var(--text3);margin-top:4px;">💡 En Google Maps: manten pulsado en el punto de la obra → copia las coordenadas → pégalas aquí</div>
-            </div>
-            <div class="form-row">
-              <div class="form-g">
-                <label class="form-lbl">Radio zona (metros)</label>
-                <input class="form-ctrl" id="obra-radio" type="number" value="500" min="100" max="2000" placeholder="500">
-              </div>
-              <div class="form-g">
-                <label class="form-lbl">Estado</label>
-                <select class="form-ctrl" id="obra-estado">
-                  <option value="activa">🟢 Activa</option>
-                  <option value="pausada">🟡 Pausada</option>
-                  <option value="terminada">🔴 Terminada</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn-primary" onclick="saveObra()" id="obra-btn">+ Crear obra</button>
-            <button class="btn-secondary" onclick="resetObraForm()">Cancelar</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-hdr">
-            <div class="card-title">🏗️ Obras registradas</div>
-            <span id="obras-count" style="font-size:10px;color:var(--text3)"></span>
-          </div>
-          <div id="obras-list" style="max-height:600px;overflow-y:auto;">
-            <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin obras registradas aún.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ALTA OPERARIOS -->
-    <div class="page" id="page-gestion">
-      <div class="row-3">
-        <div class="card">
-          <div class="card-hdr"><div class="card-title" id="gestion-title">➕ Alta de operario</div><button onclick="resetForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;font-weight:600;">✕ Limpiar</button></div>
-          <div class="card-body">
-            <input type="hidden" id="edit-id">
-            <div class="form-row">
-              <div class="form-g"><label class="form-lbl">Nombre</label><input class="form-ctrl" id="g-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Nombre"></div>
-              <div class="form-g"><label class="form-lbl">Apellidos</label><input class="form-ctrl" id="g-apellidos" type="text" oninput="capitalizarCampo(this)" placeholder="Apellidos"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-g"><label class="form-lbl">DNI</label><input class="form-ctrl" id="g-dni" type="text" placeholder="12345678A" maxlength="9"></div>
-              <div class="form-g"><label class="form-lbl">NIE</label><input class="form-ctrl" id="g-nie" type="text" placeholder="X1234567A" maxlength="9"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
-              <div class="form-g">
-                <label class="form-lbl">🤖 API Key CallMeBot <span style="font-size:9px;color:var(--text3);font-weight:400;">(el operario la activa 1 vez)</span></label>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input class="form-ctrl" id="g-callmebot" type="text" placeholder="Ej: 123456" style="letter-spacing:2px;font-family:'Montserrat',sans-serif;font-weight:700;flex:1;">
-                  <button type="button" onclick="enviarInstruccionesCallMeBot()" style="padding:9px 10px;background:var(--green-light);border:1px solid var(--green);border-radius:9px;cursor:pointer;font-size:13px;" title="Enviar instrucciones de activación al operario">📲</button>
-                </div>
-                <div style="font-size:10px;color:var(--text3);margin-top:4px;">Sin API Key → el aviso no llegará automático. <a href="#" onclick="mostrarAyudaCallMeBot();return false;" style="color:var(--blue2);">¿Cómo activarlo?</a></div>
-              </div>
-              <div class="form-g">
-                <label class="form-lbl">Obra asignada</label>
-                <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
-                  <option value="">— Sin obra asignada —</option>
-                </select>
-                <input type="hidden" id="g-obra">
-                <div id="g-obra-info" style="font-size:10px;color:var(--blue2);margin-top:4px;display:none;"></div>
-              </div>
-            </div>
-            <div class="form-g">
-                <label class="form-lbl">🌍 Idioma del operario</label>
-                <select class="form-ctrl" id="g-idioma">
-                  <option value="es">🇪🇸 Español</option>
-                  <option value="ca">🏴 Català</option>
-                  <option value="ro">🇷🇴 Română</option>
-                  <option value="ar">🇲🇦 العربية</option>
-                  <option value="fr">🇫🇷 Français</option>
-                  <option value="en">🇬🇧 English</option>
-                </select>
-              </div>
-            <div class="form-row">
-              <div class="form-g">
-                <label class="form-lbl">PIN empresa</label>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input class="form-ctrl" id="g-pin" type="text" maxlength="4" placeholder="4 dígitos" style="letter-spacing:4px;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;flex:1;">
-                  <button type="button" onclick="generarPinUnico()" style="padding:10px 12px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:14px;">🔄</button>
-                </div>
-              </div>
-              <div class="form-g"><label class="form-lbl">Estado</label><select class="form-ctrl" id="g-status"><option value="pending">⏳ Sin fichar</option><option value="in">✅ En obra</option></select></div>
-            </div>
-            <!-- HORARIO PERSONALIZADO -->
-            <div style="background:rgba(232,98,26,.06);border:1.5px solid rgba(232,98,26,.25);border-radius:10px;padding:12px 14px;margin-bottom:13px;">
-              <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--orange);margin-bottom:10px;">⏰ HORARIO DE FICHAJE — Alertas WhatsApp automáticas</div>
-              <div class="form-row">
-                <div class="form-g">
-                  <label class="form-lbl">🟢 Hora entrada (mañana)</label>
-                  <input class="form-ctrl" id="g-hora-entrada" type="time" value="08:00" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
-                </div>
-                <div class="form-g">
-                  <label class="form-lbl">🔴 Hora salida</label>
-                  <input class="form-ctrl" id="g-hora-salida" type="time" value="17:00" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
-                </div>
-              </div>
-              <div class="form-row" id="g-turno-tarde-row" style="display:none;">
-                <div class="form-g">
-                  <label class="form-lbl">🟢 Hora entrada (tarde)</label>
-                  <input class="form-ctrl" id="g-hora-entrada2" type="time" value="" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
-                </div>
-                <div class="form-g">
-                  <label class="form-lbl">🔴 Hora salida (tarde)</label>
-                  <input class="form-ctrl" id="g-hora-salida2" type="time" value="" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
-                </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-                <input type="checkbox" id="g-doble-turno" onchange="document.getElementById('g-turno-tarde-row').style.display=this.checked?'flex':'none'" style="width:16px;height:16px;cursor:pointer;">
-                <label for="g-doble-turno" style="font-size:11px;color:var(--text2);cursor:pointer;">Jornada partida (mañana + tarde)</label>
-              </div>
-              <div style="margin-top:8px;font-size:10px;color:var(--text3);">⚡ Si no ficha a los <strong>5 minutos</strong> de su hora asignada → WhatsApp automático a su móvil</div>
-            </div>
-            <div class="form-g">
-              <label class="form-lbl">📱 Sistema operativo</label>
-              <div style="display:flex;gap:8px;">
-                <button type="button" id="so-android" onclick="selectSO('android')" style="flex:1;padding:12px;background:rgba(56,224,123,.08);border:2px solid var(--green);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--green);">🤖 Android</button>
-                <button type="button" id="so-iphone" onclick="selectSO('iphone')" style="flex:1;padding:12px;background:var(--card);border:2px solid var(--border);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--text3);">🍎 iPhone</button>
-              </div>
-            </div>
-            <button class="btn-primary" onclick="saveWorker()" id="g-btn">+ Dar de alta</button>
-            <button class="btn-secondary" onclick="resetForm()">Cancelar</button>
-            <div id="wa-generado" style="display:none;margin-top:14px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:12px;padding:14px;">
-              <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--green);margin-bottom:8px;">✅ OPERARIO DADO DE ALTA</div>
-              <div id="wa-preview" style="font-size:11px;color:var(--text2);line-height:1.6;white-space:pre-wrap;background:white;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid var(--border);"></div>
-              <button onclick="sendWaAlta()" style="width:100%;padding:10px;background:#25d366;border:none;border-radius:8px;color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📱 ABRIR WHATSAPP Y ENVIAR</button>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div class="card">
-            <div class="card-hdr"><div class="card-title">👷 Operarios dados de alta</div><span id="g-count" style="font-size:10px;color:var(--text3)"></span></div>
-            <div style="padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-              <div class="search-wrap" style="flex:1;min-width:140px;"><svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg><input class="search-inp" id="g-search" placeholder="Buscar..." oninput="renderGestionList()"></div>
-              <select id="g-filtro-estado" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderGestionList()">
-                <option value="activos">✅ Activos</option>
-                <option value="todos">👁 Todos</option>
-                <option value="inactivos">⏸ Inactivos</option>
-              </select>
-            </div>
-            <div id="gestion-list" style="max-height:500px;overflow-y:auto;"></div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">🔐 Tabla de PINs</div><button onclick="window.print()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🖨️ Imprimir</button></div>
-        <table class="wtbl"><thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Eliminar</th></tr></thead><tbody id="pin-tbody"></tbody></table>
-      </div>
-    </div>
-
-    <!-- ASISTENTE IA -->
-    <div class="page" id="page-asistente">
-      <div style="max-width:700px;margin:0 auto;">
-        <div class="card">
-          <div class="card-hdr"><div class="card-title">🤖 Asistente IA</div></div>
-          <div style="padding:16px;max-height:420px;overflow-y:auto;" id="chat-messages">
-            <div style="background:var(--blue-light);border-radius:12px 12px 12px 0;padding:12px 16px;margin-bottom:10px;max-width:85%;font-size:13px;color:var(--text);">
-              👋 Hola Luis! Soy tu asistente de ObraControl GPS.<br><br>
-              Puedo ayudarte con:<br>
-              • <strong>¿Quién no ha fichado hoy?</strong><br>
-              • <strong>¿Quién fichó fuera de zona?</strong><br>
-              • <strong>Resumen del día</strong>
-            </div>
-          </div>
-          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;">
-            <input class="form-ctrl" id="chat-input" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter') sendChat()" style="flex:1;">
-            <button onclick="sendChat()" style="padding:10px 16px;background:var(--blue2);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Enviar</button>
-          </div>
-          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
-            <button onclick="quickChat('¿Quién no ha fichado hoy?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Quién no fichó?</button>
-            <button onclick="quickChat('¿Quién fichó fuera de zona?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Fuera de zona?</button>
-            <button onclick="quickChat('Resumen del día')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">Resumen</button>
-            <button onclick="sendResumenWA()" style="padding:6px 12px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:20px;font-size:11px;cursor:pointer;color:var(--green);font-weight:600;">📱 Enviar a mi WA</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="wp-overlay">
-  <div class="modal">
-    <div class="modal-hdr"><span style="font-size:24px">💬</span><div><div class="modal-title">ENVIAR WHATSAPP</div></div></div>
-    <div class="modal-body">
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text3)">Para: <strong style="color:var(--text)" id="wp-name"></strong></div>
-      <label class="form-lbl">Mensaje</label>
-      <textarea class="form-ctrl" id="wp-ta" style="min-height:110px;"></textarea>
-      <div class="modal-foot"><button class="btn-cancel" onclick="closeWP()">Cancelar</button><button class="btn-send-wp" onclick="sendWP()">📱 Enviar</button></div>
-    </div>
-  </div>
-</div>
-
-    <!-- CONSENTIMIENTOS -->
-    <div class="page" id="page-consentimientos">
-      <div class="card">
-        <div class="card-hdr">
-          <div class="card-title">📋 Registro de consentimientos RGPD</div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="cargarConsentimientos()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🔄 Actualizar</button>
-            <button onclick="generarConsentimientosDesdeOperarios()" style="font-size:10px;color:var(--green);background:none;border:none;cursor:pointer;font-weight:600;">🔧 Generar faltantes</button>
-            <button onclick="borrarTodosConsentimientos()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todos</button>
-          </div>
-        </div>
-        <table class="wtbl">
-          <thead><tr><th>Operario</th><th>DNI/NIE</th><th>Fecha</th><th>Hora</th><th>Idioma</th><th>RGPD</th><th>GPS</th><th>Acción</th></tr></thead>
-          <tbody id="consent-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- INFORMES DE JORNADA -->
-    <div class="page" id="page-informes">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-hdr">
-          <div class="card-title">📄 Informes de jornada</div>
-          <div style="font-size:10px;color:var(--text3);">Cumplimiento RD 8/2019 — Registro de jornada</div>
-        </div>
-        <div class="card-body">
-          <!-- Controles -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:16px;">
-            <div>
-              <label class="form-lbl">Tipo de informe</label>
-              <select class="form-ctrl" id="inf-tipo" onchange="onChangeTipoInforme()">
-                <option value="diario">📅 Diario</option>
-                <option value="semanal">📆 Semanal</option>
-                <option value="mensual">🗓️ Mensual</option>
-              </select>
-            </div>
-            <div id="inf-ctrl-fecha">
-              <label class="form-lbl">Fecha</label>
-              <input class="form-ctrl" type="date" id="inf-fecha">
-            </div>
-            <div id="inf-ctrl-semana" style="display:none;">
-              <label class="form-lbl">Semana (lunes)</label>
-              <input class="form-ctrl" type="date" id="inf-semana-ini">
-            </div>
-            <div id="inf-ctrl-mes" style="display:none;">
-              <label class="form-lbl">Mes</label>
-              <input class="form-ctrl" type="month" id="inf-mes">
-            </div>
-            <div>
-              <label class="form-lbl">Operario</label>
-              <select class="form-ctrl" id="inf-operario">
-                <option value="todos">👷 Todos los operarios</option>
-              </select>
-            </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn-primary" onclick="generarInforme()" style="white-space:nowrap;">🔍 Previsualizar</button>
-            </div>
-          </div>
-          <!-- Botones de exportación -->
-          <div style="display:flex;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;">
-            <button onclick="imprimirInforme()" style="padding:9px 16px;background:var(--blue2);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">🖨️ Imprimir / PDF digital</button>
-            <button onclick="descargarInformeHTML()" style="padding:9px 16px;background:var(--blue-light);color:var(--blue2);border:1px solid var(--border2);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">💾 Guardar HTML</button>
-            <span style="font-size:10px;color:var(--text3);align-self:center;">Desde el navegador: Imprimir → Guardar como PDF → listo para inspección</span>
-          </div>
-          <!-- Preview -->
-          <div id="inf-preview-wrap" style="display:none;">
-            <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Vista previa del informe</div>
-            <div id="inf-preview" style="border:1px solid var(--border);border-radius:8px;overflow:auto;background:#fff;max-height:600px;"></div>
-          </div>
-          <div id="inf-empty" style="padding:32px;text-align:center;color:var(--text3);font-size:12px;">Selecciona el tipo de informe, el período y pulsa Previsualizar.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
 <script>
 function calcDist(lat1,lng1,lat2,lng2){
   const R=6371000;
@@ -2706,7 +2092,622 @@ function descargarInformeHTML(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nombre;a.click();
   showToast('✅ Archivo descargado','ok');
 }
-
 </script>
+
+
+<div id="login-screen">
+  <div class="login-card">
+    <svg class="login-logo-svg" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+      <rect x="148" y="20" width="104" height="140" fill="#1B4F8C"/>
+      <rect x="245" y="55" width="70" height="105" fill="none" stroke="#1B4F8C" stroke-width="8"/>
+      <rect x="85" y="75" width="63" height="85" fill="none" stroke="#1B4F8C" stroke-width="8"/>
+      <rect x="170" y="32" width="60" height="55" fill="none" stroke="#E8F1FB" stroke-width="6"/>
+      <line x1="60" y1="160" x2="340" y2="160" stroke="#1B4F8C" stroke-width="7"/>
+      <text x="200" y="190" text-anchor="middle" font-family="Montserrat,Arial" font-size="24" font-weight="400" fill="#1B4F8C" letter-spacing="2">construcciones</text>
+      <text x="200" y="232" text-anchor="middle" font-family="Montserrat,Arial" font-size="52" font-weight="900" fill="#1B4F8C" letter-spacing="4">LANCE</text>
+    </svg>
+    <div class="login-badge">🏢 PANEL DE OFICINA · ENCARGADO</div>
+    <div class="login-title">Acceso restringido</div>
+    <div class="login-sub">Introduce tu PIN de encargado para continuar</div>
+    <div class="pin-dots">
+      <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
+      <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
+    </div>
+    <div class="pin-pad" id="pin-pad">
+      <div class="pk" onclick="pk('1')">1</div><div class="pk" onclick="pk('2')">2</div><div class="pk" onclick="pk('3')">3</div>
+      <div class="pk" onclick="pk('4')">4</div><div class="pk" onclick="pk('5')">5</div><div class="pk" onclick="pk('6')">6</div>
+      <div class="pk" onclick="pk('7')">7</div><div class="pk" onclick="pk('8')">8</div><div class="pk" onclick="pk('9')">9</div>
+      <div class="pk del" onclick="pkDel()">⌫</div><div class="pk zero" onclick="pk('0')">0</div>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+    <div class="pin-demo">PIN: <strong>0000</strong></div>
+  </div>
+</div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg class="sb-logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="60" y="5" width="55" height="75" fill="white"/>
+        <rect x="110" y="20" width="38" height="60" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
+        <rect x="30" y="30" width="33" height="50" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
+        <line x1="15" y1="80" x2="165" y2="80" stroke="white" stroke-width="5"/>
+        <text x="185" y="45" font-family="Montserrat,Arial" font-size="15" font-weight="400" fill="rgba(255,255,255,.65)" letter-spacing="2">construcciones</text>
+        <text x="185" y="80" font-family="Montserrat,Arial" font-size="34" font-weight="900" fill="white" letter-spacing="3">LANCE</text>
+        <text x="185" y="100" font-family="Montserrat,Arial" font-size="10" font-weight="500" fill="rgba(255,255,255,.4)" letter-spacing="2">2024 SL</text>
+      </svg>
+      <div class="sb-tagline">ObraControl GPS</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-lbl">Principal</div>
+      <div class="nav-item active" onclick="showPage('dashboard')" id="ni-dashboard">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Tablero
+      </div>
+      <div class="nav-item" onclick="showPage('jornada')" id="ni-jornada">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2m6-2v2M2 6h12"/></svg>
+        Resumen jornada
+      </div>
+      <div class="nav-item" onclick="showPage('operarios')" id="ni-operarios">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        Operarios
+      </div>
+      <div class="sb-lbl">Control</div>
+      <div class="nav-item" onclick="showPage('alertas')" id="ni-alertas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
+        Alertas <span class="n-badge" id="alert-count" style="display:none">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('extras')" id="ni-extras">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Horas extras
+      </div>
+      <div class="nav-item" onclick="showPage('horas')" id="ni-horas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Horas trabajadas
+      </div>
+      <div class="sb-lbl">Comunicación</div>
+      <div class="nav-item" onclick="showPage('tareas')" id="ni-tareas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
+        Tareas
+      </div>
+      <div class="nav-item" onclick="showPage('whatsapp')" id="ni-whatsapp">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8 1C4.1 1 1 4.1 1 8c0 1.2.3 2.4.9 3.4L1 15l3.7-.9C5.7 14.7 6.8 15 8 15c3.9 0 7-3.1 7-7S11.9 1 8 1z"/></svg>
+        WhatsApp
+      </div>
+      <div class="sb-lbl">Administración</div>
+      <div class="nav-item" onclick="showPage('obras')" id="ni-obras">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="8" width="6" height="7" rx="1"/><rect x="9" y="4" width="6" height="11" rx="1"/><path d="M4 8V5l4-4 4 4v1"/></svg>
+        Obras <span style="background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:8px;margin-left:4px;font-family:'Montserrat',sans-serif;letter-spacing:1px;">NUEVO</span>
+      </div>
+      <div class="nav-item" onclick="showPage('gestion')" id="ni-gestion">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="6" cy="4" r="2.5"/><path d="M1 13c0-2.5 2.2-4.5 5-4.5"/><path d="M10 9v4m-2-2h4"/></svg>
+        Alta de operarios
+      </div>
+      <div class="nav-item" onclick="showPage('asistente')" id="ni-asistente">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6 6.5c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.5-1.2 1.8L8 9v1"/><circle cx="8" cy="11.5" r=".5" fill="currentColor"/></svg>
+        Asistente IA
+      </div>
+      <div class="nav-item" onclick="showPage('consentimientos')" id="ni-consentimientos">📋 Consentimientos</div>
+      <div class="nav-item" onclick="showPage('informes')" id="ni-informes">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/></svg>
+        Informes de jornada
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">JM</div>
+        <div>
+          <div class="sb-user-name">Luis Campaña</div>
+          <div class="sb-user-role">Encargado · Lance 2024</div>
+        </div>
+      </div>
+      <button onclick="sendResumenWA()" style="width:100%;margin-top:6px;padding:8px;background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:#25d366;font-size:10px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📱 Resumen a mi WhatsApp</button>
+      <button class="sb-logout" onclick="logout()">↩ Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Tablero</div>
+      <div class="topbar-right">
+        <div class="live-pill"><div class="live-dot"></div>EN VIVO</div>
+        <div id="fb-live-badge" style="font-size:10px;color:var(--green);font-weight:600;display:none;"></div>
+        <div><div class="tb-clock" id="clock">--:--:--</div><div class="tb-date" id="tb-date"></div></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid">
+        <div class="kpi-card kc-blue" onclick="showPage('operarios')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Operarios</span><div class="kpi-icon"><svg fill="none" stroke="var(--blue2)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></div></div>
+          <div class="kpi-val" id="kv-total">0</div>
+          <div class="kpi-sub">Plantilla completa</div>
+        </div>
+        <div class="kpi-card kc-green" onclick="showPage('jornada')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">En obra · GPS</span><div class="kpi-icon"><svg fill="none" stroke="var(--green)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z"/></svg></div></div>
+          <div class="kpi-val" id="kv-in">0</div>
+          <div class="kpi-sub">Fichados hoy</div>
+        </div>
+        <div class="kpi-card kc-red" onclick="showPage('alertas')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Alertas</span><div class="kpi-icon"><svg fill="none" stroke="var(--red)" stroke-width="1.8" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg></div></div>
+          <div class="kpi-val" id="kv-alerts">0</div>
+          <div class="kpi-sub">Requieren atención</div>
+        </div>
+        <div class="kpi-card kc-purple" onclick="showPage('extras')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Horas extras</span><div class="kpi-icon" style="background:var(--purple-l)"><svg fill="none" stroke="var(--purple)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg></div></div>
+          <div class="kpi-val" id="kv-extras">0</div>
+          <div class="kpi-sub">Horas extra hoy</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+        <button onclick="showPage('jornada')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📅</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">JORNADA</div></button>
+        <button onclick="showPage('operarios')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">👷</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">OPERARIOS</div></button>
+        <button onclick="showPage('tareas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📋</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">TAREAS</div></button>
+        <button onclick="showPage('alertas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🚨</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALERTAS</div></button>
+        <button onclick="showPage('gestion')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">➕</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALTA</div></button>
+        <button onclick="showPage('horas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">⏱</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">HORAS</div></button>
+        <button onclick="showPage('whatsapp')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='#25d366'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">💬</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">WHATSAPP</div></button>
+        <button onclick="showPage('asistente')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🤖</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ASISTENTE</div></button>
+      </div>
+      <div class="jornada-info">
+        <div class="jor-badge"><strong>Lun – Jue</strong>08:00–13:00 · 14:00–18:00 (9h)</div>
+        <div class="jor-badge"><strong>Viernes</strong>08:00–14:00 (6h)</div>
+        <div class="jor-badge" style="background:var(--purple-l);border-color:rgba(124,58,237,.2);color:var(--purple)"><strong>Semana</strong>42h totales</div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🚨 Alertas del día</div><button onclick="showPage('alertas')" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">Ver todas →</button></div>
+        <div id="dashboard-alerts-preview" style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">✅ Sin alertas activas hoy.</div>
+      </div>
+    </div>
+
+    <!-- RESUMEN JORNADA -->
+    <div class="page" id="page-jornada">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">📅 Resumen de jornada — Hoy</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button onclick="mostrarFichajeManual()" style="font-size:10px;background:var(--orange-l);border:1px solid rgba(232,98,26,.3);color:var(--orange);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">✏️ Fichaje manual</button>
+            <button onclick="showPage('informes')" style="font-size:10px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">🖨️ Informe</button>
+            <span id="jornada-date" style="font-size:10px;color:var(--text3)"></span></div></div>
+        <div id="fichaje-manual-panel" style="display:none;background:var(--orange-l);border:1px solid rgba(232,98,26,.25);border-radius:12px;padding:16px;margin-bottom:16px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--orange);margin-bottom:12px;">✏️ FICHAJE MANUAL — Añadir/modificar hora</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end;">
+            <div>
+              <label class="form-lbl">Operario</label>
+              <select class="form-ctrl" id="fm-worker" style="border-color:rgba(232,98,26,.3);"></select>
+            </div>
+            <div>
+              <label class="form-lbl">Tipo</label>
+              <select class="form-ctrl" id="fm-tipo" style="border-color:rgba(232,98,26,.3);">
+                <option value="entrada">✅ Entrada</option>
+                <option value="salida">🔴 Salida</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-lbl">Hora</label>
+              <input class="form-ctrl" id="fm-hora" type="time" style="border-color:rgba(232,98,26,.3);">
+            </div>
+            <div>
+              <label class="form-lbl">Obra</label>
+              <select class="form-ctrl" id="fm-obra" style="border-color:rgba(232,98,26,.3);">
+                <option value="">— Obra actual —</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-lbl">Nota</label>
+              <input class="form-ctrl" id="fm-nota" type="text" placeholder="Médico, transporte..." style="border-color:rgba(232,98,26,.3);">
+            </div>
+            <div>
+              <button onclick="guardarFichajeManual()" style="padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Guardar</button>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:10px;color:var(--text3);">ℹ️ El fichaje manual sobreescribe el fichaje del operario en Firebase para hoy.</div>
+        </div>
+        <table class="jornada-table">
+          <thead><tr><th>Operario</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Zona</th><th>Estado</th></tr></thead>
+          <tbody id="jornada-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OPERARIOS -->
+    <div class="page" id="page-operarios">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">👷 Operarios registrados</div><span id="op-count" style="font-size:10px;color:var(--text3)"></span></div>
+        <div style="padding:16px 20px 0;">
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+            <input class="search-inp" id="op-search" placeholder="Buscar por nombre, DNI o NIE..." oninput="renderWorkers()">
+          </div>
+        </div>
+        <table class="wtbl">
+          <thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Zona GPS</th><th>Acción</th></tr></thead>
+          <tbody id="op-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="page" id="page-alertas">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Centro de alertas</div><span id="alertas-hdr-status" style="font-size:10px;color:var(--green);font-weight:700">✅ Sin alertas activas</span></div>
+        <div id="alerts-list">
+          <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">✅ No hay alertas activas hoy.<br><br><span style="font-size:11px;">Las alertas aparecerán cuando un operario fiche fuera de su zona de obra.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HORAS EXTRAS -->
+    <div class="page" id="page-extras">
+      <div class="row-3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">➕ Registrar horas extras</div></div>
+          <div class="card-body">
+            <div class="extra-form">
+              <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="ex-worker" style="border-color:rgba(124,58,237,.3);"></select></div>
+              <div class="form-row">
+                <div class="form-g"><label class="form-lbl">Hora inicio</label><input class="form-ctrl" id="ex-start" type="time" style="border-color:rgba(124,58,237,.3);"></div>
+                <div class="form-g"><label class="form-lbl">Hora fin</label><input class="form-ctrl" id="ex-end" type="time" style="border-color:rgba(124,58,237,.3);"></div>
+              </div>
+              <div class="form-g"><label class="form-lbl">Motivo</label><input class="form-ctrl" id="ex-reason" type="text" placeholder="Ej: Acabar tabiquería" style="border-color:rgba(124,58,237,.3);"></div>
+            </div>
+            <button class="btn-primary" style="background:var(--purple);" onclick="addExtra()">+ Registrar horas extras</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-hdr"><div class="card-title">📋 Horas extras hoy</div></div><div id="extras-list"><div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin horas extras hoy.</div></div></div>
+      </div>
+    </div>
+
+    <!-- HORAS TRABAJADAS -->
+    <div class="page" id="page-horas">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hdr">
+          <div class="card-title">⏱ Horas trabajadas</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="horas-periodo" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderHours()">
+              <option value="hoy">Hoy</option>
+              <option value="semana">Esta semana</option>
+              <option value="mes" selected>Este mes</option>
+            </select>
+            <button onclick="renderHours()" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;">🔄 Actualizar</button>
+            <button onclick="showPage('informes')" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;font-weight:700;color:var(--blue2);">🖨️ Informe</button>
+          </div>
+        </div>
+        <div id="horas-resumen" style="display:flex;gap:10px;padding:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);"></div>
+        <div id="hours-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">📅 Desglose por días</div></div>
+        <div id="horas-dias-list" style="max-height:400px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- TAREAS -->
+    <div class="page" id="page-tareas">
+      <div class="row-2-eq">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">📤 Enviar tarea</div></div>
+          <div class="card-body">
+            <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="task-to"><option value="all">Todos los operarios</option></select></div>
+            <div class="form-g"><label class="form-lbl">Prioridad</label><select class="form-ctrl" id="task-prio"><option>🟡 Normal</option><option>🔴 Urgente</option><option>🔵 Informativa</option></select></div>
+            <div class="form-g"><label class="form-lbl">Descripción</label><textarea class="form-ctrl" id="task-msg" placeholder="Describe el trabajo a realizar..."></textarea></div>
+            <button class="btn-primary" onclick="sendTask()">Enviar tarea →</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-hdr"><div class="card-title">Tareas enviadas</div><button onclick="borrarTodasTareas()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todas</button></div><div id="task-log" style="max-height:420px;overflow-y:auto;"></div></div>
+      </div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="page" id="page-whatsapp">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">💬 Mensajes WhatsApp</div></div>
+        <div id="wp-log"></div>
+      </div>
+    </div>
+
+    <!-- OBRAS -->
+    <div class="page" id="page-obras">
+      <div class="row-2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title" id="obra-form-title">🏗️ Nueva obra</div>
+            <button onclick="resetObraForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">✕ Limpiar</button>
+          </div>
+          <div class="card-body">
+            <input type="hidden" id="obra-edit-id">
+            <div class="form-g">
+              <label class="form-lbl">Nombre de la obra</label>
+              <input class="form-ctrl" id="obra-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Nave Industrial Almacelles">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">Cliente / Empresa</label>
+              <input class="form-ctrl" id="obra-cliente" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Excavaciones Barroso SL">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">Descripción / Referencia</label>
+              <input class="form-ctrl" id="obra-direccion" type="text" placeholder="Ej: Nave Polígono Industrial, Almacelles">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">📍 Coordenadas GPS <span style="font-weight:400;color:var(--text3)">(copia desde Google Maps)</span></label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input class="form-ctrl" id="obra-coords" type="text" placeholder="37.3201432, -5.4067291" oninput="parsearCoordsObra(this.value)" style="flex:1;font-family:'Montserrat',sans-serif;letter-spacing:0.5px;">
+                <button type="button" onclick="abrirGoogleMaps()" style="padding:10px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:11px;white-space:nowrap;">🌍 Maps</button>
+              </div>
+              <div id="geo-obra-result" style="font-size:10px;margin-top:5px;display:none;"></div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px;">💡 En Google Maps: manten pulsado en el punto de la obra → copia las coordenadas → pégalas aquí</div>
+            </div>
+            <div class="form-row">
+              <div class="form-g">
+                <label class="form-lbl">Radio zona (metros)</label>
+                <input class="form-ctrl" id="obra-radio" type="number" value="500" min="100" max="2000" placeholder="500">
+              </div>
+              <div class="form-g">
+                <label class="form-lbl">Estado</label>
+                <select class="form-ctrl" id="obra-estado">
+                  <option value="activa">🟢 Activa</option>
+                  <option value="pausada">🟡 Pausada</option>
+                  <option value="terminada">🔴 Terminada</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="saveObra()" id="obra-btn">+ Crear obra</button>
+            <button class="btn-secondary" onclick="resetObraForm()">Cancelar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">🏗️ Obras registradas</div>
+            <span id="obras-count" style="font-size:10px;color:var(--text3)"></span>
+          </div>
+          <div id="obras-list" style="max-height:600px;overflow-y:auto;">
+            <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin obras registradas aún.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALTA OPERARIOS -->
+    <div class="page" id="page-gestion">
+      <div class="row-3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title" id="gestion-title">➕ Alta de operario</div><button onclick="resetForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;font-weight:600;">✕ Limpiar</button></div>
+          <div class="card-body">
+            <input type="hidden" id="edit-id">
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">Nombre</label><input class="form-ctrl" id="g-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Nombre"></div>
+              <div class="form-g"><label class="form-lbl">Apellidos</label><input class="form-ctrl" id="g-apellidos" type="text" oninput="capitalizarCampo(this)" placeholder="Apellidos"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">DNI</label><input class="form-ctrl" id="g-dni" type="text" placeholder="12345678A" maxlength="9"></div>
+              <div class="form-g"><label class="form-lbl">NIE</label><input class="form-ctrl" id="g-nie" type="text" placeholder="X1234567A" maxlength="9"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
+              <div class="form-g">
+                <label class="form-lbl">🤖 API Key CallMeBot <span style="font-size:9px;color:var(--text3);font-weight:400;">(el operario la activa 1 vez)</span></label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input class="form-ctrl" id="g-callmebot" type="text" placeholder="Ej: 123456" style="letter-spacing:2px;font-family:'Montserrat',sans-serif;font-weight:700;flex:1;">
+                  <button type="button" onclick="enviarInstruccionesCallMeBot()" style="padding:9px 10px;background:var(--green-light);border:1px solid var(--green);border-radius:9px;cursor:pointer;font-size:13px;" title="Enviar instrucciones de activación al operario">📲</button>
+                </div>
+                <div style="font-size:10px;color:var(--text3);margin-top:4px;">Sin API Key → el aviso no llegará automático. <a href="#" onclick="mostrarAyudaCallMeBot();return false;" style="color:var(--blue2);">¿Cómo activarlo?</a></div>
+              </div>
+              <div class="form-g">
+                <label class="form-lbl">Obra asignada</label>
+                <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
+                  <option value="">— Sin obra asignada —</option>
+                </select>
+                <input type="hidden" id="g-obra">
+                <div id="g-obra-info" style="font-size:10px;color:var(--blue2);margin-top:4px;display:none;"></div>
+              </div>
+            </div>
+            <div class="form-g">
+                <label class="form-lbl">🌍 Idioma del operario</label>
+                <select class="form-ctrl" id="g-idioma">
+                  <option value="es">🇪🇸 Español</option>
+                  <option value="ca">🏴 Català</option>
+                  <option value="ro">🇷🇴 Română</option>
+                  <option value="ar">🇲🇦 العربية</option>
+                  <option value="fr">🇫🇷 Français</option>
+                  <option value="en">🇬🇧 English</option>
+                </select>
+              </div>
+            <div class="form-row">
+              <div class="form-g">
+                <label class="form-lbl">PIN empresa</label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input class="form-ctrl" id="g-pin" type="text" maxlength="4" placeholder="4 dígitos" style="letter-spacing:4px;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;flex:1;">
+                  <button type="button" onclick="generarPinUnico()" style="padding:10px 12px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:14px;">🔄</button>
+                </div>
+              </div>
+              <div class="form-g"><label class="form-lbl">Estado</label><select class="form-ctrl" id="g-status"><option value="pending">⏳ Sin fichar</option><option value="in">✅ En obra</option></select></div>
+            </div>
+            <!-- HORARIO PERSONALIZADO -->
+            <div style="background:rgba(232,98,26,.06);border:1.5px solid rgba(232,98,26,.25);border-radius:10px;padding:12px 14px;margin-bottom:13px;">
+              <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--orange);margin-bottom:10px;">⏰ HORARIO DE FICHAJE — Alertas WhatsApp automáticas</div>
+              <div class="form-row">
+                <div class="form-g">
+                  <label class="form-lbl">🟢 Hora entrada (mañana)</label>
+                  <input class="form-ctrl" id="g-hora-entrada" type="time" value="08:00" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
+                </div>
+                <div class="form-g">
+                  <label class="form-lbl">🔴 Hora salida</label>
+                  <input class="form-ctrl" id="g-hora-salida" type="time" value="17:00" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
+                </div>
+              </div>
+              <div class="form-row" id="g-turno-tarde-row" style="display:none;">
+                <div class="form-g">
+                  <label class="form-lbl">🟢 Hora entrada (tarde)</label>
+                  <input class="form-ctrl" id="g-hora-entrada2" type="time" value="" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
+                </div>
+                <div class="form-g">
+                  <label class="form-lbl">🔴 Hora salida (tarde)</label>
+                  <input class="form-ctrl" id="g-hora-salida2" type="time" value="" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                <input type="checkbox" id="g-doble-turno" onchange="document.getElementById('g-turno-tarde-row').style.display=this.checked?'flex':'none'" style="width:16px;height:16px;cursor:pointer;">
+                <label for="g-doble-turno" style="font-size:11px;color:var(--text2);cursor:pointer;">Jornada partida (mañana + tarde)</label>
+              </div>
+              <div style="margin-top:8px;font-size:10px;color:var(--text3);">⚡ Si no ficha a los <strong>5 minutos</strong> de su hora asignada → WhatsApp automático a su móvil</div>
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">📱 Sistema operativo</label>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="so-android" onclick="selectSO('android')" style="flex:1;padding:12px;background:rgba(56,224,123,.08);border:2px solid var(--green);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--green);">🤖 Android</button>
+                <button type="button" id="so-iphone" onclick="selectSO('iphone')" style="flex:1;padding:12px;background:var(--card);border:2px solid var(--border);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--text3);">🍎 iPhone</button>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="saveWorker()" id="g-btn">+ Dar de alta</button>
+            <button class="btn-secondary" onclick="resetForm()">Cancelar</button>
+            <div id="wa-generado" style="display:none;margin-top:14px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:12px;padding:14px;">
+              <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--green);margin-bottom:8px;">✅ OPERARIO DADO DE ALTA</div>
+              <div id="wa-preview" style="font-size:11px;color:var(--text2);line-height:1.6;white-space:pre-wrap;background:white;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid var(--border);"></div>
+              <button onclick="sendWaAlta()" style="width:100%;padding:10px;background:#25d366;border:none;border-radius:8px;color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📱 ABRIR WHATSAPP Y ENVIAR</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">👷 Operarios dados de alta</div><span id="g-count" style="font-size:10px;color:var(--text3)"></span></div>
+            <div style="padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <div class="search-wrap" style="flex:1;min-width:140px;"><svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg><input class="search-inp" id="g-search" placeholder="Buscar..." oninput="renderGestionList()"></div>
+              <select id="g-filtro-estado" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderGestionList()">
+                <option value="activos">✅ Activos</option>
+                <option value="todos">👁 Todos</option>
+                <option value="inactivos">⏸ Inactivos</option>
+              </select>
+            </div>
+            <div id="gestion-list" style="max-height:500px;overflow-y:auto;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🔐 Tabla de PINs</div><button onclick="window.print()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🖨️ Imprimir</button></div>
+        <table class="wtbl"><thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Eliminar</th></tr></thead><tbody id="pin-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ASISTENTE IA -->
+    <div class="page" id="page-asistente">
+      <div style="max-width:700px;margin:0 auto;">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">🤖 Asistente IA</div></div>
+          <div style="padding:16px;max-height:420px;overflow-y:auto;" id="chat-messages">
+            <div style="background:var(--blue-light);border-radius:12px 12px 12px 0;padding:12px 16px;margin-bottom:10px;max-width:85%;font-size:13px;color:var(--text);">
+              👋 Hola Luis! Soy tu asistente de ObraControl GPS.<br><br>
+              Puedo ayudarte con:<br>
+              • <strong>¿Quién no ha fichado hoy?</strong><br>
+              • <strong>¿Quién fichó fuera de zona?</strong><br>
+              • <strong>Resumen del día</strong>
+            </div>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;">
+            <input class="form-ctrl" id="chat-input" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter') sendChat()" style="flex:1;">
+            <button onclick="sendChat()" style="padding:10px 16px;background:var(--blue2);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Enviar</button>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="quickChat('¿Quién no ha fichado hoy?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Quién no fichó?</button>
+            <button onclick="quickChat('¿Quién fichó fuera de zona?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Fuera de zona?</button>
+            <button onclick="quickChat('Resumen del día')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">Resumen</button>
+            <button onclick="sendResumenWA()" style="padding:6px 12px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:20px;font-size:11px;cursor:pointer;color:var(--green);font-weight:600;">📱 Enviar a mi WA</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="wp-overlay">
+  <div class="modal">
+    <div class="modal-hdr"><span style="font-size:24px">💬</span><div><div class="modal-title">ENVIAR WHATSAPP</div></div></div>
+    <div class="modal-body">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text3)">Para: <strong style="color:var(--text)" id="wp-name"></strong></div>
+      <label class="form-lbl">Mensaje</label>
+      <textarea class="form-ctrl" id="wp-ta" style="min-height:110px;"></textarea>
+      <div class="modal-foot"><button class="btn-cancel" onclick="closeWP()">Cancelar</button><button class="btn-send-wp" onclick="sendWP()">📱 Enviar</button></div>
+    </div>
+  </div>
+</div>
+
+    <!-- CONSENTIMIENTOS -->
+    <div class="page" id="page-consentimientos">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📋 Registro de consentimientos RGPD</div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="cargarConsentimientos()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🔄 Actualizar</button>
+            <button onclick="generarConsentimientosDesdeOperarios()" style="font-size:10px;color:var(--green);background:none;border:none;cursor:pointer;font-weight:600;">🔧 Generar faltantes</button>
+            <button onclick="borrarTodosConsentimientos()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todos</button>
+          </div>
+        </div>
+        <table class="wtbl">
+          <thead><tr><th>Operario</th><th>DNI/NIE</th><th>Fecha</th><th>Hora</th><th>Idioma</th><th>RGPD</th><th>GPS</th><th>Acción</th></tr></thead>
+          <tbody id="consent-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INFORMES DE JORNADA -->
+    <div class="page" id="page-informes">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hdr">
+          <div class="card-title">📄 Informes de jornada</div>
+          <div style="font-size:10px;color:var(--text3);">Cumplimiento RD 8/2019 — Registro de jornada</div>
+        </div>
+        <div class="card-body">
+          <!-- Controles -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:16px;">
+            <div>
+              <label class="form-lbl">Tipo de informe</label>
+              <select class="form-ctrl" id="inf-tipo" onchange="onChangeTipoInforme()">
+                <option value="diario">📅 Diario</option>
+                <option value="semanal">📆 Semanal</option>
+                <option value="mensual">🗓️ Mensual</option>
+              </select>
+            </div>
+            <div id="inf-ctrl-fecha">
+              <label class="form-lbl">Fecha</label>
+              <input class="form-ctrl" type="date" id="inf-fecha">
+            </div>
+            <div id="inf-ctrl-semana" style="display:none;">
+              <label class="form-lbl">Semana (lunes)</label>
+              <input class="form-ctrl" type="date" id="inf-semana-ini">
+            </div>
+            <div id="inf-ctrl-mes" style="display:none;">
+              <label class="form-lbl">Mes</label>
+              <input class="form-ctrl" type="month" id="inf-mes">
+            </div>
+            <div>
+              <label class="form-lbl">Operario</label>
+              <select class="form-ctrl" id="inf-operario">
+                <option value="todos">👷 Todos los operarios</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-primary" onclick="generarInforme()" style="white-space:nowrap;">🔍 Previsualizar</button>
+            </div>
+          </div>
+          <!-- Botones de exportación -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;">
+            <button onclick="imprimirInforme()" style="padding:9px 16px;background:var(--blue2);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">🖨️ Imprimir / PDF digital</button>
+            <button onclick="descargarInformeHTML()" style="padding:9px 16px;background:var(--blue-light);color:var(--blue2);border:1px solid var(--border2);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">💾 Guardar HTML</button>
+            <span style="font-size:10px;color:var(--text3);align-self:center;">Desde el navegador: Imprimir → Guardar como PDF → listo para inspección</span>
+          </div>
+          <!-- Preview -->
+          <div id="inf-preview-wrap" style="display:none;">
+            <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Vista previa del informe</div>
+            <div id="inf-preview" style="border:1px solid var(--border);border-radius:8px;overflow:auto;background:#fff;max-height:600px;"></div>
+          </div>
+          <div id="inf-empty" style="padding:32px;text-align:center;color:var(--text3);font-size:12px;">Selecciona el tipo de informe, el período y pulsa Previsualizar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
 </body>
 </html>
