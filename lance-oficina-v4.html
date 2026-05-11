@@ -187,6 +187,16 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
 </head>
 <body>
 <script>
+/* ── PIN PAD listeners ── */
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('[data-pk]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var v=this.getAttribute('data-pk');
+      if(v==='del') pkDel(); else pk(v);
+    });
+  });
+});
+
 function calcDist(lat1,lng1,lat2,lng2){
   const R=6371000;
   const dLat=(lat2-lat1)*Math.PI/180;
@@ -2114,10 +2124,10 @@ function descargarInformeHTML(){
       <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
     </div>
     <div class="pin-pad" id="pin-pad">
-      <div class="pk" onclick="pk('1')">1</div><div class="pk" onclick="pk('2')">2</div><div class="pk" onclick="pk('3')">3</div>
-      <div class="pk" onclick="pk('4')">4</div><div class="pk" onclick="pk('5')">5</div><div class="pk" onclick="pk('6')">6</div>
-      <div class="pk" onclick="pk('7')">7</div><div class="pk" onclick="pk('8')">8</div><div class="pk" onclick="pk('9')">9</div>
-      <div class="pk del" onclick="pkDel()">⌫</div><div class="pk zero" onclick="pk('0')">0</div>
+      <div class="pk" data-pk="1">1</div><div class="pk" data-pk="2">2</div><div class="pk" data-pk="3">3</div>
+      <div class="pk" data-pk="4">4</div><div class="pk" data-pk="5">5</div><div class="pk" data-pk="6">6</div>
+      <div class="pk" data-pk="7">7</div><div class="pk" data-pk="8">8</div><div class="pk" data-pk="9">9</div>
+      <div class="pk del" data-pk="del">⌫</div><div class="pk zero" data-pk="0">0</div>
     </div>
     <div class="pin-err" id="pin-err"></div>
     <div class="pin-demo">PIN: <strong>0000</strong></div>
