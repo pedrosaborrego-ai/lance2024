@@ -1517,39 +1517,44 @@ function selectSO(so){
 function generarMsgWA(w){
   const doc=w.dni||w.nie||'';
   const so=selectedSO||'android';
-  const inst=so==='iphone'?`📲 *INSTALAR EN IPHONE:*\
-1️⃣ Abre en *Safari*\
-2️⃣ Pulsa *Compartir* ⬆️\
-3️⃣ *"Añadir a pantalla de inicio"*`:`📲 *INSTALAR EN ANDROID:*\
-1️⃣ Abre en Chrome\
-2️⃣ Pulsa los *3 puntos* ⋮\
-3️⃣ *"Añadir a pantalla de inicio"*`;
-  return `🏗️ *CONSTRUCCIONES LANCE 2024 SL*\
-\
-Hola ${w.nombre} ${w.apellidos} 👋\
-\
-📱 Enlace de la app:\
-👉 ${APP_URL}\
-\
-📄 Tu DNI/NIE: *${doc}*\
-🔐 Tu PIN inicial: *${w.pin}*\
-_(Podrás cambiarlo al entrar)_\
-\
-📋 *PASOS PARA FICHAR:*\
-1️⃣ Abre el enlace\
-2️⃣ Elige tu idioma\
-3️⃣ Acepta el consentimiento\
-4️⃣ Introduce tu DNI o NIE\
-5️⃣ Introduce el PIN\
-6️⃣ Crea tu PIN personal\
-7️⃣ ¡Ficha tu entrada!\
-\
-${inst}\
-\
-📍 Obra asignada:\
-${w.obra||'Consulta con el encargado'}\
-\
-_ObraControl GPS · Construcciones Lance 2024 SL_`;
+  const instIphone=`📱 *CÓMO INSTALAR EN IPHONE (una sola vez):*\
+1️⃣ Abre el enlace con *Safari* (importante: no uses Chrome)\
+2️⃣ Pulsa el botón *Compartir* 📤 (cuadrado con flecha arriba)\
+3️⃣ Baja y pulsa *"Añadir a pantalla de inicio"*\
+4️⃣ Pulsa *"Añadir"*\
+✅ ¡Listo! Ya tienes el icono de Lance en tu pantalla`;
+  const instAndroid=`📱 *CÓMO INSTALAR EN ANDROID (una sola vez):*\
+1️⃣ Abre el enlace en *Chrome*\
+2️⃣ Pulsa los *3 puntos* ⋮ arriba a la derecha\
+3️⃣ Pulsa *"Añadir a pantalla de inicio"*\
+4️⃣ Pulsa *"Añadir"*\
+✅ ¡Listo! Ya tienes el icono de Lance en tu pantalla`;
+  const inst=so==='iphone'?instIphone:instAndroid;
+  return `🏗️ *CONSTRUCCIONES LANCE 2024 SL*
+Hola ${w.nombre} 👋 Bienvenido al fichaje digital.
+
+📲 *ENLACE APP:*
+👉 ${APP_URL}
+
+1️⃣ DNI/NIE: *${doc}*
+2️⃣ PIN inicial: *${w.pin}* _(cámbialo al entrar)_
+3️⃣ Obra: *${w.obra||'Consulta al encargado'}*
+
+✅ *PASOS:*
+1. Abre el enlace
+2. Elige idioma
+3. Pulsa Aceptar
+4. Escribe DNI: *${doc}*
+5. Escribe PIN: *${w.pin}*
+6. Crea tu PIN personal
+7. Pulsa FICHAR ENTRADA 🟢
+8. Al acabar pulsa FICHAR SALIDA 🔴
+
+${inst}
+
+💡 Cada mañana → Entrada. Al salir → Salida.
+Dudas → llama al encargado Luis.
+_ObraControl GPS · Lance 2024 SL_`;
 }
 
 function sendWaAlta(){
