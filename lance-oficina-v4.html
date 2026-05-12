@@ -348,9 +348,9 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
         <button onclick="showPage('asistente')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🤖</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ASISTENTE</div></button>
       </div>
       <div class="jornada-info">
-        <div class="jor-badge"><strong>Lun – Jue</strong>08:00–13:00 · 14:00–18:00 (9h)</div>
-        <div class="jor-badge"><strong>Viernes</strong>08:00–14:00 (6h)</div>
-        <div class="jor-badge" style="background:var(--purple-l);border-color:rgba(124,58,237,.2);color:var(--purple)"><strong>Semana</strong>42h totales</div>
+        <div class="jor-badge"><strong>Lun – Jue</strong>07:00–18:00 (11h)</div>
+        <div class="jor-badge"><strong>Viernes</strong>07:00–14:00 (7h)</div>
+        <div class="jor-badge" style="background:var(--purple-l);border-color:rgba(124,58,237,.2);color:var(--purple)"><strong>Semana</strong>51h totales</div>
       </div>
       <div class="card">
         <div class="card-hdr"><div class="card-title">🚨 Alertas del día</div><button onclick="showPage('alertas')" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">Ver todas →</button></div>
@@ -616,6 +616,11 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
             </div>
             <div class="form-row">
               <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
+            <div class="form-g" style="background:#E7F7E7;border:1px solid #86EFAC;border-radius:8px;padding:10px;margin-bottom:4px;">
+              <label class="form-lbl" style="color:#16A34A;">🤖 CallMeBot API Key (WhatsApp automático)</label>
+              <input class="form-ctrl" id="g-callmebot" type="text" placeholder="Ej: 123456" style="letter-spacing:2px;">
+              <div style="font-size:9px;color:#16A34A;margin-top:4px;">El operario activa su número enviando <strong>"I allow callmebot to send me messages"</strong> al +34 644 44 74 05 en WhatsApp. Recibirá su apikey.</div>
+            </div>
               <div class="form-g">
                 <label class="form-lbl">Obra asignada</label>
                 <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
@@ -841,14 +846,17 @@ function calcDist(lat1,lng1,lat2,lng2){
 const FB_URL = 'https://lance-a99b4-default-rtdb.europe-west1.firebasedatabase.app';
 const APP_URL = 'https://obracontrol-tech.github.io/lance2024/lance-operario-v3.html';
 const ENCARGADO_WA = '+34629108645';
+const TELEGRAM_TOKEN = '8423643316:AAH9QJu2TP5mTQP522zZz9wvZG_pUR6_RxA';
+const TELEGRAM_LUIS = '6113262220';
+const CALLMEBOT_URL = 'https://api.callmebot.com/whatsapp.php';
 const DAYS_CAP=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
 const JORNADA={
-  'Lunes':{t1s:'08:00',t1e:'13:00',t2s:'14:00',t2e:'18:00',total:9},
-  'Martes':{t1s:'08:00',t1e:'13:00',t2s:'14:00',t2e:'18:00',total:9},
-  'Miércoles':{t1s:'08:00',t1e:'13:00',t2s:'14:00',t2e:'18:00',total:9},
-  'Jueves':{t1s:'08:00',t1e:'13:00',t2s:'14:00',t2e:'18:00',total:9},
-  'Viernes':{t1s:'08:00',t1e:'14:00',t2s:null,t2e:null,total:6},
+  'Lunes':{t1s:'07:00',t1e:'18:00',t2s:null,t2e:null,total:11},
+  'Martes':{t1s:'07:00',t1e:'18:00',t2s:null,t2e:null,total:11},
+  'Miércoles':{t1s:'07:00',t1e:'18:00',t2s:null,t2e:null,total:11},
+  'Jueves':{t1s:'07:00',t1e:'18:00',t2s:null,t2e:null,total:11},
+  'Viernes':{t1s:'07:00',t1e:'14:00',t2s:null,t2e:null,total:7},
 };
 
 let WORKERS=[];
@@ -869,7 +877,7 @@ function loadWorkersFromFirebase(){
     Object.entries(data).forEach(([key,op])=>{
       if(!op||!op.nombre)return;
       const exists=WORKERS.find(w=>(w.dni&&w.dni.replace(/[^A-Z0-9]/gi,'').toUpperCase()===key.toUpperCase())||(w.nie&&w.nie.replace(/[^A-Z0-9]/gi,'').toUpperCase()===key.toUpperCase()));
-      if(!exists){WORKERS.push({id:1000+id,nombre:op.nombre||'',apellidos:op.apellidos||'',dni:op.dni||'',nie:op.nie||'',tel:op.tel||'',obra:op.obra||'',pin:op.pin||'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true,horaEntrada:op.horaEntrada||'07:00',horaSalida:op.horaSalida||'18:00',diasLaborables:op.diasLaborables||[1,2,3,4,5]});id++;}
+      if(!exists){WORKERS.push({id:1000+id,nombre:op.nombre||'',apellidos:op.apellidos||'',dni:op.dni||'',nie:op.nie||'',tel:op.tel||'',obra:op.obra||'',pin:op.pin||'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true,horaEntrada:op.horaEntrada||'07:00',horaSalida:op.horaSalida||'18:00',diasLaborables:op.diasLaborables||[1,2,3,4,5],callmebotKey:op.callmebotKey||''});id++;}
     });
     const seen=new Set();
     WORKERS=WORKERS.filter(w=>{const d=(w.dni||w.nie||'').toUpperCase();if(!d)return true;if(seen.has(d))return false;seen.add(d);return true;});
@@ -881,7 +889,7 @@ function loadWorkersFromFirebase(){
 
 function fbSyncWorker(w,pinChanged=false){
   const doc=(w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(!doc)return;
-  const regData={nombre:w.nombre,apellidos:w.apellidos,dni:w.dni||'',nie:w.nie||'',pin:w.pin,obra:w.obra||'',tel:w.tel||'',activo:true,pin_reset:pinChanged,horaEntrada:w.horaEntrada||'07:00',horaSalida:w.horaSalida||'18:00',diasLaborables:w.diasLaborables||[1,2,3,4,5]};
+  const regData={nombre:w.nombre,apellidos:w.apellidos,dni:w.dni||'',nie:w.nie||'',pin:w.pin,obra:w.obra||'',tel:w.tel||'',activo:true,pin_reset:pinChanged,horaEntrada:w.horaEntrada||'07:00',horaSalida:w.horaSalida||'18:00',diasLaborables:w.diasLaborables||[1,2,3,4,5],callmebotKey:w.callmebotKey||''};
   if(w.obra_lat&&w.obra_lng){regData.obra_lat=w.obra_lat;regData.obra_lng=w.obra_lng;}
   fetch(`${FB_URL}/operarios_registro/${doc}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(regData)}).catch(()=>{});
 }
@@ -1307,6 +1315,7 @@ function saveWorker(){
   const status=document.getElementById('g-status').value;
   const idioma=document.getElementById('g-idioma')?.value||'es';
   const horaEntrada=document.getElementById('g-hora-entrada')?.value||'07:00';
+  const callmebotKey=document.getElementById('g-callmebot')?.value.trim()||'';
   const horaSalida=document.getElementById('g-hora-salida')?.value||'15:00';
   const diasLaborables=[0,1,2,3,4,5,6].filter(d=>document.getElementById('g-dia-'+d)?.checked);
   if(!nombre){showToast('Escribe el nombre','err');return;}
@@ -1359,7 +1368,7 @@ function saveWorker(){
   } else {
     // ── NUEVO OPERARIO ──
     const ni=Math.max(0,...WORKERS.map(w=>w.id))+1;
-    const nw={id:ni,nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,horaEntrada,horaSalida,diasLaborables,
+    const nw={id:ni,nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,horaEntrada,horaSalida,diasLaborables,callmebotKey,
               arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,
               obra_lat:_obraLat||null,obra_lng:_obraLng||null};
     _obraLat=null;_obraLng=null;
@@ -1410,6 +1419,7 @@ function editWorker(id){
   if(document.getElementById('g-hora-salida'))document.getElementById('g-hora-salida').value=w.horaSalida||'18:00';
   const dias=w.diasLaborables||[1,2,3,4,5];
   [0,1,2,3,4,5,6].forEach(d=>{const el=document.getElementById('g-dia-'+d);if(el)el.checked=dias.includes(d);});
+  if(document.getElementById('g-callmebot'))document.getElementById('g-callmebot').value=w.callmebotKey||'';
   const btnG=document.getElementById('btn-geo');if(btnG)btnG.textContent=w.obra_lat?'✅ OK':'📍 Zona';
   document.getElementById('g-btn').textContent='💾 Guardar cambios';
   document.getElementById('gestion-title').textContent='✏️ Editar operario';
@@ -2260,37 +2270,35 @@ function checkHorarioAlertas(){
 function enviarAlertaWA(w,tipo,horaEsperada){
   const nombre=`${w.nombre} ${w.apellidos}`;
   const icono=tipo==='entrada'?'⏰':'🔴';
-  const accion=tipo==='entrada'?'NO HA FICHADO ENTRADA':'NO HA FICHADO SALIDA';
   const ahora=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-  // Mensaje para el operario
-  const msgOp=encodeURIComponent(`${icono} *ALERTA FICHAJE*
 
-Hola ${w.nombre}, son las ${ahora} y todavía no has fichado tu ${tipo==='entrada'?'ENTRADA':'SALIDA'}.
-
-Tu horario: ${w.horaEntrada||'07:00'} – ${w.horaSalida||'15:00'}
-
-Por favor ficha cuanto antes desde la app.
-
-_ObraControl GPS · Construcciones Lance 2024 SL_`);
-  // Mensaje para Luis (encargado)
-  const msgLuis=encodeURIComponent(`${icono} *ALERTA FICHAJE*
+  // ✅ 1. Telegram a Luis — siempre, sin necesidad de abrir navegador
+  const msgTelegram=`${icono} *ALERTA FICHAJE*
 
 👷 *${nombre}*
-${accion}
+${tipo==='entrada'?'NO HA FICHADO ENTRADA':'NO HA FICHADO SALIDA'}
 
 Hora esperada: ${horaEsperada}
 Hora actual: ${ahora}
 
-_ObraControl GPS · Construcciones Lance 2024 SL_`);
+_ObraControl GPS · Lance 2024_`;
+  fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:TELEGRAM_LUIS,text:msgTelegram,parse_mode:'Markdown'})
+  }).then(()=>showToast(`📱 Alerta Telegram enviada a Luis — ${nombre}`,'ok'))
+    .catch(()=>showToast('⚠️ Error enviando Telegram','err'));
 
-  // Abrir WA al operario si tiene teléfono
+  // ✅ 2. CallMeBot WhatsApp al operario — si tiene apikey configurada
   const telOp=(w.tel||'').replace(/[\s\-\(\)]/g,'').replace(/^\+/,'');
-  if(telOp){
-    const numOp=telOp.startsWith('34')?telOp:'34'+telOp;
-    setTimeout(()=>window.open(`https://wa.me/${numOp}?text=${msgOp}`,'_blank'),300);
+  const numOp=telOp.startsWith('34')?telOp:'34'+telOp;
+  const callmebotKey=w.callmebotKey||'';
+  if(numOp&&callmebotKey){
+    const msgOp=encodeURIComponent(`${icono} ALERTA FICHAJE\n\nHola ${w.nombre}, son las ${ahora} y todavia no has fichado tu ${tipo==='entrada'?'ENTRADA':'SALIDA'}.\n\nTu horario: ${w.horaEntrada||'07:00'} a ${w.horaSalida||'18:00'}\n\nFicha cuanto antes desde la app.\n\nObraControl GPS - Lance 2024`);
+    fetch(`${CALLMEBOT_URL}?phone=${numOp}&text=${msgOp}&apikey=${callmebotKey}`)
+      .then(()=>showToast(`📱 WhatsApp enviado a ${w.nombre}`,'ok'))
+      .catch(()=>{});
   }
-  // Enviar copia a Luis siempre
-  setTimeout(()=>window.open(`https://wa.me/${ENCARGADO_WA.replace(/\D/g,'')}?text=${msgLuis}`,'_blank'),800);
 }
 
 function addHorarioAlerta(w, tipo, horaEsperada){
