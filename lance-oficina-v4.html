@@ -186,17 +186,650 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
 </style>
 </head>
 <body>
-<script>
-/* ── PIN PAD listeners ── */
-document.addEventListener('DOMContentLoaded',function(){
-  document.querySelectorAll('[data-pk]').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var v=this.getAttribute('data-pk');
-      if(v==='del') pkDel(); else pk(v);
-    });
-  });
-});
 
+<div id="login-screen">
+  <div class="login-card">
+    <svg class="login-logo-svg" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
+      <rect x="148" y="20" width="104" height="140" fill="#1B4F8C"/>
+      <rect x="245" y="55" width="70" height="105" fill="none" stroke="#1B4F8C" stroke-width="8"/>
+      <rect x="85" y="75" width="63" height="85" fill="none" stroke="#1B4F8C" stroke-width="8"/>
+      <rect x="170" y="32" width="60" height="55" fill="none" stroke="#E8F1FB" stroke-width="6"/>
+      <line x1="60" y1="160" x2="340" y2="160" stroke="#1B4F8C" stroke-width="7"/>
+      <text x="200" y="190" text-anchor="middle" font-family="Montserrat,Arial" font-size="24" font-weight="400" fill="#1B4F8C" letter-spacing="2">construcciones</text>
+      <text x="200" y="232" text-anchor="middle" font-family="Montserrat,Arial" font-size="52" font-weight="900" fill="#1B4F8C" letter-spacing="4">LANCE</text>
+    </svg>
+    <div class="login-badge">🏢 PANEL DE OFICINA · ENCARGADO</div>
+    <div class="login-title">Acceso restringido</div>
+    <div class="login-sub">Introduce tu PIN de encargado para continuar</div>
+    <div class="pin-dots">
+      <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
+      <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
+    </div>
+    <div class="pin-pad" id="pin-pad">
+      <div class="pk" onclick="pk('1')">1</div><div class="pk" onclick="pk('2')">2</div><div class="pk" onclick="pk('3')">3</div>
+      <div class="pk" onclick="pk('4')">4</div><div class="pk" onclick="pk('5')">5</div><div class="pk" onclick="pk('6')">6</div>
+      <div class="pk" onclick="pk('7')">7</div><div class="pk" onclick="pk('8')">8</div><div class="pk" onclick="pk('9')">9</div>
+      <div class="pk del" onclick="pkDel()">⌫</div><div class="pk zero" onclick="pk('0')">0</div>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+    <div class="pin-demo">PIN: <strong>0000</strong></div>
+  </div>
+</div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg class="sb-logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="60" y="5" width="55" height="75" fill="white"/>
+        <rect x="110" y="20" width="38" height="60" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
+        <rect x="30" y="30" width="33" height="50" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
+        <line x1="15" y1="80" x2="165" y2="80" stroke="white" stroke-width="5"/>
+        <text x="185" y="45" font-family="Montserrat,Arial" font-size="15" font-weight="400" fill="rgba(255,255,255,.65)" letter-spacing="2">construcciones</text>
+        <text x="185" y="80" font-family="Montserrat,Arial" font-size="34" font-weight="900" fill="white" letter-spacing="3">LANCE</text>
+        <text x="185" y="100" font-family="Montserrat,Arial" font-size="10" font-weight="500" fill="rgba(255,255,255,.4)" letter-spacing="2">2024 SL</text>
+      </svg>
+      <div class="sb-tagline">ObraControl GPS</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-lbl">Principal</div>
+      <div class="nav-item active" onclick="showPage('dashboard')" id="ni-dashboard">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Tablero
+      </div>
+      <div class="nav-item" onclick="showPage('jornada')" id="ni-jornada">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2m6-2v2M2 6h12"/></svg>
+        Resumen jornada
+      </div>
+      <div class="nav-item" onclick="showPage('operarios')" id="ni-operarios">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        Operarios
+      </div>
+      <div class="sb-lbl">Control</div>
+      <div class="nav-item" onclick="showPage('alertas')" id="ni-alertas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
+        Alertas <span class="n-badge" id="alert-count" style="display:none">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('extras')" id="ni-extras">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Horas extras
+      </div>
+      <div class="nav-item" onclick="showPage('horas')" id="ni-horas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Horas trabajadas
+      </div>
+      <div class="sb-lbl">Comunicación</div>
+      <div class="nav-item" onclick="showPage('tareas')" id="ni-tareas">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
+        Tareas
+      </div>
+      <div class="nav-item" onclick="showPage('whatsapp')" id="ni-whatsapp">
+        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8 1C4.1 1 1 4.1 1 8c0 1.2.3 2.4.9 3.4L1 15l3.7-.9C5.7 14.7 6.8 15 8 15c3.9 0 7-3.1 7-7S11.9 1 8 1z"/></svg>
+        WhatsApp
+      </div>
+      <div class="sb-lbl">Administración</div>
+      <div class="nav-item" onclick="showPage('obras')" id="ni-obras">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="8" width="6" height="7" rx="1"/><rect x="9" y="4" width="6" height="11" rx="1"/><path d="M4 8V5l4-4 4 4v1"/></svg>
+        Obras <span style="background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:8px;margin-left:4px;font-family:'Montserrat',sans-serif;letter-spacing:1px;">NUEVO</span>
+      </div>
+      <div class="nav-item" onclick="showPage('gestion')" id="ni-gestion">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="6" cy="4" r="2.5"/><path d="M1 13c0-2.5 2.2-4.5 5-4.5"/><path d="M10 9v4m-2-2h4"/></svg>
+        Alta de operarios
+      </div>
+      <div class="nav-item" onclick="showPage('asistente')" id="ni-asistente">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6 6.5c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.5-1.2 1.8L8 9v1"/><circle cx="8" cy="11.5" r=".5" fill="currentColor"/></svg>
+        Asistente IA
+      </div>
+      <div class="nav-item" onclick="showPage('consentimientos')" id="ni-consentimientos">📋 Consentimientos</div>
+      <div class="nav-item" onclick="showPage('informes')" id="ni-informes">
+        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/></svg>
+        Informes de jornada
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">JM</div>
+        <div>
+          <div class="sb-user-name">Luis Campaña</div>
+          <div class="sb-user-role">Encargado · Lance 2024</div>
+        </div>
+      </div>
+      <button onclick="sendResumenWA()" style="width:100%;margin-top:6px;padding:8px;background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:#25d366;font-size:10px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📱 Resumen a mi WhatsApp</button>
+      <button class="sb-logout" onclick="logout()">↩ Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Tablero</div>
+      <div class="topbar-right">
+        <div class="live-pill"><div class="live-dot"></div>EN VIVO</div>
+        <div id="fb-live-badge" style="font-size:10px;color:var(--green);font-weight:600;display:none;"></div>
+        <div><div class="tb-clock" id="clock">--:--:--</div><div class="tb-date" id="tb-date"></div></div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);">
+        <div class="kpi-card kc-blue" onclick="showPage('operarios')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Operarios</span><div class="kpi-icon"><svg fill="none" stroke="var(--blue2)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></div></div>
+          <div class="kpi-val" id="kv-total">0</div>
+          <div class="kpi-sub">Plantilla completa</div>
+        </div>
+        <div class="kpi-card kc-green" onclick="showPage('jornada')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">En obra · GPS</span><div class="kpi-icon"><svg fill="none" stroke="var(--green)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z"/></svg></div></div>
+          <div class="kpi-val" id="kv-in">0</div>
+          <div class="kpi-sub">Fichados hoy</div>
+        </div>
+        <div class="kpi-card kc-red" onclick="showPage('alertas')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Alertas</span><div class="kpi-icon"><svg fill="none" stroke="var(--red)" stroke-width="1.8" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg></div></div>
+          <div class="kpi-val" id="kv-alerts">0</div>
+          <div class="kpi-sub">Requieren atención</div>
+        </div>
+        <div class="kpi-card kc-purple" onclick="showPage('extras')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Horas extras</span><div class="kpi-icon" style="background:var(--purple-l)"><svg fill="none" stroke="var(--purple)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg></div></div>
+          <div class="kpi-val" id="kv-extras">0</div>
+          <div class="kpi-sub">Horas extra hoy</div>
+        </div>
+        <div class="kpi-card kc-orange" onclick="showPage('obras')" style="cursor:pointer">
+          <div class="kpi-header"><span class="kpi-label">Obras activas</span><div class="kpi-icon"><svg fill="none" stroke="var(--orange)" stroke-width="1.8" viewBox="0 0 16 16"><rect x="1" y="8" width="6" height="7" rx="1"/><rect x="9" y="4" width="6" height="11" rx="1"/><path d="M4 8V5l4-4 4 4v1"/></svg></div></div>
+          <div class="kpi-val" id="kv-obras">0</div>
+          <div class="kpi-sub">En curso ahora</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+        <button onclick="showPage('jornada')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📅</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">JORNADA</div></button>
+        <button onclick="showPage('operarios')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">👷</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">OPERARIOS</div></button>
+        <button onclick="showPage('tareas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📋</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">TAREAS</div></button>
+        <button onclick="showPage('alertas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🚨</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALERTAS</div></button>
+        <button onclick="showPage('gestion')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">➕</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALTA</div></button>
+        <button onclick="showPage('horas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">⏱</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">HORAS</div></button>
+        <button onclick="showPage('whatsapp')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='#25d366'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">💬</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">WHATSAPP</div></button>
+        <button onclick="showPage('asistente')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🤖</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ASISTENTE</div></button>
+      </div>
+      <div class="jornada-info">
+        <div class="jor-badge"><strong>Lun – Jue</strong>08:00–13:00 · 14:00–18:00 (9h)</div>
+        <div class="jor-badge"><strong>Viernes</strong>08:00–14:00 (6h)</div>
+        <div class="jor-badge" style="background:var(--purple-l);border-color:rgba(124,58,237,.2);color:var(--purple)"><strong>Semana</strong>42h totales</div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🚨 Alertas del día</div><button onclick="showPage('alertas')" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">Ver todas →</button></div>
+        <div id="dashboard-alerts-preview" style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">✅ Sin alertas activas hoy.</div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">🏗️ Obras activas</div>
+          <button onclick="showPage('obras')" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">Gestionar →</button>
+        </div>
+        <div id="dashboard-obras-list" style="padding:16px 20px;">
+          <div style="text-align:center;color:var(--text3);font-size:12px;">⏳ Cargando obras...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESUMEN JORNADA -->
+    <div class="page" id="page-jornada">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">📅 Resumen de jornada — Hoy</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <button onclick="mostrarFichajeManual()" style="font-size:10px;background:var(--orange-l);border:1px solid rgba(232,98,26,.3);color:var(--orange);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">✏️ Fichaje manual</button>
+            <button onclick="showPage('informes')" style="font-size:10px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">🖨️ Informe</button>
+            <span id="jornada-date" style="font-size:10px;color:var(--text3)"></span></div></div>
+        <div id="fichaje-manual-panel" style="display:none;background:var(--orange-l);border:1px solid rgba(232,98,26,.25);border-radius:12px;padding:16px;margin-bottom:16px;">
+          <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--orange);margin-bottom:12px;">✏️ FICHAJE MANUAL — Añadir/modificar hora</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end;">
+            <div>
+              <label class="form-lbl">Operario</label>
+              <select class="form-ctrl" id="fm-worker" style="border-color:rgba(232,98,26,.3);"></select>
+            </div>
+            <div>
+              <label class="form-lbl">Tipo</label>
+              <select class="form-ctrl" id="fm-tipo" style="border-color:rgba(232,98,26,.3);">
+                <option value="entrada">✅ Entrada</option>
+                <option value="salida">🔴 Salida</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-lbl">Hora</label>
+              <input class="form-ctrl" id="fm-hora" type="time" style="border-color:rgba(232,98,26,.3);">
+            </div>
+            <div>
+              <label class="form-lbl">Obra</label>
+              <select class="form-ctrl" id="fm-obra" style="border-color:rgba(232,98,26,.3);">
+                <option value="">— Obra actual —</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-lbl">Nota</label>
+              <input class="form-ctrl" id="fm-nota" type="text" placeholder="Médico, transporte..." style="border-color:rgba(232,98,26,.3);">
+            </div>
+            <div>
+              <button onclick="guardarFichajeManual()" style="padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Guardar</button>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:10px;color:var(--text3);">ℹ️ El fichaje manual sobreescribe el fichaje del operario en Firebase para hoy.</div>
+        </div>
+        <table class="jornada-table">
+          <thead><tr><th>Operario</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Zona</th><th>Estado</th></tr></thead>
+          <tbody id="jornada-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OPERARIOS -->
+    <div class="page" id="page-operarios">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">👷 Operarios registrados</div><span id="op-count" style="font-size:10px;color:var(--text3)"></span></div>
+        <div style="padding:16px 20px 0;">
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+            <input class="search-inp" id="op-search" placeholder="Buscar por nombre, DNI o NIE..." oninput="renderWorkers()">
+          </div>
+        </div>
+        <table class="wtbl">
+          <thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Zona GPS</th><th>Acción</th></tr></thead>
+          <tbody id="op-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="page" id="page-alertas">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">Centro de alertas</div><span id="alertas-hdr-status" style="font-size:10px;color:var(--green);font-weight:700">✅ Sin alertas activas</span></div>
+        <div id="alerts-list">
+          <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">✅ No hay alertas activas hoy.<br><br><span style="font-size:11px;">Las alertas aparecerán cuando un operario fiche fuera de su zona de obra.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HORAS EXTRAS -->
+    <div class="page" id="page-extras">
+      <div class="row-3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">➕ Registrar horas extras</div></div>
+          <div class="card-body">
+            <div class="extra-form">
+              <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="ex-worker" style="border-color:rgba(124,58,237,.3);"></select></div>
+              <div class="form-row">
+                <div class="form-g"><label class="form-lbl">Hora inicio</label><input class="form-ctrl" id="ex-start" type="time" style="border-color:rgba(124,58,237,.3);"></div>
+                <div class="form-g"><label class="form-lbl">Hora fin</label><input class="form-ctrl" id="ex-end" type="time" style="border-color:rgba(124,58,237,.3);"></div>
+              </div>
+              <div class="form-g"><label class="form-lbl">Motivo</label><input class="form-ctrl" id="ex-reason" type="text" placeholder="Ej: Acabar tabiquería" style="border-color:rgba(124,58,237,.3);"></div>
+            </div>
+            <button class="btn-primary" style="background:var(--purple);" onclick="addExtra()">+ Registrar horas extras</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-hdr"><div class="card-title">📋 Horas extras hoy</div></div><div id="extras-list"><div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin horas extras hoy.</div></div></div>
+      </div>
+    </div>
+
+    <!-- HORAS TRABAJADAS -->
+    <div class="page" id="page-horas">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hdr">
+          <div class="card-title">⏱ Horas trabajadas</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="horas-periodo" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderHours()">
+              <option value="hoy">Hoy</option>
+              <option value="semana">Esta semana</option>
+              <option value="mes" selected>Este mes</option>
+            </select>
+            <button onclick="renderHours()" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;">🔄 Actualizar</button>
+            <button onclick="showPage('informes')" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;font-weight:700;color:var(--blue2);">🖨️ Informe</button>
+          </div>
+        </div>
+        <div id="horas-resumen" style="display:flex;gap:10px;padding:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);"></div>
+        <div id="hours-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📅 Desglose por días</div>
+        </div>
+        <div id="horas-dias-list" style="max-height:400px;overflow-y:auto;"></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-hdr">
+          <div class="card-title">📆 Control de asistencia mensual</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="cal-modo" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderCalendario()">
+              <option value="semana">📅 Esta semana</option>
+              <option value="mes">🗓️ Mes completo</option>
+            </select>
+            <select id="cal-mes" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderCalendario()"></select>
+            <select id="cal-operario" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderCalendario()">
+              <option value="todos">👷 Todos</option>
+            </select>
+            <button onclick="renderCalendario()" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;">🔄</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;padding:10px 16px;flex-wrap:wrap;font-size:10px;color:var(--text3);">
+          <span>🟢 Completo</span>
+          <span>🟡 Parcial (solo entrada o salida)</span>
+          <span>🔴 No fichó</span>
+          <span>⚪ Fin de semana</span>
+          <span>🔵 Hoy</span>
+        </div>
+        <div id="cal-container" style="padding:0 16px 16px;overflow-x:auto;"></div>
+      </div>
+    </div>
+
+    <!-- TAREAS -->
+    <div class="page" id="page-tareas">
+      <div class="row-2-eq">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">📤 Enviar tarea</div></div>
+          <div class="card-body">
+            <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="task-to"><option value="all">Todos los operarios</option></select></div>
+            <div class="form-g"><label class="form-lbl">Prioridad</label><select class="form-ctrl" id="task-prio"><option>🟡 Normal</option><option>🔴 Urgente</option><option>🔵 Informativa</option></select></div>
+            <div class="form-g"><label class="form-lbl">Descripción</label><textarea class="form-ctrl" id="task-msg" placeholder="Describe el trabajo a realizar..."></textarea></div>
+            <button class="btn-primary" onclick="sendTask()">Enviar tarea →</button>
+          </div>
+        </div>
+        <div class="card"><div class="card-hdr"><div class="card-title">Tareas enviadas</div><button onclick="borrarTodasTareas()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todas</button></div><div id="task-log" style="max-height:420px;overflow-y:auto;"></div></div>
+      </div>
+    </div>
+
+    <!-- WHATSAPP -->
+    <div class="page" id="page-whatsapp">
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">💬 Mensajes WhatsApp</div></div>
+        <div id="wp-log"></div>
+      </div>
+    </div>
+
+    <!-- OBRAS -->
+    <div class="page" id="page-obras">
+      <div class="row-2">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title" id="obra-form-title">🏗️ Nueva obra</div>
+            <button onclick="resetObraForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">✕ Limpiar</button>
+          </div>
+          <div class="card-body">
+            <input type="hidden" id="obra-edit-id">
+            <div class="form-g">
+              <label class="form-lbl">Nombre de la obra</label>
+              <input class="form-ctrl" id="obra-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">Cliente / Empresa</label>
+              <input class="form-ctrl" id="obra-cliente" type="text" oninput="capitalizarCampo(this)" placeholder="">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">Descripción / Referencia</label>
+              <input class="form-ctrl" id="obra-direccion" type="text" placeholder="">
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">📍 Coordenadas GPS <span style="font-weight:400;color:var(--text3)">(copia desde Google Maps)</span></label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input class="form-ctrl" id="obra-coords" type="text" placeholder="37.3201432, -5.4067291" oninput="parsearCoordsObra(this.value)" style="flex:1;font-family:'Montserrat',sans-serif;letter-spacing:0.5px;">
+                <button type="button" onclick="abrirGoogleMaps()" style="padding:10px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:11px;white-space:nowrap;">🌍 Maps</button>
+              </div>
+              <div id="geo-obra-result" style="font-size:10px;margin-top:5px;display:none;"></div>
+              <div style="font-size:10px;color:var(--text3);margin-top:4px;">💡 En Google Maps: manten pulsado en el punto de la obra → copia las coordenadas → pégalas aquí</div>
+            </div>
+            <div class="form-row">
+              <div class="form-g">
+                <label class="form-lbl">Radio zona (metros)</label>
+                <input class="form-ctrl" id="obra-radio" type="number" value="500" min="100" max="2000" placeholder="500">
+              </div>
+              <div class="form-g">
+                <label class="form-lbl">Estado</label>
+                <select class="form-ctrl" id="obra-estado">
+                  <option value="activa">🟢 Activa</option>
+                  <option value="pausada">🟡 Pausada</option>
+                  <option value="terminada">🔴 Terminada</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="saveObra()" id="obra-btn">+ Crear obra</button>
+            <button class="btn-secondary" onclick="resetObraForm()">Cancelar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">🏗️ Obras registradas</div>
+            <span id="obras-count" style="font-size:10px;color:var(--text3)"></span>
+          </div>
+          <div id="obras-list" style="max-height:600px;overflow-y:auto;">
+            <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin obras registradas aún.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALTA OPERARIOS -->
+    <div class="page" id="page-gestion">
+      <div class="row-3">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title" id="gestion-title">➕ Alta de operario</div><button onclick="resetForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;font-weight:600;">✕ Limpiar</button></div>
+          <div class="card-body">
+            <input type="hidden" id="edit-id">
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">Nombre</label><input class="form-ctrl" id="g-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Nombre"></div>
+              <div class="form-g"><label class="form-lbl">Apellidos</label><input class="form-ctrl" id="g-apellidos" type="text" oninput="capitalizarCampo(this)" placeholder="Apellidos"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">DNI</label><input class="form-ctrl" id="g-dni" type="text" placeholder="12345678A" maxlength="9"></div>
+              <div class="form-g"><label class="form-lbl">NIE</label><input class="form-ctrl" id="g-nie" type="text" placeholder="X1234567A" maxlength="9"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
+              <div class="form-g">
+                <label class="form-lbl">Obra asignada</label>
+                <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
+                  <option value="">— Sin obra asignada —</option>
+                </select>
+                <input type="hidden" id="g-obra">
+                <div id="g-obra-info" style="font-size:10px;color:var(--blue2);margin-top:4px;display:none;"></div>
+              </div>
+            </div>
+            <div class="form-g">
+                <label class="form-lbl">🌍 Idioma del operario</label>
+                <select class="form-ctrl" id="g-idioma">
+                  <option value="es">🇪🇸 Español</option>
+                  <option value="ca">🏴 Català</option>
+                  <option value="ro">🇷🇴 Română</option>
+                  <option value="ar">🇲🇦 العربية</option>
+                  <option value="fr">🇫🇷 Français</option>
+                  <option value="en">🇬🇧 English</option>
+                </select>
+              </div>
+            <div style="background:var(--blue-pale);border:1px solid var(--border2);border-radius:10px;padding:12px;margin-bottom:8px;">
+              <div style="font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--blue2);margin-bottom:10px;">⏰ Horario personal de fichaje</div>
+              <div class="form-row">
+                <div class="form-g">
+                  <label class="form-lbl">Hora entrada habitual</label>
+                  <input class="form-ctrl" id="g-hora-entrada" type="time" value="07:00">
+                </div>
+                <div class="form-g">
+                  <label class="form-lbl">Hora salida habitual</label>
+                  <input class="form-ctrl" id="g-hora-salida" type="time" value="18:00">
+                </div>
+              </div>
+              <div class="form-g">
+                <label class="form-lbl">Días laborables</label>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;"><input type="checkbox" id="g-dia-1" checked> L</label>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;"><input type="checkbox" id="g-dia-2" checked> M</label>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;"><input type="checkbox" id="g-dia-3" checked> X</label>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;"><input type="checkbox" id="g-dia-4" checked> J</label>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;"><input type="checkbox" id="g-dia-5" checked> V</label>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;"><input type="checkbox" id="g-dia-6"> S</label>
+                  <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;"><input type="checkbox" id="g-dia-0"> D</label>
+                </div>
+              </div>
+              <div style="font-size:9px;color:var(--text3);margin-top:4px;">⚠️ 10 min después de la hora → alerta automática por WhatsApp al operario y a Luis</div>
+            </div>
+            <div class="form-row">
+              <div class="form-g">
+                <label class="form-lbl">PIN empresa</label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input class="form-ctrl" id="g-pin" type="text" maxlength="4" placeholder="4 dígitos" style="letter-spacing:4px;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;flex:1;">
+                  <button type="button" onclick="generarPinUnico()" style="padding:10px 12px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:14px;">🔄</button>
+                </div>
+              </div>
+              <div class="form-g"><label class="form-lbl">Estado</label><select class="form-ctrl" id="g-status"><option value="pending">⏳ Sin fichar</option><option value="in">✅ En obra</option></select></div>
+            </div>
+            <div class="form-g">
+              <label class="form-lbl">📱 Sistema operativo</label>
+              <div style="display:flex;gap:8px;">
+                <button type="button" id="so-android" onclick="selectSO('android')" style="flex:1;padding:12px;background:rgba(56,224,123,.08);border:2px solid var(--green);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--green);">🤖 Android</button>
+                <button type="button" id="so-iphone" onclick="selectSO('iphone')" style="flex:1;padding:12px;background:var(--card);border:2px solid var(--border);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--text3);">🍎 iPhone</button>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="saveWorker()" id="g-btn">+ Dar de alta</button>
+            <button class="btn-secondary" onclick="resetForm()">Cancelar</button>
+            <div id="wa-generado" style="display:none;margin-top:14px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:12px;padding:14px;">
+              <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--green);margin-bottom:8px;">✅ OPERARIO DADO DE ALTA</div>
+              <div id="wa-preview" style="font-size:11px;color:var(--text2);line-height:1.6;white-space:pre-wrap;background:white;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid var(--border);"></div>
+              <button onclick="sendWaAlta()" style="width:100%;padding:10px;background:#25d366;border:none;border-radius:8px;color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📱 ABRIR WHATSAPP Y ENVIAR</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-hdr"><div class="card-title">👷 Operarios dados de alta</div><span id="g-count" style="font-size:10px;color:var(--text3)"></span></div>
+            <div style="padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <div class="search-wrap" style="flex:1;min-width:140px;"><svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg><input class="search-inp" id="g-search" placeholder="Buscar..." oninput="renderGestionList()"></div>
+              <select id="g-filtro-estado" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderGestionList()">
+                <option value="activos">✅ Activos</option>
+                <option value="todos">👁 Todos</option>
+                <option value="inactivos">⏸ Inactivos</option>
+              </select>
+            </div>
+            <div id="gestion-list" style="max-height:500px;overflow-y:auto;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🔐 Tabla de PINs</div><button onclick="window.print()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🖨️ Imprimir</button></div>
+        <table class="wtbl"><thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Eliminar</th></tr></thead><tbody id="pin-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ASISTENTE IA -->
+    <div class="page" id="page-asistente">
+      <div style="max-width:700px;margin:0 auto;">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">🤖 Asistente IA</div></div>
+          <div style="padding:16px;max-height:420px;overflow-y:auto;" id="chat-messages">
+            <div style="background:var(--blue-light);border-radius:12px 12px 12px 0;padding:12px 16px;margin-bottom:10px;max-width:85%;font-size:13px;color:var(--text);">
+              👋 Hola Luis! Soy tu asistente de ObraControl GPS.<br><br>
+              Puedo ayudarte con:<br>
+              • <strong>¿Quién no ha fichado hoy?</strong><br>
+              • <strong>¿Quién fichó fuera de zona?</strong><br>
+              • <strong>Resumen del día</strong>
+            </div>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;">
+            <input class="form-ctrl" id="chat-input" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter') sendChat()" style="flex:1;">
+            <button onclick="sendChat()" style="padding:10px 16px;background:var(--blue2);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Enviar</button>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="quickChat('¿Quién no ha fichado hoy?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Quién no fichó?</button>
+            <button onclick="quickChat('¿Quién fichó fuera de zona?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Fuera de zona?</button>
+            <button onclick="quickChat('Resumen del día')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">Resumen</button>
+            <button onclick="sendResumenWA()" style="padding:6px 12px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:20px;font-size:11px;cursor:pointer;color:var(--green);font-weight:600;">📱 Enviar a mi WA</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="wp-overlay">
+  <div class="modal">
+    <div class="modal-hdr"><span style="font-size:24px">💬</span><div><div class="modal-title">ENVIAR WHATSAPP</div></div></div>
+    <div class="modal-body">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text3)">Para: <strong style="color:var(--text)" id="wp-name"></strong></div>
+      <label class="form-lbl">Mensaje</label>
+      <textarea class="form-ctrl" id="wp-ta" style="min-height:110px;"></textarea>
+      <div class="modal-foot"><button class="btn-cancel" onclick="closeWP()">Cancelar</button><button class="btn-send-wp" onclick="sendWP()">📱 Enviar</button></div>
+    </div>
+  </div>
+</div>
+
+    <!-- CONSENTIMIENTOS -->
+    <div class="page" id="page-consentimientos">
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📋 Registro de consentimientos RGPD</div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="cargarConsentimientos()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🔄 Actualizar</button>
+            <button onclick="generarConsentimientosDesdeOperarios()" style="font-size:10px;color:var(--green);background:none;border:none;cursor:pointer;font-weight:600;">🔧 Generar faltantes</button>
+            <button onclick="borrarTodosConsentimientos()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todos</button>
+          </div>
+        </div>
+        <table class="wtbl">
+          <thead><tr><th>Operario</th><th>DNI/NIE</th><th>Fecha</th><th>Hora</th><th>Idioma</th><th>RGPD</th><th>GPS</th><th>Acción</th></tr></thead>
+          <tbody id="consent-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- INFORMES DE JORNADA -->
+    <div class="page" id="page-informes">
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-hdr">
+          <div class="card-title">📄 Informes de jornada</div>
+          <div style="font-size:10px;color:var(--text3);">Cumplimiento RD 8/2019 — Registro de jornada</div>
+        </div>
+        <div class="card-body">
+          <!-- Controles -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:16px;">
+            <div>
+              <label class="form-lbl">Tipo de informe</label>
+              <select class="form-ctrl" id="inf-tipo" onchange="onChangeTipoInforme()">
+                <option value="diario">📅 Diario</option>
+                <option value="semanal">📆 Semanal</option>
+                <option value="mensual">🗓️ Mensual</option>
+              </select>
+            </div>
+            <div id="inf-ctrl-fecha">
+              <label class="form-lbl">Fecha</label>
+              <input class="form-ctrl" type="date" id="inf-fecha">
+            </div>
+            <div id="inf-ctrl-semana" style="display:none;">
+              <label class="form-lbl">Semana (lunes)</label>
+              <input class="form-ctrl" type="date" id="inf-semana-ini">
+            </div>
+            <div id="inf-ctrl-mes" style="display:none;">
+              <label class="form-lbl">Mes</label>
+              <input class="form-ctrl" type="month" id="inf-mes">
+            </div>
+            <div>
+              <label class="form-lbl">Operario</label>
+              <select class="form-ctrl" id="inf-operario">
+                <option value="todos">👷 Todos los operarios</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-primary" onclick="generarInforme()" style="white-space:nowrap;">🔍 Previsualizar</button>
+            </div>
+          </div>
+          <!-- Botones de exportación -->
+          <div style="display:flex;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;">
+            <button onclick="imprimirInforme()" style="padding:9px 16px;background:var(--blue2);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">🖨️ Imprimir / PDF digital</button>
+            <button onclick="descargarInformeHTML()" style="padding:9px 16px;background:var(--blue-light);color:var(--blue2);border:1px solid var(--border2);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">💾 Guardar HTML</button>
+            <span style="font-size:10px;color:var(--text3);align-self:center;">Desde el navegador: Imprimir → Guardar como PDF → listo para inspección</span>
+          </div>
+          <!-- Preview -->
+          <div id="inf-preview-wrap" style="display:none;">
+            <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Vista previa del informe</div>
+            <div id="inf-preview" style="border:1px solid var(--border);border-radius:8px;overflow:auto;background:#fff;max-height:600px;"></div>
+          </div>
+          <div id="inf-empty" style="padding:32px;text-align:center;color:var(--text3);font-size:12px;">Selecciona el tipo de informe, el período y pulsa Previsualizar.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
 function calcDist(lat1,lng1,lat2,lng2){
   const R=6371000;
   const dLat=(lat2-lat1)*Math.PI/180;
@@ -236,7 +869,7 @@ function loadWorkersFromFirebase(){
     Object.entries(data).forEach(([key,op])=>{
       if(!op||!op.nombre)return;
       const exists=WORKERS.find(w=>(w.dni&&w.dni.replace(/[^A-Z0-9]/gi,'').toUpperCase()===key.toUpperCase())||(w.nie&&w.nie.replace(/[^A-Z0-9]/gi,'').toUpperCase()===key.toUpperCase()));
-      if(!exists){WORKERS.push({id:1000+id,nombre:op.nombre||'',apellidos:op.apellidos||'',dni:op.dni||'',nie:op.nie||'',tel:op.tel||'',obra:op.obra||'',pin:op.pin||'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true});id++;}
+      if(!exists){WORKERS.push({id:1000+id,nombre:op.nombre||'',apellidos:op.apellidos||'',dni:op.dni||'',nie:op.nie||'',tel:op.tel||'',obra:op.obra||'',pin:op.pin||'----',status:'pending',arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,inactivo:op.inactivo===true,horaEntrada:op.horaEntrada||'07:00',horaSalida:op.horaSalida||'18:00',diasLaborables:op.diasLaborables||[1,2,3,4,5]});id++;}
     });
     const seen=new Set();
     WORKERS=WORKERS.filter(w=>{const d=(w.dni||w.nie||'').toUpperCase();if(!d)return true;if(seen.has(d))return false;seen.add(d);return true;});
@@ -248,7 +881,7 @@ function loadWorkersFromFirebase(){
 
 function fbSyncWorker(w,pinChanged=false){
   const doc=(w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(!doc)return;
-  const regData={nombre:w.nombre,apellidos:w.apellidos,dni:w.dni||'',nie:w.nie||'',pin:w.pin,obra:w.obra||'',tel:w.tel||'',activo:true,pin_reset:pinChanged};
+  const regData={nombre:w.nombre,apellidos:w.apellidos,dni:w.dni||'',nie:w.nie||'',pin:w.pin,obra:w.obra||'',tel:w.tel||'',activo:true,pin_reset:pinChanged,horaEntrada:w.horaEntrada||'07:00',horaSalida:w.horaSalida||'18:00',diasLaborables:w.diasLaborables||[1,2,3,4,5]};
   if(w.obra_lat&&w.obra_lng){regData.obra_lat=w.obra_lat;regData.obra_lng=w.obra_lng;}
   fetch(`${FB_URL}/operarios_registro/${doc}.json`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(regData)}).catch(()=>{});
 }
@@ -278,7 +911,7 @@ function loadFirebaseData(){
       const hoyStr2=new Date().toISOString().split('T')[0];
       const esDeFechaAnterior=op.fecha&&op.fecha!==hoyStr2;
       if(op.tipo==='entrada'){w.arrival=op.hora;w.dep=null;if(op.hora&&!esDeFechaAnterior){const[eh,em]=op.hora.split(':').map(Number);const now=new Date();const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);w.h=mins>0?redondearMediaHora(mins/60):0;}else if(esDeFechaAnterior){w.h=0;}}
-      else if(op.tipo==='salida'){w.dep=op.hora;const at=op.hora_entrada||w.arrival;if(at&&op.hora){w.arrival=at;const[eh,em]=at.split(':').map(Number);const[sh,sm]=op.hora.split(':').map(Number);const mins=(sh*60+sm)-(eh*60+em);w.h=mins>0?redondearMediaHora(mins/60):0;}}
+      else if(op.tipo==='salida'){w.dep=op.hora;if(esDeFechaAnterior){w.h=0;}else{const at=op.hora_entrada||w.arrival;if(at&&op.hora){w.arrival=at;const[eh,em]=at.split(':').map(Number);const[sh,sm]=op.hora.split(':').map(Number);const mins=(sh*60+sm)-(eh*60+em);w.h=mins>0?redondearMediaHora(mins/60):0;}}}
       if(op.ciudad) w.ciudad_gps=op.ciudad+(op.provincia?', '+op.provincia:'');
       // Coordenadas para botón Google Maps
       if(op.lat&&op.lng){w._lat=parseFloat(op.lat);w._lng=parseFloat(op.lng);}
@@ -366,14 +999,23 @@ function showPage(name){
   setTimeout(()=>{window.scrollTo(0,0);document.documentElement.scrollTop=0;},50);
   if(name==='operarios')renderWorkers();
   if(name==='jornada')renderJornada();
-  if(name==='horas')renderHours();
+  if(name==='horas'){
+    renderHours();
+    initCalendario();
+    // Esperar hasta que WORKERS tenga datos (máx 5 intentos)
+    let _calTry=0;
+    const _calWait=setInterval(()=>{
+      _calTry++;
+      if(WORKERS.length>0||_calTry>10){clearInterval(_calWait);initCalendario();renderCalendario();}
+    },500);
+  }
   if(name==='informes')initInformes();
   if(name==='tareas')renderTaskLog();
-  if(name==='gestion'){renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
+  if(name==='gestion'){if(!OBRAS||!OBRAS.length)cargarObras();renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
   if(name==='extras')updateExtraSelect();
   if(name==='consentimientos')cargarConsentimientos();
   if(name==='obras'){cargarObras();renderObrasList();}
-  if(name==='gestion'){renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
+  if(name==='gestion'){if(!OBRAS||!OBRAS.length)cargarObras();renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
   if(name==='jornada'){renderJornada();mostrarFichajeManual&&document.getElementById('fichaje-manual-panel')&&(document.getElementById('fichaje-manual-panel').style.display='none');}
 }
 
@@ -437,7 +1079,7 @@ function renderHours(){
   const periodo=(document.getElementById('horas-periodo')||{value:'hoy'}).value;
   // ✅ MEJORA 2: Horas por días + acumulado mensual desde Firebase/fichajes
   const hoy=new Date();
-  const hoyStr=hoy.toISOString().split('T')[0];
+  const hoyStr=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
   // Calcular rango de fechas según período
   let fechas=[];
   if(periodo==='hoy'){fechas=[hoyStr];}
@@ -575,6 +1217,7 @@ function renderGestionList(){
       <div style="flex:1;min-width:0">
         <div style="font-weight:600;font-size:13px;color:${nombreColor}">${w.nombre} ${w.apellidos}${badgeInactivo}</div>
         <div style="font-size:10px;color:var(--text3)">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''} · PIN: <strong style="color:var(--blue2)">${w.pin}</strong>${w.tel?' · 📱 '+w.tel:''}</div>
+
       </div>
       <div style="display:flex;gap:5px;flex-shrink:0">
         ${!inactivo?`<button onclick="sendWaOperario(${w.id})" style="padding:5px 8px;border-radius:6px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);color:var(--green);font-size:11px;cursor:pointer;">📱</button>`:''}
@@ -584,6 +1227,36 @@ function renderGestionList(){
       </div>
     </div>`;
   }).join('');
+}
+
+// Asignar obra directamente desde la lista de operarios
+function asignarObraDesdeLista(id){
+  const w=WORKERS.find(x=>x.id===id);if(!w)return;
+  if(!OBRAS||!OBRAS.length){showToast('⚠️ Primero crea obras en el apartado Obras','err');return;}
+  const activas=OBRAS.filter(o=>o.estado!=='terminada');
+  if(!activas.length){showToast('⚠️ No hay obras activas','err');return;}
+  const opciones=activas.map((o,i)=>`${i+1}. ${o.nombre}${o.cliente?' · '+o.cliente:''}${o.lat?' ✅':' ⚠️'}`).join('\n');
+  const actual=w.obra?`\nActual: ${w.obra}`:'';
+  const idx=prompt(`Asignar obra a ${w.nombre} ${w.apellidos}${actual}\n\n${opciones}\n\nEscribe el número (0 para quitar obra):`);
+  if(idx===null)return;
+  const num=parseInt(idx);
+  let obraSelec=null;
+  if(num===0){w.obra='';w.obra_lat=null;w.obra_lng=null;}
+  else if(num>=1&&num<=activas.length){
+    obraSelec=activas[num-1];
+    w.obra=obraSelec.nombre;
+    if(obraSelec.lat&&obraSelec.lng){w.obra_lat=parseFloat(obraSelec.lat);w.obra_lng=parseFloat(obraSelec.lng);}
+  } else {showToast('⚠️ Número no válido','err');return;}
+  // Guardar en Firebase
+  const docKey=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+  if(docKey){
+    const upd={obra:w.obra||'',obra_lat:w.obra_lat||null,obra_lng:w.obra_lng||null};
+    fetch(`${FB_URL}/operarios_registro/${docKey}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(upd)}).catch(()=>{});
+    // También actualizar en activos si está fichado
+    fetch(`${FB_URL}/operarios_activos/${docKey}.json`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(upd)}).catch(()=>{});
+  }
+  saveW();renderGestionList();
+  showToast(w.obra?`✅ ${w.nombre} → ${w.obra}`:`✅ ${w.nombre} sin obra`,'ok');
 }
 
 // ✅ MEJORA 3: Activar/Desactivar operario
@@ -609,7 +1282,17 @@ function toggleInactivoWorker(id, pausar){
 function renderPinTable(){
   const tb=document.getElementById('pin-tbody');if(!tb)return;
   const sb={in:'<span class="pill p-in">✅ En obra</span>',out:'<span class="pill p-out">🔴 Fuera</span>',pending:'<span class="pill p-pend">⏳ Sin fichar</span>'};
-  tb.innerHTML=WORKERS.map((w,i)=>`<tr><td style="font-weight:700;color:var(--text3)">${i+1}</td><td><div class="w-name">${w.nombre} ${w.apellidos}</div></td><td style="font-size:11px">${w.dni||w.nie||'—'}</td><td style="font-size:11px;color:var(--text3)">${w.obra||'—'}</td><td><span style="font-family:'Montserrat';font-size:20px;font-weight:900;color:var(--blue2);letter-spacing:4px">${w.pin}</span></td><td>${sb[w.status]||'—'}</td><td><button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️ Eliminar</button></td></tr>`).join('');
+  tb.innerHTML=WORKERS.map((w,i)=>{
+    return `<tr>
+      <td style="font-weight:700;color:var(--text3)">${i+1}</td>
+      <td><div class="w-name">${w.nombre} ${w.apellidos}</div></td>
+      <td style="font-size:11px">${w.dni||w.nie||'—'}</td>
+      <td style="font-size:11px;color:var(--text3)">${w.obra||'—'}</td>
+      <td><span style="font-family:'Montserrat';font-size:20px;font-weight:900;color:var(--blue2);letter-spacing:4px">${w.pin}</span></td>
+      <td>${sb[w.status]||'—'}</td>
+      <td><button class="btn-danger" onclick="deleteWorker(${w.id})">🗑️ Eliminar</button></td>
+    </tr>`;
+  }).join('');
 }
 
 function saveWorker(){
@@ -623,12 +1306,9 @@ function saveWorker(){
   const pin=document.getElementById('g-pin').value.trim();
   const status=document.getElementById('g-status').value;
   const idioma=document.getElementById('g-idioma')?.value||'es';
-  const horaEntrada=document.getElementById('g-hora-entrada')?.value||'08:00';
-  const horaSalida=document.getElementById('g-hora-salida')?.value||'17:00';
-  const dobleTurno=document.getElementById('g-doble-turno')?.checked||false;
-  const horaEntrada2=dobleTurno?(document.getElementById('g-hora-entrada2')?.value||''):'';
-  const horaSalida2=dobleTurno?(document.getElementById('g-hora-salida2')?.value||''):'';
-  const callmebot=document.getElementById('g-callmebot')?.value.trim()||'';
+  const horaEntrada=document.getElementById('g-hora-entrada')?.value||'07:00';
+  const horaSalida=document.getElementById('g-hora-salida')?.value||'15:00';
+  const diasLaborables=[0,1,2,3,4,5,6].filter(d=>document.getElementById('g-dia-'+d)?.checked);
   if(!nombre){showToast('Escribe el nombre','err');return;}
   if(!apellidos){showToast('Escribe los apellidos','err');return;}
   if(!dni&&!nie){showToast('Introduce DNI o NIE','err');return;}
@@ -641,8 +1321,9 @@ function saveWorker(){
     const w=WORKERS.find(w=>w.id==id);
     if(w){
       const pinChanged=w.pin!==pin;
+      w.horaEntrada=horaEntrada;w.horaSalida=horaSalida;w.diasLaborables=diasLaborables;
       const obraChanged=w.obra!==obra;
-      Object.assign(w,{nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,horaEntrada,horaSalida,dobleTurno,horaEntrada2,horaSalida2,callmebot});
+      Object.assign(w,{nombre,apellidos,dni,nie,tel,obra,pin,status,idioma});
       // Guardar coordenadas si se geocodificó nueva zona
       if(_obraLat&&_obraLng){w.obra_lat=_obraLat;w.obra_lng=_obraLng;_obraLat=null;_obraLng=null;}
       else if(obraChanged){w.obra_lat=null;w.obra_lng=null;}
@@ -678,8 +1359,7 @@ function saveWorker(){
   } else {
     // ── NUEVO OPERARIO ──
     const ni=Math.max(0,...WORKERS.map(w=>w.id))+1;
-    const nw={id:ni,nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,
-              horaEntrada,horaSalida,dobleTurno,horaEntrada2,horaSalida2,callmebot,
+    const nw={id:ni,nombre,apellidos,dni,nie,tel,obra,pin,status,idioma,horaEntrada,horaSalida,diasLaborables,
               arrival:null,dep:null,h:0,extras:0,en_zona:null,dist_obra:null,
               obra_lat:_obraLat||null,obra_lng:_obraLng||null};
     _obraLat=null;_obraLng=null;
@@ -725,13 +1405,11 @@ function editWorker(id){
   document.getElementById('g-pin').value=w.pin;
   document.getElementById('g-status').value=w.status;
   const idEl=document.getElementById('g-idioma');if(idEl&&w.idioma)idEl.value=w.idioma;
-  // Cargar horario personalizado
-  const heEl=document.getElementById('g-hora-entrada');if(heEl)heEl.value=w.horaEntrada||'08:00';
-  const hsEl=document.getElementById('g-hora-salida');if(hsEl)hsEl.value=w.horaSalida||'17:00';
-  const dtEl=document.getElementById('g-doble-turno');
-  if(dtEl){dtEl.checked=w.dobleTurno||false;document.getElementById('g-turno-tarde-row').style.display=w.dobleTurno?'flex':'none';}
-  const he2El=document.getElementById('g-hora-entrada2');if(he2El)he2El.value=w.horaEntrada2||'';
-  const hs2El=document.getElementById('g-hora-salida2');if(hs2El)hs2El.value=w.horaSalida2||'';
+  // Cargar horario personal
+  if(document.getElementById('g-hora-entrada'))document.getElementById('g-hora-entrada').value=w.horaEntrada||'07:00';
+  if(document.getElementById('g-hora-salida'))document.getElementById('g-hora-salida').value=w.horaSalida||'18:00';
+  const dias=w.diasLaborables||[1,2,3,4,5];
+  [0,1,2,3,4,5,6].forEach(d=>{const el=document.getElementById('g-dia-'+d);if(el)el.checked=dias.includes(d);});
   const btnG=document.getElementById('btn-geo');if(btnG)btnG.textContent=w.obra_lat?'✅ OK':'📍 Zona';
   document.getElementById('g-btn').textContent='💾 Guardar cambios';
   document.getElementById('gestion-title').textContent='✏️ Editar operario';
@@ -1220,7 +1898,9 @@ function renderJornada(){
         ?`<span class="pill p-out">⚠️ ${Math.round(w.dist_obra||0)}m${ciudad?' · '+ciudad:''}</span>`
         :w.en_zona===false
           ?`<span class="pill p-pend" title="Zona no definida">📍 ${ciudad||'—'}</span>`
-          :'<span class="pill p-pend">—</span>';
+          :ciudad
+            ?`<span class="pill p-pend">📍 ${ciudad}</span>`
+            :'<span class="pill p-pend" title="Sin coordenadas de obra configuradas">—</span>';
     let estadoLabel;
     if(w.status==='pending')estadoLabel='<span style="font-size:10px;color:var(--red);font-weight:600">Sin fichar</span>';
     else if(w.status==='in')estadoLabel='<span style="font-size:10px;color:var(--green);font-weight:600">En obra</span>';
@@ -1272,13 +1952,39 @@ let _obraFormLat = null, _obraFormLng = null;
 
 function cargarObras(){
   fetch(`${FB_URL}/obras.json`).then(r=>r.json()).then(data=>{
-    if(!data){OBRAS=[];renderObrasList();return;}
+    if(!data){OBRAS=[];renderObrasList();renderDashboardObras();return;}
     OBRAS=Object.entries(data).map(([id,o])=>({id,...o}));
     OBRAS.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
     renderObrasList();
+    renderDashboardObras();
     updateObrasSelect();
     showToast(`✅ ${OBRAS.length} obras cargadas`,'ok');
-  }).catch(()=>{OBRAS=[];renderObrasList();});
+  }).catch(()=>{OBRAS=[];renderObrasList();renderDashboardObras();});
+}
+
+function renderDashboardObras(){
+  const el=document.getElementById('dashboard-obras-list');
+  if(!el)return;
+  const activas=OBRAS.filter(o=>o.estado==='activa');
+  if(!activas.length){
+    el.innerHTML='<div style="text-align:center;color:var(--text3);font-size:12px;padding:8px;">Sin obras activas. <button onclick="showPage('obras')" style="color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">+ Crear obra</button></div>';
+    return;
+  }
+  el.innerHTML=activas.map(o=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);" onclick="showPage('obras')" style="cursor:pointer">
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🏗️</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:13px;color:var(--text)">${o.nombre||'Sin nombre'}</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px;">${o.cliente||'—'} · ${o.direccion||'—'}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:10px;font-weight:700;color:var(--green);">🟢 Activa</div>
+        ${o.lat?'<div style="font-size:9px;color:var(--text3);">📍 GPS ✅</div>':'<div style="font-size:9px;color:var(--amber);">⚠️ Sin GPS</div>'}
+      </div>
+    </div>`).join('');
+  // Añadir KPI de obras al tablero
+  const kvObras=document.getElementById('kv-obras');
+  if(kvObras)kvObras.textContent=activas.length;
 }
 
 function renderObrasList(){
@@ -1505,184 +2211,86 @@ function asignarObraRapida(obraId){
 }
 
 // ══════════════════════════════════════
-// ALERTAS DE HORARIO — Sin fichar + WhatsApp automático
+// ALERTAS DE HORARIO — Sin fichar
 // ══════════════════════════════════════
 let _horarioAlertasGeneradas = {};
 
 function checkHorarioAlertas(){
-  const ahora = new Date();
-  const hoy = DAYS_CAP[ahora.getDay()];
-  if(hoy==='Sábado'||hoy==='Domingo') return;
+  const ahora=new Date();
+  const dowActual=ahora.getDay(); // 0=dom,1=lun...6=sab
+  const hh=ahora.getHours();
+  const mm=ahora.getMinutes();
+  const minActual=hh*60+mm;
+  const fechaHoy=`${ahora.getFullYear()}-${String(ahora.getMonth()+1).padStart(2,'0')}-${String(ahora.getDate()).padStart(2,'0')}`;
 
-  const hh = ahora.getHours();
-  const mm = ahora.getMinutes();
-  const minActual = hh * 60 + mm;
-  const fechaHoy = ahora.toISOString().split('T')[0];
+  // ✅ NUEVO: comprobar cada operario con su horario PERSONAL
+  WORKERS.filter(w=>!w.inactivo).forEach(w=>{
+    const diasLab=w.diasLaborables||[1,2,3,4,5];
+    if(!diasLab.includes(dowActual))return; // No es día laborable para este operario
 
-  WORKERS.filter(w => !w.inactivo).forEach(w => {
-    // Usar horario propio del operario, o el global como fallback
-    const jorGlobal = JORNADA[hoy];
-    const entradaMañana = w.horaEntrada || (jorGlobal ? jorGlobal.t1s : '08:00');
-    const salidaMañana  = w.horaSalida  || (jorGlobal ? (jorGlobal.t2e||jorGlobal.t1e) : '17:00');
+    const entrada=w.horaEntrada||'07:00';
+    const salida=w.horaSalida||'18:00';
+    const[hE,mE]=entrada.split(':').map(Number);
+    const[hS,mS]=salida.split(':').map(Number);
+    const minEntrada=hE*60+mE+10; // ✅ 10 minutos después
+    const minSalida=hS*60+mS+10;
 
-    // ── ALERTA ENTRADA MAÑANA (5 min después) ──
-    const [heH, heM] = entradaMañana.split(':').map(Number);
-    const minEntrada5 = heH * 60 + heM + 5;
-    const keyEnt = 'entrada_' + (w.dni||w.nie||w.id) + '_' + fechaHoy;
-
-    if(minActual >= minEntrada5 && w.status === 'pending' && !_horarioAlertasGeneradas[keyEnt]){
-      _horarioAlertasGeneradas[keyEnt] = true;
-      addHorarioAlerta(w, 'entrada', entradaMañana);
-      enviarWAAviso(w, 'entrada', entradaMañana);
+    // Alerta entrada
+    if(minActual>=minEntrada&&w.status==='pending'){
+      const key='entrada_'+(w.dni||w.nie||w.id)+'_'+fechaHoy;
+      if(!_horarioAlertasGeneradas[key]){
+        _horarioAlertasGeneradas[key]=true;
+        addHorarioAlerta(w,'entrada',entrada);
+        enviarAlertaWA(w,'entrada',entrada);
+      }
     }
-
-    // ── ALERTA SALIDA (5 min después) ──
-    const [hsH, hsM] = salidaMañana.split(':').map(Number);
-    const minSalida5 = hsH * 60 + hsM + 5;
-    const keySal = 'salida_' + (w.dni||w.nie||w.id) + '_' + fechaHoy;
-
-    if(minActual >= minSalida5 && w.status === 'in' && w.arrival && !w.dep && !_horarioAlertasGeneradas[keySal]){
-      _horarioAlertasGeneradas[keySal] = true;
-      addHorarioAlerta(w, 'salida', salidaMañana);
-      enviarWAAviso(w, 'salida', salidaMañana);
-    }
-
-    // ── TURNO TARDE (si aplica) ──
-    if(w.dobleTurno && w.horaEntrada2 && w.horaSalida2){
-      const [he2H, he2M] = w.horaEntrada2.split(':').map(Number);
-      const minEnt2 = he2H * 60 + he2M + 5;
-      const keyEnt2 = 'entrada2_' + (w.dni||w.nie||w.id) + '_' + fechaHoy;
-      if(minActual >= minEnt2 && w.status === 'pending' && !_horarioAlertasGeneradas[keyEnt2]){
-        _horarioAlertasGeneradas[keyEnt2] = true;
-        addHorarioAlerta(w, 'entrada', w.horaEntrada2);
-        enviarWAAviso(w, 'entrada', w.horaEntrada2);
+    // Alerta salida
+    if(minActual>=minSalida&&w.status==='in'&&w.arrival&&!w.dep){
+      const key='salida_'+(w.dni||w.nie||w.id)+'_'+fechaHoy;
+      if(!_horarioAlertasGeneradas[key]){
+        _horarioAlertasGeneradas[key]=true;
+        addHorarioAlerta(w,'salida',salida);
+        enviarAlertaWA(w,'salida',salida);
       }
     }
   });
 }
 
-// ── ENVÍO WHATSAPP AUTOMÁTICO VIA CALLMEBOT ──
-function enviarWAAviso(w, tipo, horaEsperada){
-  if(!w.tel) return;
+// ✅ NUEVO: Enviar WhatsApp al operario Y copia a Luis
+function enviarAlertaWA(w,tipo,horaEsperada){
+  const nombre=`${w.nombre} ${w.apellidos}`;
+  const icono=tipo==='entrada'?'⏰':'🔴';
+  const accion=tipo==='entrada'?'NO HA FICHADO ENTRADA':'NO HA FICHADO SALIDA';
+  const ahora=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  // Mensaje para el operario
+  const msgOp=encodeURIComponent(`${icono} *ALERTA FICHAJE*
 
-  const nombre = w.nombre + ' ' + w.apellidos;
-  const ahora = new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-  const obra = w.obra || 'la obra';
+Hola ${w.nombre}, son las ${ahora} y todavía no has fichado tu ${tipo==='entrada'?'ENTRADA':'SALIDA'}.
 
-  let msg = '';
-  if(tipo === 'entrada'){
-    msg = '🚨 AVISO OBRACONTROL GPS\n\n'
-        + '⏰ Son las ' + ahora + '\n\n'
-        + 'Hola ' + nombre + ',\n\n'
-        + '❗ Debías fichar entrada a las ' + horaEsperada + ' en ' + obra + ' y aún NO lo has hecho.\n\n'
-        + '📱 FICHA AHORA:\n'
-        + APP_URL + '\n\n'
-        + 'Si ya estás en la obra, abre la app y ficha inmediatamente.\n\n'
-        + '— Construcciones Lance 2024';
-  } else {
-    msg = '🔴 AVISO SALIDA — OBRACONTROL GPS\n\n'
-        + '⏰ Son las ' + ahora + '\n\n'
-        + 'Hola ' + nombre + ',\n\n'
-        + '❗ Debías fichar SALIDA a las ' + horaEsperada + ' y aún NO lo has hecho.\n\n'
-        + '📱 FICHA TU SALIDA:\n'
-        + APP_URL + '\n\n'
-        + '— Construcciones Lance 2024';
+Tu horario: ${w.horaEntrada||'07:00'} – ${w.horaSalida||'15:00'}
+
+Por favor ficha cuanto antes desde la app.
+
+_ObraControl GPS · Construcciones Lance 2024 SL_`);
+  // Mensaje para Luis (encargado)
+  const msgLuis=encodeURIComponent(`${icono} *ALERTA FICHAJE*
+
+👷 *${nombre}*
+${accion}
+
+Hora esperada: ${horaEsperada}
+Hora actual: ${ahora}
+
+_ObraControl GPS · Construcciones Lance 2024 SL_`);
+
+  // Abrir WA al operario si tiene teléfono
+  const telOp=(w.tel||'').replace(/[\s\-\(\)]/g,'').replace(/^\+/,'');
+  if(telOp){
+    const numOp=telOp.startsWith('34')?telOp:'34'+telOp;
+    setTimeout(()=>window.open(`https://wa.me/${numOp}?text=${msgOp}`,'_blank'),300);
   }
-
-  const tel = w.tel.replace(/[\s\-\(\)]/g,'');
-
-  // ── OPCIÓN A: CallMeBot (automático, sin intervención) ──
-  if(w.callmebot){
-    const urlCMB = 'https://api.callmebot.com/whatsapp.php'
-      + '?phone=' + encodeURIComponent(tel)
-      + '&text=' + encodeURIComponent(msg)
-      + '&apikey=' + w.callmebot;
-    fetch(urlCMB)
-      .then(r => r.text())
-      .then(resp => {
-        if(resp.includes('Message Sent') || resp.includes('OK')){
-          showToast('✅ WhatsApp automático enviado a ' + w.nombre, 'ok');
-        } else {
-          showToast('⚠️ Error CallMeBot — abriendo WA manual', 'warn');
-          abrirWAManual(tel, msg);
-        }
-      })
-      .catch(() => {
-        showToast('⚠️ Sin conexión CallMeBot — abriendo WA manual', 'warn');
-        abrirWAManual(tel, msg);
-      });
-  } else {
-    // ── OPCIÓN B: WhatsApp Web (fallback si no tiene CallMeBot) ──
-    abrirWAManual(tel, msg);
-    showToast('📱 WA manual — ' + w.nombre + ' no tiene CallMeBot activado', 'warn');
-  }
-
-  // Guardar aviso en Firebase
-  const docKey = (w.dni||w.nie||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-  if(docKey){
-    fetch(`${FB_URL}/avisos_horario/${docKey}_${Date.now()}.json`,{
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        tipo, horaEsperada,
-        horaAviso: ahora,
-        fecha: new Date().toISOString().split('T')[0],
-        timestamp: Date.now(),
-        metodo: w.callmebot ? 'callmebot' : 'manual'
-      })
-    }).catch(()=>{});
-  }
-}
-
-function abrirWAManual(tel, msg){
-  const telLimpio = tel.startsWith('+') ? tel.slice(1) : tel;
-  window.open('https://wa.me/' + telLimpio + '?text=' + encodeURIComponent(msg), '_blank');
-}
-
-
-
-function checkHorarioAlertas(){
-  const ahora = new Date();
-  const hoy = DAYS_CAP[ahora.getDay()];
-  const jor = JORNADA[hoy];
-  if(!jor) return; // Fin de semana — sin alertas
-
-  const hh = ahora.getHours();
-  const mm = ahora.getMinutes();
-  const minActual = hh * 60 + mm;
-
-  // Hora de entrada: 08:00 → alerta a partir de 08:15
-  const [h1e, m1e] = jor.t1s.split(':').map(Number);
-  const minEntrada = h1e * 60 + m1e + 15;
-
-  // Hora de salida: fin de jornada + 15min
-  const horaFinStr = jor.t2e || jor.t1e;
-  const [hFin, mFin] = horaFinStr.split(':').map(Number);
-  const minSalida = hFin * 60 + mFin + 15;
-
-  // Comprobar operarios sin fichar entrada
-  if(minActual >= minEntrada){
-    const sinEntrada = WORKERS.filter(w => w.status === 'pending');
-    sinEntrada.forEach(w => {
-      const key = 'entrada_' + (w.dni||w.nie||w.id) + '_' + ahora.toISOString().split('T')[0];
-      if(!_horarioAlertasGeneradas[key]){
-        _horarioAlertasGeneradas[key] = true;
-        addHorarioAlerta(w, 'entrada', jor.t1s);
-      }
-    });
-  }
-
-  // Comprobar operarios sin fichar salida
-  if(minActual >= minSalida){
-    const sinSalida = WORKERS.filter(w => w.status === 'in' && w.arrival && !w.dep);
-    sinSalida.forEach(w => {
-      const key = 'salida_' + (w.dni||w.nie||w.id) + '_' + ahora.toISOString().split('T')[0];
-      if(!_horarioAlertasGeneradas[key]){
-        _horarioAlertasGeneradas[key] = true;
-        addHorarioAlerta(w, 'salida', horaFinStr);
-      }
-    });
-  }
+  // Enviar copia a Luis siempre
+  setTimeout(()=>window.open(`https://wa.me/${ENCARGADO_WA.replace(/\D/g,'')}?text=${msgLuis}`,'_blank'),800);
 }
 
 function addHorarioAlerta(w, tipo, horaEsperada){
@@ -1745,6 +2353,262 @@ function fichajeManualDesdeAlerta(docKey, tipo){
 
 let toastTimer;
 function showToast(msg,tipo){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${tipo}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ══════════════════════════════════════════════════════════
+// MÓDULO CALENDARIO DE ASISTENCIA
+// ══════════════════════════════════════════════════════════
+
+function initCalendario(){
+  // Poblar selector de meses (últimos 6 meses)
+  const sel=document.getElementById('cal-mes');
+  if(!sel)return;
+  sel.innerHTML='';
+  const hoy=new Date();
+  const anioActual=hoy.getFullYear();
+  const mesActual=hoy.getMonth(); // 0-11
+  for(let i=0;i<6;i++){
+    // Calcular año y mes correctamente sin usar toISOString (evita desfase UTC)
+    let mesIdx=mesActual-i;
+    let anio=anioActual;
+    while(mesIdx<0){mesIdx+=12;anio--;}
+    const val=`${anio}-${String(mesIdx+1).padStart(2,'0')}`;
+    const d=new Date(anio,mesIdx,1);
+    const lbl=d.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+    sel.innerHTML+=`<option value="${val}"${i===0?' selected':''}>${lbl.charAt(0).toUpperCase()+lbl.slice(1)}</option>`;
+  }
+  // Default: semana si hay selector de modo
+  const modo=document.getElementById('cal-modo');
+  if(modo&&!modo.value)modo.value='semana';
+  // Poblar selector de operarios
+  const selOp=document.getElementById('cal-operario');
+  if(selOp){
+    selOp.innerHTML='<option value="todos">👷 Todos</option>';
+    WORKERS.filter(w=>!w.inactivo).forEach(w=>{
+      const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      selOp.innerHTML+=`<option value="${doc}">${w.nombre} ${w.apellidos}</option>`;
+    });
+  }
+}
+
+async function renderCalendario(){
+  const cont=document.getElementById('cal-container');
+  if(!cont)return;
+  const mes=document.getElementById('cal-mes')?.value;
+  const filtroOp=document.getElementById('cal-operario')?.value||'todos';
+  const modo=document.getElementById('cal-modo')?.value||'semana';
+  if(!mes)return;
+
+  cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;">⏳ Cargando...</div>';
+  if(!WORKERS||!WORKERS.length){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--amber);font-size:12px;">⚠️ Espera que carguen los operarios e inténtalo de nuevo.</div>';return;}
+
+  const[y,m]=mes.split('-').map(Number);
+  const diasMes=new Date(y,m,0).getDate();
+  const hoy=new Date();
+  const hoyStr=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}-${String(hoy.getDate()).padStart(2,'0')}`;
+
+  // Generar lista de fechas según modo
+  let fechas=[];
+  if(modo==='semana'){
+    // Semana actual (lunes a domingo) — usando fecha LOCAL para evitar desfase UTC
+    const dayOfWeek=hoy.getDay(); // 0=domingo, 1=lunes...6=sábado
+    const diffLunes=dayOfWeek===0?-6:1-dayOfWeek; // días hasta el lunes
+    const lunes=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()+diffLunes);
+    for(let i=0;i<7;i++){
+      const d=new Date(lunes.getFullYear(),lunes.getMonth(),lunes.getDate()+i);
+      const fechaStr=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      fechas.push({fecha:fechaStr,dia:d.getDate(),dow:d.getDay(),
+        label:d.toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'short'})});
+    }
+  } else {
+    // Mes completo
+    for(let i=1;i<=diasMes;i++){
+      const d=new Date(y,m-1,i);
+      // Usar fecha local directamente sin toISOString
+      const fechaStr=`${y}-${String(m).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+      fechas.push({fecha:fechaStr,dia:i,dow:d.getDay()});
+    }
+  }
+
+  // Cargar todos los fichajes del mes en paralelo
+  const resultados=await Promise.all(fechas.map(({fecha})=>
+    fetch(`${FB_URL}/fichajes/${fecha}.json`).then(r=>r.json()).then(d=>({fecha,data:d})).catch(()=>({fecha,data:null}))
+  ));
+
+  // Agrupar fichajes por fecha y operario
+  // ✅ Agrupa correctamente entradas y salidas aunque vengan de registros separados
+  const porFechaOp={}; // {fecha: {doc: {entrada,salida,nombre,manual}}}
+  resultados.forEach(({fecha,data})=>{
+    if(!data)return;
+    if(!porFechaOp[fecha])porFechaOp[fecha]={};
+    Object.values(data).forEach(f=>{
+      if(!f||!f.doc)return;
+      const doc=f.doc.replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      if(!doc)return;
+      if(filtroOp!=='todos'&&doc!==filtroOp)return;
+      if(!porFechaOp[fecha][doc])porFechaOp[fecha][doc]={entrada:null,salida:null,nombre:f.nombre||doc,manual:false};
+      const op=porFechaOp[fecha][doc];
+      // ✅ FIX: el registro de salida incluye hora_entrada — recuperarla
+      if(f.tipo==='entrada'){
+        if(!op.entrada)op.entrada=f.hora;
+      } else if(f.tipo==='salida'){
+        if(!op.salida)op.salida=f.hora;
+        // Si el registro de salida tiene hora_entrada guardada, usarla
+        if(!op.entrada&&f.hora_entrada)op.entrada=f.hora_entrada;
+      }
+      // También cubrir caso donde solo hay un registro con ambas horas
+      if(f.hora_entrada&&!op.entrada)op.entrada=f.hora_entrada;
+      if(f.manual)op.manual=true;
+      // Actualizar nombre si está disponible
+      if(f.nombre&&f.nombre.trim())op.nombre=f.nombre;
+    });
+  });
+
+  // Operarios a mostrar
+  const ops=filtroOp==='todos'
+    ?WORKERS.filter(w=>!w.inactivo)
+    :WORKERS.filter(w=>!w.inactivo&&(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase()===filtroOp);
+
+  if(!ops.length){cont.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:12px;">Sin operarios.</div>';return;}
+
+  // Construir HTML del calendario
+  const dias=['L','M','X','J','V','S','D'];
+  let html='';
+
+  if(modo==='semana'){
+    // ✅ VISTA SEMANA: tabla clara con todos los operarios y los 7 días
+    html+=`<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:11px;width:100%;">`;
+    html+=`<thead><tr><th style="padding:8px 12px;text-align:left;background:var(--bg);min-width:160px;font-weight:700;color:var(--text2);">Operario</th>`;
+    fechas.forEach(({fecha,label,dow})=>{
+      const esFS=dow===0||dow===6;
+      const esHoy=fecha===hoyStr;
+      const fmtLabel=label||fecha;
+      html+=`<th style="padding:8px 6px;text-align:center;background:${esHoy?'var(--blue2)':esFS?'var(--bg)':'var(--white)'};color:${esHoy?'#fff':esFS?'var(--text3)':'var(--text)'};min-width:80px;border-left:1px solid var(--border);font-weight:${esHoy?'700':'500'};font-size:10px;">${fmtLabel}</th>`;
+    });
+    html+=`<th style="padding:8px;background:var(--bg);text-align:center;font-size:10px;min-width:70px;">Resumen</th></tr></thead><tbody>`;
+
+    const ops2=WORKERS.filter(w=>!w.inactivo);
+    ops2.forEach(w=>{
+      const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      let diasOk=0,diasParc=0,diasNo=0,totalH=0;
+      html+=`<tr><td style="padding:8px 12px;font-weight:600;font-size:12px;border-bottom:1px solid var(--border);">${w.nombre}<br><span style="font-size:9px;color:var(--text3);font-weight:400">${w.apellidos}</span></td>`;
+      fechas.forEach(({fecha,dow})=>{
+        const esFS=dow===0||dow===6;
+        const esFutura=fecha>hoyStr;
+        const esHoy=fecha===hoyStr;
+        const fData=porFechaOp[fecha]?.[doc];
+        let bg,contenido,title;
+        if(esFS){bg='var(--bg)';contenido='';title='Fin de semana';}
+        else if(esFutura){bg='var(--white)';contenido='';title='';}
+        else if(!fData||(!fData.entrada&&!fData.salida)){
+          bg='#FEE2E2';diasNo++;
+          contenido='<div style="font-size:18px">🔴</div><div style="font-size:9px;color:#DC2626;margin-top:2px">Sin fichar</div>';
+          title='No fichó';
+        } else if(fData.entrada&&fData.salida){
+          bg='#DCFCE7';diasOk++;
+          const[eh,em]=fData.entrada.split(':').map(Number);
+          const[sh,sm]=fData.salida.split(':').map(Number);
+          const h=redondearMediaHora(Math.max(0,(sh*60+sm)-(eh*60+em))/60);
+          totalH+=h;
+          contenido=`<div style="font-size:18px">🟢</div><div style="font-size:9px;color:#16A34A;margin-top:1px">${fData.entrada}→${fData.salida}</div><div style="font-family:'Montserrat';font-weight:800;font-size:11px;color:#16A34A">${formatH(h)}h</div>`;
+          title=`Entrada: ${fData.entrada} · Salida: ${fData.salida} · ${formatH(h)}h${fData.manual?' (manual)':''}`;
+        } else {
+          bg='#FEF3C7';diasParc++;
+          const hora=fData.entrada||fData.salida;
+          const tipo=fData.entrada?'Entrada':'Salida';
+          contenido=`<div style="font-size:18px">🟡</div><div style="font-size:9px;color:#D97706;margin-top:1px">${tipo}: ${hora}</div>`;
+          title=`Parcial — ${tipo}: ${hora}`;
+        }
+        html+=`<td style="text-align:center;background:${bg};border:1px solid var(--border);padding:6px 4px;" title="${title}">${contenido}</td>`;
+      });
+      // Columna resumen
+      const trabajados=diasOk+diasParc;
+      html+=`<td style="padding:6px 8px;text-align:center;background:var(--bg);border-left:2px solid var(--border);font-size:10px;">
+        <div style="font-family:'Montserrat';font-weight:800;font-size:14px;color:var(--blue2)">${formatH(totalH)}h</div>
+        <div style="color:var(--green);font-size:9px">${diasOk}✅${diasParc?` ${diasParc}⚠️`:''}</div>
+        ${diasNo?`<div style="color:var(--red);font-size:9px">${diasNo}❌</div>`:''}
+      </td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+
+  } else if(filtroOp==='todos'){
+    // Vista resumen: tabla con operarios en filas y días en columnas
+    html+=`<div style="overflow-x:auto;"><table style="border-collapse:collapse;font-size:10px;min-width:100%;">`;
+    html+=`<thead><tr><th style="padding:6px 10px;text-align:left;background:var(--bg);position:sticky;left:0;z-index:2;min-width:140px;">Operario</th>`;
+    fechas.forEach(({dia,dow})=>{
+      const esFS=dow===0||dow===6;
+      const fechaStr=`${mes}-${String(dia).padStart(2,'0')}`;
+      const esHoy=fechaStr===hoyStr;
+      html+=`<th style="padding:4px 2px;text-align:center;background:${esHoy?'var(--blue2)':esFS?'var(--bg)':'var(--white)'};color:${esHoy?'#fff':esFS?'var(--text3)':'var(--text)'};min-width:32px;border-left:1px solid var(--border);">
+        <div style="font-weight:700">${dia}</div>
+        <div style="font-size:8px;opacity:.7">${dias[(dow+6)%7]}</div>
+      </th>`;
+    });
+    html+=`<th style="padding:6px 8px;background:var(--bg);text-align:center;">Total</th></tr></thead><tbody>`;
+
+    ops.forEach(w=>{
+      const doc=(w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      let diasCompletos=0,diasParciales=0,diasSinFichar=0;
+      html+=`<tr><td style="padding:6px 10px;font-weight:600;font-size:11px;border-bottom:1px solid var(--border);position:sticky;left:0;background:var(--white);z-index:1;">${w.nombre} ${w.apellidos.split(' ')[0]}</td>`;
+      fechas.forEach(({fecha,dow})=>{
+        const esFS=dow===0||dow===6;
+        const esFutura=fecha>hoyStr;
+        const esHoy=fecha===hoyStr;
+        const fData=porFechaOp[fecha]?.[doc];
+        let color,emoji,title;
+        if(esFS){color='var(--bg)';emoji='';title='Fin de semana';}
+        else if(esFutura){color='var(--white)';emoji='';title='';}
+        else if(!fData||(!fData.entrada&&!fData.salida)){
+          color='#FEE2E2';emoji='🔴';title='No fichó';diasSinFichar++;
+        } else if(fData.entrada&&fData.salida){
+          color='#DCFCE7';emoji='🟢';title=`${fData.entrada}→${fData.salida}`;diasCompletos++;
+        } else {
+          color='#FEF3C7';emoji='🟡';title=fData.entrada?`Entrada ${fData.entrada}`:`Salida ${fData.salida}`;diasParciales++;
+        }
+        html+=`<td style="text-align:center;background:${color};border:1px solid var(--border);border-collapse:collapse;padding:2px;" title="${title}">${emoji}</td>`;
+      });
+      const totalL=diasCompletos+diasParciales;
+      html+=`<td style="padding:4px 8px;text-align:center;font-family:'Montserrat';font-weight:700;font-size:11px;background:var(--bg);border-left:2px solid var(--border);">
+        <div style="color:var(--green)">${diasCompletos}✅</div>
+        ${diasParciales?`<div style="color:var(--amber)">${diasParciales}⚠️</div>`:''}
+        ${diasSinFichar?`<div style="color:var(--red)">${diasSinFichar}❌</div>`:''}
+      </td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  } else {
+    // Vista detalle de un operario: calendario visual por semanas
+    const doc=filtroOp;
+    const op=ops[0];
+    html+=`<div style="font-weight:700;font-size:13px;margin-bottom:12px;">${op?.nombre} ${op?.apellidos}</div>`;
+    // Cabecera días
+    html+=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;">`;
+    dias.forEach(d=>html+=`<div style="text-align:center;font-size:10px;font-weight:700;color:var(--text3);">${d}</div>`);
+    html+=`</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">`;
+    // Espacios vacíos antes del día 1
+    const primerDow=(new Date(y,m-1,1).getDay()+6)%7;
+    for(let i=0;i<primerDow;i++)html+=`<div></div>`;
+    // Días
+    fechas.forEach(({fecha,dia,dow})=>{
+      const esFS=dow===0||dow===6;
+      const esFutura=fecha>hoyStr;
+      const esHoy=fecha===hoyStr;
+      const fData=porFechaOp[fecha]?.[doc];
+      let bg,border,txt='',subtxt='';
+      if(esHoy){bg='var(--blue2)';border='var(--blue2)';txt='color:#fff';}
+      else if(esFS){bg='var(--bg)';border='var(--border)';}
+      else if(esFutura){bg='var(--white)';border='var(--border)';}
+      else if(!fData||(!fData.entrada&&!fData.salida)){bg='#FEE2E2';border='#FCA5A5';subtxt='No fichó';}
+      else if(fData.entrada&&fData.salida){bg='#DCFCE7';border='#86EFAC';subtxt=`${fData.entrada}-${fData.salida}`;}
+      else{bg='#FEF3C7';border='#FCD34D';subtxt=fData.entrada?`E:${fData.entrada}`:`S:${fData.salida}`;}
+      html+=`<div style="background:${bg};border:1px solid ${border};border-radius:6px;padding:4px 2px;text-align:center;min-height:44px;">
+        <div style="font-family:'Montserrat';font-weight:800;font-size:13px;${txt}">${dia}</div>
+        <div style="font-size:7px;color:${esHoy?'rgba(255,255,255,.8)':'var(--text3)'};line-height:1.2;margin-top:2px;">${subtxt}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  cont.innerHTML=html;
+}
 
 // ══════════════════════════════════════════════════════════
 // MÓDULO INFORMES DE JORNADA — RD 8/2019
@@ -2051,622 +2915,7 @@ function descargarInformeHTML(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nombre;a.click();
   showToast('✅ Archivo descargado','ok');
 }
+
 </script>
-
-
-<div id="login-screen">
-  <div class="login-card">
-    <svg class="login-logo-svg" viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg">
-      <rect x="148" y="20" width="104" height="140" fill="#1B4F8C"/>
-      <rect x="245" y="55" width="70" height="105" fill="none" stroke="#1B4F8C" stroke-width="8"/>
-      <rect x="85" y="75" width="63" height="85" fill="none" stroke="#1B4F8C" stroke-width="8"/>
-      <rect x="170" y="32" width="60" height="55" fill="none" stroke="#E8F1FB" stroke-width="6"/>
-      <line x1="60" y1="160" x2="340" y2="160" stroke="#1B4F8C" stroke-width="7"/>
-      <text x="200" y="190" text-anchor="middle" font-family="Montserrat,Arial" font-size="24" font-weight="400" fill="#1B4F8C" letter-spacing="2">construcciones</text>
-      <text x="200" y="232" text-anchor="middle" font-family="Montserrat,Arial" font-size="52" font-weight="900" fill="#1B4F8C" letter-spacing="4">LANCE</text>
-    </svg>
-    <div class="login-badge">🏢 PANEL DE OFICINA · ENCARGADO</div>
-    <div class="login-title">Acceso restringido</div>
-    <div class="login-sub">Introduce tu PIN de encargado para continuar</div>
-    <div class="pin-dots">
-      <div class="pdot" id="pd0"></div><div class="pdot" id="pd1"></div>
-      <div class="pdot" id="pd2"></div><div class="pdot" id="pd3"></div>
-    </div>
-    <div class="pin-pad" id="pin-pad">
-      <div class="pk" data-pk="1">1</div><div class="pk" data-pk="2">2</div><div class="pk" data-pk="3">3</div>
-      <div class="pk" data-pk="4">4</div><div class="pk" data-pk="5">5</div><div class="pk" data-pk="6">6</div>
-      <div class="pk" data-pk="7">7</div><div class="pk" data-pk="8">8</div><div class="pk" data-pk="9">9</div>
-      <div class="pk del" data-pk="del">⌫</div><div class="pk zero" data-pk="0">0</div>
-    </div>
-    <div class="pin-err" id="pin-err"></div>
-    <div class="pin-demo">PIN: <strong>0000</strong></div>
-  </div>
-</div>
-
-<div id="app">
-  <aside class="sidebar">
-    <div class="sb-logo">
-      <svg class="sb-logo-svg" viewBox="0 0 400 130" xmlns="http://www.w3.org/2000/svg">
-        <rect x="60" y="5" width="55" height="75" fill="white"/>
-        <rect x="110" y="20" width="38" height="60" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
-        <rect x="30" y="30" width="33" height="50" fill="none" stroke="white" stroke-width="5" opacity=".6"/>
-        <line x1="15" y1="80" x2="165" y2="80" stroke="white" stroke-width="5"/>
-        <text x="185" y="45" font-family="Montserrat,Arial" font-size="15" font-weight="400" fill="rgba(255,255,255,.65)" letter-spacing="2">construcciones</text>
-        <text x="185" y="80" font-family="Montserrat,Arial" font-size="34" font-weight="900" fill="white" letter-spacing="3">LANCE</text>
-        <text x="185" y="100" font-family="Montserrat,Arial" font-size="10" font-weight="500" fill="rgba(255,255,255,.4)" letter-spacing="2">2024 SL</text>
-      </svg>
-      <div class="sb-tagline">ObraControl GPS</div>
-    </div>
-    <nav class="sb-nav">
-      <div class="sb-lbl">Principal</div>
-      <div class="nav-item active" onclick="showPage('dashboard')" id="ni-dashboard">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
-        Tablero
-      </div>
-      <div class="nav-item" onclick="showPage('jornada')" id="ni-jornada">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 1v2m6-2v2M2 6h12"/></svg>
-        Resumen jornada
-      </div>
-      <div class="nav-item" onclick="showPage('operarios')" id="ni-operarios">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
-        Operarios
-      </div>
-      <div class="sb-lbl">Control</div>
-      <div class="nav-item" onclick="showPage('alertas')" id="ni-alertas">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg>
-        Alertas <span class="n-badge" id="alert-count" style="display:none">0</span>
-      </div>
-      <div class="nav-item" onclick="showPage('extras')" id="ni-extras">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
-        Horas extras
-      </div>
-      <div class="nav-item" onclick="showPage('horas')" id="ni-horas">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
-        Horas trabajadas
-      </div>
-      <div class="sb-lbl">Comunicación</div>
-      <div class="nav-item" onclick="showPage('tareas')" id="ni-tareas">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8l2 2 4-4"/></svg>
-        Tareas
-      </div>
-      <div class="nav-item" onclick="showPage('whatsapp')" id="ni-whatsapp">
-        <svg fill="currentColor" viewBox="0 0 16 16"><path d="M8 1C4.1 1 1 4.1 1 8c0 1.2.3 2.4.9 3.4L1 15l3.7-.9C5.7 14.7 6.8 15 8 15c3.9 0 7-3.1 7-7S11.9 1 8 1z"/></svg>
-        WhatsApp
-      </div>
-      <div class="sb-lbl">Administración</div>
-      <div class="nav-item" onclick="showPage('obras')" id="ni-obras">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="1" y="8" width="6" height="7" rx="1"/><rect x="9" y="4" width="6" height="11" rx="1"/><path d="M4 8V5l4-4 4 4v1"/></svg>
-        Obras <span style="background:var(--orange);color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:8px;margin-left:4px;font-family:'Montserrat',sans-serif;letter-spacing:1px;">NUEVO</span>
-      </div>
-      <div class="nav-item" onclick="showPage('gestion')" id="ni-gestion">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="6" cy="4" r="2.5"/><path d="M1 13c0-2.5 2.2-4.5 5-4.5"/><path d="M10 9v4m-2-2h4"/></svg>
-        Alta de operarios
-      </div>
-      <div class="nav-item" onclick="showPage('asistente')" id="ni-asistente">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6 6.5c0-1.1.9-2 2-2s2 .9 2 2c0 .8-.5 1.5-1.2 1.8L8 9v1"/><circle cx="8" cy="11.5" r=".5" fill="currentColor"/></svg>
-        Asistente IA
-      </div>
-      <div class="nav-item" onclick="showPage('consentimientos')" id="ni-consentimientos">📋 Consentimientos</div>
-      <div class="nav-item" onclick="showPage('informes')" id="ni-informes">
-        <svg fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 16 16"><rect x="3" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/></svg>
-        Informes de jornada
-      </div>
-    </nav>
-    <div class="sb-footer">
-      <div class="sb-user">
-        <div class="sb-avatar">JM</div>
-        <div>
-          <div class="sb-user-name">Luis Campaña</div>
-          <div class="sb-user-role">Encargado · Lance 2024</div>
-        </div>
-      </div>
-      <button onclick="sendResumenWA()" style="width:100%;margin-top:6px;padding:8px;background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);border-radius:8px;color:#25d366;font-size:10px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">📱 Resumen a mi WhatsApp</button>
-      <button class="sb-logout" onclick="logout()">↩ Cerrar sesión</button>
-    </div>
-  </aside>
-
-  <div class="main-content">
-    <div class="topbar">
-      <div class="topbar-title" id="topbar-title">Tablero</div>
-      <div class="topbar-right">
-        <div class="live-pill"><div class="live-dot"></div>EN VIVO</div>
-        <div id="fb-live-badge" style="font-size:10px;color:var(--green);font-weight:600;display:none;"></div>
-        <div><div class="tb-clock" id="clock">--:--:--</div><div class="tb-date" id="tb-date"></div></div>
-      </div>
-    </div>
-
-    <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
-      <div class="kpi-grid">
-        <div class="kpi-card kc-blue" onclick="showPage('operarios')" style="cursor:pointer">
-          <div class="kpi-header"><span class="kpi-label">Operarios</span><div class="kpi-icon"><svg fill="none" stroke="var(--blue2)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></div></div>
-          <div class="kpi-val" id="kv-total">0</div>
-          <div class="kpi-sub">Plantilla completa</div>
-        </div>
-        <div class="kpi-card kc-green" onclick="showPage('jornada')" style="cursor:pointer">
-          <div class="kpi-header"><span class="kpi-label">En obra · GPS</span><div class="kpi-icon"><svg fill="none" stroke="var(--green)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="6" r="2.5"/><path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z"/></svg></div></div>
-          <div class="kpi-val" id="kv-in">0</div>
-          <div class="kpi-sub">Fichados hoy</div>
-        </div>
-        <div class="kpi-card kc-red" onclick="showPage('alertas')" style="cursor:pointer">
-          <div class="kpi-header"><span class="kpi-label">Alertas</span><div class="kpi-icon"><svg fill="none" stroke="var(--red)" stroke-width="1.8" viewBox="0 0 16 16"><path d="M8 1C5.8 1 4 2.8 4 5v5l-1 1.5h10L12 10V5c0-2.2-1.8-4-4-4z"/><path d="M6.5 13.5a1.5 1.5 0 003 0"/></svg></div></div>
-          <div class="kpi-val" id="kv-alerts">0</div>
-          <div class="kpi-sub">Requieren atención</div>
-        </div>
-        <div class="kpi-card kc-purple" onclick="showPage('extras')" style="cursor:pointer">
-          <div class="kpi-header"><span class="kpi-label">Horas extras</span><div class="kpi-icon" style="background:var(--purple-l)"><svg fill="none" stroke="var(--purple)" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg></div></div>
-          <div class="kpi-val" id="kv-extras">0</div>
-          <div class="kpi-sub">Horas extra hoy</div>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
-        <button onclick="showPage('jornada')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📅</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">JORNADA</div></button>
-        <button onclick="showPage('operarios')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">👷</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">OPERARIOS</div></button>
-        <button onclick="showPage('tareas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">📋</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">TAREAS</div></button>
-        <button onclick="showPage('alertas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🚨</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALERTAS</div></button>
-        <button onclick="showPage('gestion')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">➕</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ALTA</div></button>
-        <button onclick="showPage('horas')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--blue2)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">⏱</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">HORAS</div></button>
-        <button onclick="showPage('whatsapp')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='#25d366'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">💬</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">WHATSAPP</div></button>
-        <button onclick="showPage('asistente')" style="padding:14px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .18s;box-shadow:var(--shadow);" onmouseover="this.style.borderColor='var(--orange)'" onmouseout="this.style.borderColor='var(--border)'"><div style="font-size:24px;margin-bottom:6px;">🤖</div><div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text);">ASISTENTE</div></button>
-      </div>
-      <div class="jornada-info">
-        <div class="jor-badge"><strong>Lun – Jue</strong>08:00–13:00 · 14:00–18:00 (9h)</div>
-        <div class="jor-badge"><strong>Viernes</strong>08:00–14:00 (6h)</div>
-        <div class="jor-badge" style="background:var(--purple-l);border-color:rgba(124,58,237,.2);color:var(--purple)"><strong>Semana</strong>42h totales</div>
-      </div>
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">🚨 Alertas del día</div><button onclick="showPage('alertas')" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">Ver todas →</button></div>
-        <div id="dashboard-alerts-preview" style="padding:24px;text-align:center;color:var(--text3);font-size:12px;">✅ Sin alertas activas hoy.</div>
-      </div>
-    </div>
-
-    <!-- RESUMEN JORNADA -->
-    <div class="page" id="page-jornada">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">📅 Resumen de jornada — Hoy</div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <button onclick="mostrarFichajeManual()" style="font-size:10px;background:var(--orange-l);border:1px solid rgba(232,98,26,.3);color:var(--orange);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">✏️ Fichaje manual</button>
-            <button onclick="showPage('informes')" style="font-size:10px;background:var(--blue-light);border:1px solid var(--border2);color:var(--blue2);padding:5px 10px;border-radius:7px;cursor:pointer;font-weight:700;font-family:'Montserrat',sans-serif;">🖨️ Informe</button>
-            <span id="jornada-date" style="font-size:10px;color:var(--text3)"></span></div></div>
-        <div id="fichaje-manual-panel" style="display:none;background:var(--orange-l);border:1px solid rgba(232,98,26,.25);border-radius:12px;padding:16px;margin-bottom:16px;">
-          <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--orange);margin-bottom:12px;">✏️ FICHAJE MANUAL — Añadir/modificar hora</div>
-          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end;">
-            <div>
-              <label class="form-lbl">Operario</label>
-              <select class="form-ctrl" id="fm-worker" style="border-color:rgba(232,98,26,.3);"></select>
-            </div>
-            <div>
-              <label class="form-lbl">Tipo</label>
-              <select class="form-ctrl" id="fm-tipo" style="border-color:rgba(232,98,26,.3);">
-                <option value="entrada">✅ Entrada</option>
-                <option value="salida">🔴 Salida</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-lbl">Hora</label>
-              <input class="form-ctrl" id="fm-hora" type="time" style="border-color:rgba(232,98,26,.3);">
-            </div>
-            <div>
-              <label class="form-lbl">Obra</label>
-              <select class="form-ctrl" id="fm-obra" style="border-color:rgba(232,98,26,.3);">
-                <option value="">— Obra actual —</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-lbl">Nota</label>
-              <input class="form-ctrl" id="fm-nota" type="text" placeholder="Médico, transporte..." style="border-color:rgba(232,98,26,.3);">
-            </div>
-            <div>
-              <button onclick="guardarFichajeManual()" style="padding:10px 16px;background:var(--orange);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;">Guardar</button>
-            </div>
-          </div>
-          <div style="margin-top:8px;font-size:10px;color:var(--text3);">ℹ️ El fichaje manual sobreescribe el fichaje del operario en Firebase para hoy.</div>
-        </div>
-        <table class="jornada-table">
-          <thead><tr><th>Operario</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Zona</th><th>Estado</th></tr></thead>
-          <tbody id="jornada-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- OPERARIOS -->
-    <div class="page" id="page-operarios">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">👷 Operarios registrados</div><span id="op-count" style="font-size:10px;color:var(--text3)"></span></div>
-        <div style="padding:16px 20px 0;">
-          <div class="search-wrap">
-            <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
-            <input class="search-inp" id="op-search" placeholder="Buscar por nombre, DNI o NIE..." oninput="renderWorkers()">
-          </div>
-        </div>
-        <table class="wtbl">
-          <thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Zona GPS</th><th>Acción</th></tr></thead>
-          <tbody id="op-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ALERTAS -->
-    <div class="page" id="page-alertas">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">Centro de alertas</div><span id="alertas-hdr-status" style="font-size:10px;color:var(--green);font-weight:700">✅ Sin alertas activas</span></div>
-        <div id="alerts-list">
-          <div style="padding:32px;text-align:center;color:var(--text3);font-size:13px;">✅ No hay alertas activas hoy.<br><br><span style="font-size:11px;">Las alertas aparecerán cuando un operario fiche fuera de su zona de obra.</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- HORAS EXTRAS -->
-    <div class="page" id="page-extras">
-      <div class="row-3">
-        <div class="card">
-          <div class="card-hdr"><div class="card-title">➕ Registrar horas extras</div></div>
-          <div class="card-body">
-            <div class="extra-form">
-              <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="ex-worker" style="border-color:rgba(124,58,237,.3);"></select></div>
-              <div class="form-row">
-                <div class="form-g"><label class="form-lbl">Hora inicio</label><input class="form-ctrl" id="ex-start" type="time" style="border-color:rgba(124,58,237,.3);"></div>
-                <div class="form-g"><label class="form-lbl">Hora fin</label><input class="form-ctrl" id="ex-end" type="time" style="border-color:rgba(124,58,237,.3);"></div>
-              </div>
-              <div class="form-g"><label class="form-lbl">Motivo</label><input class="form-ctrl" id="ex-reason" type="text" placeholder="Ej: Acabar tabiquería" style="border-color:rgba(124,58,237,.3);"></div>
-            </div>
-            <button class="btn-primary" style="background:var(--purple);" onclick="addExtra()">+ Registrar horas extras</button>
-          </div>
-        </div>
-        <div class="card"><div class="card-hdr"><div class="card-title">📋 Horas extras hoy</div></div><div id="extras-list"><div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin horas extras hoy.</div></div></div>
-      </div>
-    </div>
-
-    <!-- HORAS TRABAJADAS -->
-    <div class="page" id="page-horas">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-hdr">
-          <div class="card-title">⏱ Horas trabajadas</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <select id="horas-periodo" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderHours()">
-              <option value="hoy">Hoy</option>
-              <option value="semana">Esta semana</option>
-              <option value="mes" selected>Este mes</option>
-            </select>
-            <button onclick="renderHours()" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;">🔄 Actualizar</button>
-            <button onclick="showPage('informes')" style="padding:5px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:7px;font-size:11px;cursor:pointer;font-weight:700;color:var(--blue2);">🖨️ Informe</button>
-          </div>
-        </div>
-        <div id="horas-resumen" style="display:flex;gap:10px;padding:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--border);"></div>
-        <div id="hours-list"></div>
-      </div>
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">📅 Desglose por días</div></div>
-        <div id="horas-dias-list" style="max-height:400px;overflow-y:auto;"></div>
-      </div>
-    </div>
-
-    <!-- TAREAS -->
-    <div class="page" id="page-tareas">
-      <div class="row-2-eq">
-        <div class="card">
-          <div class="card-hdr"><div class="card-title">📤 Enviar tarea</div></div>
-          <div class="card-body">
-            <div class="form-g"><label class="form-lbl">Operario</label><select class="form-ctrl" id="task-to"><option value="all">Todos los operarios</option></select></div>
-            <div class="form-g"><label class="form-lbl">Prioridad</label><select class="form-ctrl" id="task-prio"><option>🟡 Normal</option><option>🔴 Urgente</option><option>🔵 Informativa</option></select></div>
-            <div class="form-g"><label class="form-lbl">Descripción</label><textarea class="form-ctrl" id="task-msg" placeholder="Describe el trabajo a realizar..."></textarea></div>
-            <button class="btn-primary" onclick="sendTask()">Enviar tarea →</button>
-          </div>
-        </div>
-        <div class="card"><div class="card-hdr"><div class="card-title">Tareas enviadas</div><button onclick="borrarTodasTareas()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todas</button></div><div id="task-log" style="max-height:420px;overflow-y:auto;"></div></div>
-      </div>
-    </div>
-
-    <!-- WHATSAPP -->
-    <div class="page" id="page-whatsapp">
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">💬 Mensajes WhatsApp</div></div>
-        <div id="wp-log"></div>
-      </div>
-    </div>
-
-    <!-- OBRAS -->
-    <div class="page" id="page-obras">
-      <div class="row-2">
-        <div class="card">
-          <div class="card-hdr">
-            <div class="card-title" id="obra-form-title">🏗️ Nueva obra</div>
-            <button onclick="resetObraForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;">✕ Limpiar</button>
-          </div>
-          <div class="card-body">
-            <input type="hidden" id="obra-edit-id">
-            <div class="form-g">
-              <label class="form-lbl">Nombre de la obra</label>
-              <input class="form-ctrl" id="obra-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Nave Industrial Almacelles">
-            </div>
-            <div class="form-g">
-              <label class="form-lbl">Cliente / Empresa</label>
-              <input class="form-ctrl" id="obra-cliente" type="text" oninput="capitalizarCampo(this)" placeholder="Ej: Excavaciones Barroso SL">
-            </div>
-            <div class="form-g">
-              <label class="form-lbl">Descripción / Referencia</label>
-              <input class="form-ctrl" id="obra-direccion" type="text" placeholder="Ej: Nave Polígono Industrial, Almacelles">
-            </div>
-            <div class="form-g">
-              <label class="form-lbl">📍 Coordenadas GPS <span style="font-weight:400;color:var(--text3)">(copia desde Google Maps)</span></label>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input class="form-ctrl" id="obra-coords" type="text" placeholder="37.3201432, -5.4067291" oninput="parsearCoordsObra(this.value)" style="flex:1;font-family:'Montserrat',sans-serif;letter-spacing:0.5px;">
-                <button type="button" onclick="abrirGoogleMaps()" style="padding:10px 10px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:11px;white-space:nowrap;">🌍 Maps</button>
-              </div>
-              <div id="geo-obra-result" style="font-size:10px;margin-top:5px;display:none;"></div>
-              <div style="font-size:10px;color:var(--text3);margin-top:4px;">💡 En Google Maps: manten pulsado en el punto de la obra → copia las coordenadas → pégalas aquí</div>
-            </div>
-            <div class="form-row">
-              <div class="form-g">
-                <label class="form-lbl">Radio zona (metros)</label>
-                <input class="form-ctrl" id="obra-radio" type="number" value="500" min="100" max="2000" placeholder="500">
-              </div>
-              <div class="form-g">
-                <label class="form-lbl">Estado</label>
-                <select class="form-ctrl" id="obra-estado">
-                  <option value="activa">🟢 Activa</option>
-                  <option value="pausada">🟡 Pausada</option>
-                  <option value="terminada">🔴 Terminada</option>
-                </select>
-              </div>
-            </div>
-            <button class="btn-primary" onclick="saveObra()" id="obra-btn">+ Crear obra</button>
-            <button class="btn-secondary" onclick="resetObraForm()">Cancelar</button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-hdr">
-            <div class="card-title">🏗️ Obras registradas</div>
-            <span id="obras-count" style="font-size:10px;color:var(--text3)"></span>
-          </div>
-          <div id="obras-list" style="max-height:600px;overflow-y:auto;">
-            <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Sin obras registradas aún.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ALTA OPERARIOS -->
-    <div class="page" id="page-gestion">
-      <div class="row-3">
-        <div class="card">
-          <div class="card-hdr"><div class="card-title" id="gestion-title">➕ Alta de operario</div><button onclick="resetForm()" style="font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;font-weight:600;">✕ Limpiar</button></div>
-          <div class="card-body">
-            <input type="hidden" id="edit-id">
-            <div class="form-row">
-              <div class="form-g"><label class="form-lbl">Nombre</label><input class="form-ctrl" id="g-nombre" type="text" oninput="capitalizarCampo(this)" placeholder="Nombre"></div>
-              <div class="form-g"><label class="form-lbl">Apellidos</label><input class="form-ctrl" id="g-apellidos" type="text" oninput="capitalizarCampo(this)" placeholder="Apellidos"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-g"><label class="form-lbl">DNI</label><input class="form-ctrl" id="g-dni" type="text" placeholder="12345678A" maxlength="9"></div>
-              <div class="form-g"><label class="form-lbl">NIE</label><input class="form-ctrl" id="g-nie" type="text" placeholder="X1234567A" maxlength="9"></div>
-            </div>
-            <div class="form-row">
-              <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
-              <div class="form-g">
-                <label class="form-lbl">🤖 API Key CallMeBot <span style="font-size:9px;color:var(--text3);font-weight:400;">(el operario la activa 1 vez)</span></label>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input class="form-ctrl" id="g-callmebot" type="text" placeholder="Ej: 123456" style="letter-spacing:2px;font-family:'Montserrat',sans-serif;font-weight:700;flex:1;">
-                  <button type="button" onclick="enviarInstruccionesCallMeBot()" style="padding:9px 10px;background:var(--green-light);border:1px solid var(--green);border-radius:9px;cursor:pointer;font-size:13px;" title="Enviar instrucciones de activación al operario">📲</button>
-                </div>
-                <div style="font-size:10px;color:var(--text3);margin-top:4px;">Sin API Key → el aviso no llegará automático. <a href="#" onclick="mostrarAyudaCallMeBot();return false;" style="color:var(--blue2);">¿Cómo activarlo?</a></div>
-              </div>
-              <div class="form-g">
-                <label class="form-lbl">Obra asignada</label>
-                <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
-                  <option value="">— Sin obra asignada —</option>
-                </select>
-                <input type="hidden" id="g-obra">
-                <div id="g-obra-info" style="font-size:10px;color:var(--blue2);margin-top:4px;display:none;"></div>
-              </div>
-            </div>
-            <div class="form-g">
-                <label class="form-lbl">🌍 Idioma del operario</label>
-                <select class="form-ctrl" id="g-idioma">
-                  <option value="es">🇪🇸 Español</option>
-                  <option value="ca">🏴 Català</option>
-                  <option value="ro">🇷🇴 Română</option>
-                  <option value="ar">🇲🇦 العربية</option>
-                  <option value="fr">🇫🇷 Français</option>
-                  <option value="en">🇬🇧 English</option>
-                </select>
-              </div>
-            <div class="form-row">
-              <div class="form-g">
-                <label class="form-lbl">PIN empresa</label>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input class="form-ctrl" id="g-pin" type="text" maxlength="4" placeholder="4 dígitos" style="letter-spacing:4px;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;flex:1;">
-                  <button type="button" onclick="generarPinUnico()" style="padding:10px 12px;background:var(--blue-light);border:1px solid var(--border2);border-radius:9px;cursor:pointer;font-size:14px;">🔄</button>
-                </div>
-              </div>
-              <div class="form-g"><label class="form-lbl">Estado</label><select class="form-ctrl" id="g-status"><option value="pending">⏳ Sin fichar</option><option value="in">✅ En obra</option></select></div>
-            </div>
-            <!-- HORARIO PERSONALIZADO -->
-            <div style="background:rgba(232,98,26,.06);border:1.5px solid rgba(232,98,26,.25);border-radius:10px;padding:12px 14px;margin-bottom:13px;">
-              <div style="font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--orange);margin-bottom:10px;">⏰ HORARIO DE FICHAJE — Alertas WhatsApp automáticas</div>
-              <div class="form-row">
-                <div class="form-g">
-                  <label class="form-lbl">🟢 Hora entrada (mañana)</label>
-                  <input class="form-ctrl" id="g-hora-entrada" type="time" value="08:00" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
-                </div>
-                <div class="form-g">
-                  <label class="form-lbl">🔴 Hora salida</label>
-                  <input class="form-ctrl" id="g-hora-salida" type="time" value="17:00" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
-                </div>
-              </div>
-              <div class="form-row" id="g-turno-tarde-row" style="display:none;">
-                <div class="form-g">
-                  <label class="form-lbl">🟢 Hora entrada (tarde)</label>
-                  <input class="form-ctrl" id="g-hora-entrada2" type="time" value="" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
-                </div>
-                <div class="form-g">
-                  <label class="form-lbl">🔴 Hora salida (tarde)</label>
-                  <input class="form-ctrl" id="g-hora-salida2" type="time" value="" style="border-color:rgba(232,98,26,.3);font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;text-align:center;">
-                </div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-                <input type="checkbox" id="g-doble-turno" onchange="document.getElementById('g-turno-tarde-row').style.display=this.checked?'flex':'none'" style="width:16px;height:16px;cursor:pointer;">
-                <label for="g-doble-turno" style="font-size:11px;color:var(--text2);cursor:pointer;">Jornada partida (mañana + tarde)</label>
-              </div>
-              <div style="margin-top:8px;font-size:10px;color:var(--text3);">⚡ Si no ficha a los <strong>5 minutos</strong> de su hora asignada → WhatsApp automático a su móvil</div>
-            </div>
-            <div class="form-g">
-              <label class="form-lbl">📱 Sistema operativo</label>
-              <div style="display:flex;gap:8px;">
-                <button type="button" id="so-android" onclick="selectSO('android')" style="flex:1;padding:12px;background:rgba(56,224,123,.08);border:2px solid var(--green);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--green);">🤖 Android</button>
-                <button type="button" id="so-iphone" onclick="selectSO('iphone')" style="flex:1;padding:12px;background:var(--card);border:2px solid var(--border);border-radius:10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:var(--text3);">🍎 iPhone</button>
-              </div>
-            </div>
-            <button class="btn-primary" onclick="saveWorker()" id="g-btn">+ Dar de alta</button>
-            <button class="btn-secondary" onclick="resetForm()">Cancelar</button>
-            <div id="wa-generado" style="display:none;margin-top:14px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:12px;padding:14px;">
-              <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--green);margin-bottom:8px;">✅ OPERARIO DADO DE ALTA</div>
-              <div id="wa-preview" style="font-size:11px;color:var(--text2);line-height:1.6;white-space:pre-wrap;background:white;border-radius:8px;padding:10px;margin-bottom:10px;border:1px solid var(--border);"></div>
-              <button onclick="sendWaAlta()" style="width:100%;padding:10px;background:#25d366;border:none;border-radius:8px;color:#fff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">📱 ABRIR WHATSAPP Y ENVIAR</button>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div class="card">
-            <div class="card-hdr"><div class="card-title">👷 Operarios dados de alta</div><span id="g-count" style="font-size:10px;color:var(--text3)"></span></div>
-            <div style="padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-              <div class="search-wrap" style="flex:1;min-width:140px;"><svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg><input class="search-inp" id="g-search" placeholder="Buscar..." oninput="renderGestionList()"></div>
-              <select id="g-filtro-estado" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="renderGestionList()">
-                <option value="activos">✅ Activos</option>
-                <option value="todos">👁 Todos</option>
-                <option value="inactivos">⏸ Inactivos</option>
-              </select>
-            </div>
-            <div id="gestion-list" style="max-height:500px;overflow-y:auto;"></div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hdr"><div class="card-title">🔐 Tabla de PINs</div><button onclick="window.print()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🖨️ Imprimir</button></div>
-        <table class="wtbl"><thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Eliminar</th></tr></thead><tbody id="pin-tbody"></tbody></table>
-      </div>
-    </div>
-
-    <!-- ASISTENTE IA -->
-    <div class="page" id="page-asistente">
-      <div style="max-width:700px;margin:0 auto;">
-        <div class="card">
-          <div class="card-hdr"><div class="card-title">🤖 Asistente IA</div></div>
-          <div style="padding:16px;max-height:420px;overflow-y:auto;" id="chat-messages">
-            <div style="background:var(--blue-light);border-radius:12px 12px 12px 0;padding:12px 16px;margin-bottom:10px;max-width:85%;font-size:13px;color:var(--text);">
-              👋 Hola Luis! Soy tu asistente de ObraControl GPS.<br><br>
-              Puedo ayudarte con:<br>
-              • <strong>¿Quién no ha fichado hoy?</strong><br>
-              • <strong>¿Quién fichó fuera de zona?</strong><br>
-              • <strong>Resumen del día</strong>
-            </div>
-          </div>
-          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;">
-            <input class="form-ctrl" id="chat-input" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter') sendChat()" style="flex:1;">
-            <button onclick="sendChat()" style="padding:10px 16px;background:var(--blue2);color:#fff;border:none;border-radius:9px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">Enviar</button>
-          </div>
-          <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;">
-            <button onclick="quickChat('¿Quién no ha fichado hoy?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Quién no fichó?</button>
-            <button onclick="quickChat('¿Quién fichó fuera de zona?')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">¿Fuera de zona?</button>
-            <button onclick="quickChat('Resumen del día')" style="padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:11px;cursor:pointer;color:var(--text2);">Resumen</button>
-            <button onclick="sendResumenWA()" style="padding:6px 12px;background:#DCFCE7;border:1px solid rgba(22,163,74,.25);border-radius:20px;font-size:11px;cursor:pointer;color:var(--green);font-weight:600;">📱 Enviar a mi WA</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="wp-overlay">
-  <div class="modal">
-    <div class="modal-hdr"><span style="font-size:24px">💬</span><div><div class="modal-title">ENVIAR WHATSAPP</div></div></div>
-    <div class="modal-body">
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--text3)">Para: <strong style="color:var(--text)" id="wp-name"></strong></div>
-      <label class="form-lbl">Mensaje</label>
-      <textarea class="form-ctrl" id="wp-ta" style="min-height:110px;"></textarea>
-      <div class="modal-foot"><button class="btn-cancel" onclick="closeWP()">Cancelar</button><button class="btn-send-wp" onclick="sendWP()">📱 Enviar</button></div>
-    </div>
-  </div>
-</div>
-
-    <!-- CONSENTIMIENTOS -->
-    <div class="page" id="page-consentimientos">
-      <div class="card">
-        <div class="card-hdr">
-          <div class="card-title">📋 Registro de consentimientos RGPD</div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="cargarConsentimientos()" style="font-size:10px;color:var(--blue2);background:none;border:none;cursor:pointer;font-weight:600;">🔄 Actualizar</button>
-            <button onclick="generarConsentimientosDesdeOperarios()" style="font-size:10px;color:var(--green);background:none;border:none;cursor:pointer;font-weight:600;">🔧 Generar faltantes</button>
-            <button onclick="borrarTodosConsentimientos()" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">🗑️ Borrar todos</button>
-          </div>
-        </div>
-        <table class="wtbl">
-          <thead><tr><th>Operario</th><th>DNI/NIE</th><th>Fecha</th><th>Hora</th><th>Idioma</th><th>RGPD</th><th>GPS</th><th>Acción</th></tr></thead>
-          <tbody id="consent-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- INFORMES DE JORNADA -->
-    <div class="page" id="page-informes">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-hdr">
-          <div class="card-title">📄 Informes de jornada</div>
-          <div style="font-size:10px;color:var(--text3);">Cumplimiento RD 8/2019 — Registro de jornada</div>
-        </div>
-        <div class="card-body">
-          <!-- Controles -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;margin-bottom:16px;">
-            <div>
-              <label class="form-lbl">Tipo de informe</label>
-              <select class="form-ctrl" id="inf-tipo" onchange="onChangeTipoInforme()">
-                <option value="diario">📅 Diario</option>
-                <option value="semanal">📆 Semanal</option>
-                <option value="mensual">🗓️ Mensual</option>
-              </select>
-            </div>
-            <div id="inf-ctrl-fecha">
-              <label class="form-lbl">Fecha</label>
-              <input class="form-ctrl" type="date" id="inf-fecha">
-            </div>
-            <div id="inf-ctrl-semana" style="display:none;">
-              <label class="form-lbl">Semana (lunes)</label>
-              <input class="form-ctrl" type="date" id="inf-semana-ini">
-            </div>
-            <div id="inf-ctrl-mes" style="display:none;">
-              <label class="form-lbl">Mes</label>
-              <input class="form-ctrl" type="month" id="inf-mes">
-            </div>
-            <div>
-              <label class="form-lbl">Operario</label>
-              <select class="form-ctrl" id="inf-operario">
-                <option value="todos">👷 Todos los operarios</option>
-              </select>
-            </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn-primary" onclick="generarInforme()" style="white-space:nowrap;">🔍 Previsualizar</button>
-            </div>
-          </div>
-          <!-- Botones de exportación -->
-          <div style="display:flex;gap:10px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;">
-            <button onclick="imprimirInforme()" style="padding:9px 16px;background:var(--blue2);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">🖨️ Imprimir / PDF digital</button>
-            <button onclick="descargarInformeHTML()" style="padding:9px 16px;background:var(--blue-light);color:var(--blue2);border:1px solid var(--border2);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Montserrat',sans-serif;">💾 Guardar HTML</button>
-            <span style="font-size:10px;color:var(--text3);align-self:center;">Desde el navegador: Imprimir → Guardar como PDF → listo para inspección</span>
-          </div>
-          <!-- Preview -->
-          <div id="inf-preview-wrap" style="display:none;">
-            <div style="font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;">Vista previa del informe</div>
-            <div id="inf-preview" style="border:1px solid var(--border);border-radius:8px;overflow:auto;background:#fff;max-height:600px;"></div>
-          </div>
-          <div id="inf-empty" style="padding:32px;text-align:center;color:var(--text3);font-size:12px;">Selecciona el tipo de informe, el período y pulsa Previsualizar.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-
 </body>
 </html>
