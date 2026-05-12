@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ObraControl — Panel de Oficina · Construcciones Lance 2024 SL</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--blue:#1B4F8C;--blue2:#2563AE;--blue3:#3B82C4;--blue-light:#E8F1FB;--blue-pale:#F0F6FF;--orange:#E8621A;--orange2:#FF7A35;--orange-l:#FFF3EC;--bg:#F4F7FC;--white:#FFFFFF;--card:#FFFFFF;--border:#E2EAF4;--border2:#D0DDF0;--text:#1A2840;--text2:#4A6080;--text3:#8FA5C0;--green:#16A34A;--green-l:#DCFCE7;--red:#DC2626;--red-l:#FEE2E2;--amber:#D97706;--amber-l:#FEF3C7;--purple:#7C3AED;--purple-l:#EDE9FE;--shadow:0 1px 3px rgba(27,79,140,.08),0 4px 16px rgba(27,79,140,.06);--shadow-lg:0 4px 24px rgba(27,79,140,.12),0 1px 4px rgba(27,79,140,.06);}
@@ -430,6 +431,46 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
           <thead><tr><th>#</th><th>Nombre</th><th>DNI/NIE</th><th>Obra</th><th>PIN</th><th>Estado</th><th>Zona GPS</th><th>Acción</th></tr></thead>
           <tbody id="op-tbody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- FICHA OPERARIO -->
+    <div class="page" id="page-ficha-operario">
+      <div style="margin-bottom:16px;">
+        <button onclick="showPage('operarios')" style="padding:8px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;">← Volver a operarios</button>
+      </div>
+      <!-- Cabecera operario -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-body" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div id="ficha-avatar" style="width:64px;height:64px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:900;font-size:22px;color:var(--blue2);flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <div id="ficha-nombre" style="font-family:'Montserrat',sans-serif;font-size:20px;font-weight:800;color:var(--text);"></div>
+            <div id="ficha-dni" style="font-size:12px;color:var(--text3);margin-top:2px;"></div>
+            <div id="ficha-obra-actual" style="margin-top:6px;"></div>
+          </div>
+          <div id="ficha-estado-badge"></div>
+        </div>
+      </div>
+      <!-- KPIs mensuales -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;" id="ficha-kpis"></div>
+      <!-- Gráfico + tabla mes -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">📊 Horas por día — mes actual</div></div>
+          <div style="padding:16px;"><canvas id="ficha-chart" height="200"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr"><div class="card-title">🏗️ Obras este mes</div></div>
+          <div id="ficha-obras-mes" style="max-height:260px;overflow-y:auto;"></div>
+        </div>
+      </div>
+      <!-- Historial fichajes -->
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">📋 Historial completo de fichajes</div>
+          <select id="ficha-mes-sel" class="form-ctrl" style="font-size:11px;padding:5px 10px;width:auto;" onchange="cargarFichaOperario()"></select>
+        </div>
+        <div id="ficha-historial" style="max-height:500px;overflow-y:auto;"></div>
       </div>
     </div>
 
@@ -987,7 +1028,7 @@ function tick(){const n=new Date();document.getElementById('clock').textContent=
 setInterval(tick,1000);tick();
 
 // ── PÁGINAS ──
-const TITLES={dashboard:'Tablero',jornada:'Resumen de jornada',operarios:'Operarios',alertas:'Alertas',extras:'Horas extras',horas:'Horas trabajadas',tareas:'Tareas',whatsapp:'WhatsApp',gestion:'Alta de operarios',asistente:'Asistente IA',consentimientos:'Consentimientos RGPD',obras:'Obras',informes:'📄 Informes de jornada'};
+const TITLES={dashboard:'Tablero',jornada:'Resumen de jornada',operarios:'Operarios','ficha-operario':'👷 Ficha del operario',alertas:'Alertas',extras:'Horas extras',horas:'Horas trabajadas',tareas:'Tareas',whatsapp:'WhatsApp',gestion:'Alta de operarios',asistente:'Asistente IA',consentimientos:'Consentimientos RGPD',obras:'Obras',informes:'📄 Informes de jornada'};
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -1061,7 +1102,7 @@ function renderWorkers(){
   const sb={in:'<span class="pill p-in">✅ En obra</span>',out:'<span class="pill p-out">🔴 Fuera</span>',pending:'<span class="pill p-pend">⏳ Sin fichar</span>'};
   tb.innerHTML=filtered.map((w,i)=>`<tr>
     <td style="font-weight:700;color:var(--text3)">${i+1}</td>
-    <td><div class="w-name">${w.nombre} ${w.apellidos}</div><div class="w-doc">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''}</div>${w._lat&&w._lng?'<a href="https://www.google.com/maps?q='+w._lat+','+w._lng+'" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:#E8F1FB;border:1px solid #D0DDF0;border-radius:5px;font-size:9px;color:#2563AE;font-weight:700;text-decoration:none;margin-top:3px;">📍 Ver en Maps</a>':''}</td>
+    <td style="cursor:pointer;" onclick="abrirFichaOperario(${w.id})"><div class="w-name" style="color:var(--blue2);text-decoration:underline dotted;">${w.nombre} ${w.apellidos}</div><div class="w-doc">${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''}</div>${w._lat&&w._lng?'<a href="https://www.google.com/maps?q='+w._lat+','+w._lng+'" target="_blank" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:#E8F1FB;border:1px solid #D0DDF0;border-radius:5px;font-size:9px;color:#2563AE;font-weight:700;text-decoration:none;margin-top:3px;">📍 Ver en Maps</a>':''}</td>
 
 
 
@@ -2336,6 +2377,202 @@ function fichajeManualDesdeAlerta(docKey, tipo){
 
 let toastTimer;
 function showToast(msg,tipo){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${tipo}`;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);}
+
+
+// ══════════════════════════════════════════════════════════
+// FICHA COMPLETA DEL OPERARIO
+// ══════════════════════════════════════════════════════════
+let _fichaWorkerId = null;
+
+function abrirFichaOperario(id){
+  _fichaWorkerId = id;
+  // Poblar selector de meses
+  const sel = document.getElementById('ficha-mes-sel');
+  if(sel){
+    sel.innerHTML = '';
+    const hoy = new Date();
+    for(let i=0;i<6;i++){
+      let m = hoy.getMonth()-i, y = hoy.getFullYear();
+      while(m<0){m+=12;y--;}
+      const val = `${y}-${String(m+1).padStart(2,'0')}`;
+      const lbl = new Date(y,m,1).toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+      sel.innerHTML += `<option value="${val}"${i===0?' selected':''}>${lbl.charAt(0).toUpperCase()+lbl.slice(1)}</option>`;
+    }
+  }
+  // Añadir ni-ficha-operario al nav si no existe
+  if(!document.getElementById('ni-ficha-operario')){
+    const ni = document.createElement('div');
+    ni.id = 'ni-ficha-operario';
+    ni.style.display = 'none';
+    document.querySelector('.sb-nav').appendChild(ni);
+  }
+  showPage('ficha-operario');
+  cargarFichaOperario();
+}
+
+async function cargarFichaOperario(){
+  const w = WORKERS.find(x=>x.id===_fichaWorkerId);
+  if(!w) return;
+  const doc = (w.dni||w.nie||'').replace(/[^A-Z0-9]/gi,'').toUpperCase();
+  const mes = document.getElementById('ficha-mes-sel')?.value || new Date().toISOString().slice(0,7);
+  const [y,m] = mes.split('-').map(Number);
+  const diasMes = new Date(y,m,0).getDate();
+  const hoyStr = `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}-${String(new Date().getDate()).padStart(2,'0')}`;
+
+  // ── Cabecera ──
+  const iniciales = (w.nombre[0]||'')+(w.apellidos[0]||'');
+  document.getElementById('ficha-avatar').textContent = iniciales;
+  document.getElementById('ficha-nombre').textContent = `${w.nombre} ${w.apellidos}`;
+  document.getElementById('ficha-dni').textContent = `${w.dni?'DNI: '+w.dni:''} ${w.nie?'NIE: '+w.nie:''} · PIN: ${w.pin} · 📱 ${w.tel||'—'}`;
+  document.getElementById('ficha-obra-actual').innerHTML = w.obra
+    ? `<span style="background:var(--blue-light);color:var(--blue2);padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;">🏗️ ${w.obra}</span>`
+    : '<span style="background:var(--amber-l);color:var(--amber);padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;">⚠️ Sin obra asignada</span>';
+  const estadoMap = {in:'<span style="background:#DCFCE7;color:#16A34A;padding:6px 14px;border-radius:20px;font-weight:700;font-size:12px;">✅ En obra</span>',out:'<span style="background:#FEE2E2;color:#DC2626;padding:6px 14px;border-radius:20px;font-weight:700;font-size:12px;">🔴 Fuera</span>',pending:'<span style="background:#FEF3C7;color:#D97706;padding:6px 14px;border-radius:20px;font-weight:700;font-size:12px;">⏳ Sin fichar</span>'};
+  document.getElementById('ficha-estado-badge').innerHTML = estadoMap[w.status]||'';
+
+  // ── Cargar fichajes del mes ──
+  document.getElementById('ficha-historial').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);">⏳ Cargando...</div>';
+
+  const fechas = [];
+  for(let i=1;i<=diasMes;i++){
+    fechas.push(`${mes}-${String(i).padStart(2,'0')}`);
+  }
+
+  const resultados = await Promise.all(fechas.map(fecha=>
+    fetch(`${FB_URL}/fichajes/${fecha}.json`).then(r=>r.json()).then(d=>({fecha,data:d})).catch(()=>({fecha,data:null}))
+  ));
+
+  // Procesar fichajes del operario
+  const fichajesPorDia = {}; // {fecha: {entrada,salida,obra,horas,manual}}
+  const obrasUsadas = new Set();
+  let totalHoras = 0, diasTrabajados = 0, totalExtras = 0;
+
+  resultados.forEach(({fecha,data})=>{
+    if(!data) return;
+    Object.values(data).forEach(f=>{
+      if(!f||!f.doc) return;
+      const fDoc = f.doc.replace(/[^A-Z0-9]/gi,'').toUpperCase();
+      if(fDoc !== doc) return;
+      if(!fichajesPorDia[fecha]) fichajesPorDia[fecha] = {entrada:null,salida:null,obra:'',horas:0,manual:false};
+      const fd = fichajesPorDia[fecha];
+      if(f.tipo==='entrada') fd.entrada = f.hora;
+      if(f.tipo==='salida') fd.salida = f.hora;
+      if(f.hora_entrada && !fd.entrada) fd.entrada = f.hora_entrada;
+      if(f.obra) {fd.obra = f.obra; obrasUsadas.add(f.obra);}
+      if(f.ciudad && !fd.obra) fd.obra = f.ciudad;
+      if(f.manual) fd.manual = true;
+    });
+    if(fichajesPorDia[fecha]){
+      const fd = fichajesPorDia[fecha];
+      if(fd.entrada && fd.salida){
+        const[eh,em]=fd.entrada.split(':').map(Number);
+        const[sh,sm]=fd.salida.split(':').map(Number);
+        const mins=(sh*60+sm)-(eh*60+em);
+        if(mins>0){
+          fd.horas = redondearMediaHora(mins/60);
+          totalHoras += fd.horas;
+          diasTrabajados++;
+          // Horas extras (más de 11h en semana, más de 7h viernes)
+          const dow = new Date(fecha+'T12:00:00').getDay();
+          const hNorm = dow===5?7:11;
+          if(fd.horas > hNorm) totalExtras += fd.horas - hNorm;
+        }
+      } else if(fd.entrada && fecha===hoyStr){
+        const[eh,em]=fd.entrada.split(':').map(Number);
+        const now=new Date();
+        const mins=(now.getHours()*60+now.getMinutes())-(eh*60+em);
+        if(mins>0) fd.horas = redondearMediaHora(mins/60);
+      }
+    }
+  });
+
+  const media = diasTrabajados>0?(totalHoras/diasTrabajados).toFixed(1):0;
+
+  // ── KPIs ──
+  document.getElementById('ficha-kpis').innerHTML = `
+    <div class="kpi-card kc-blue"><div class="kpi-header"><span class="kpi-label">Total horas</span></div><div class="kpi-val" style="font-size:36px">${formatH(totalHoras)}</div><div class="kpi-sub">Este mes</div></div>
+    <div class="kpi-card kc-green"><div class="kpi-header"><span class="kpi-label">Días trabajados</span></div><div class="kpi-val" style="font-size:36px">${diasTrabajados}</div><div class="kpi-sub">De ${diasMes} días</div></div>
+    <div class="kpi-card kc-orange"><div class="kpi-header"><span class="kpi-label">Media diaria</span></div><div class="kpi-val" style="font-size:36px">${media}</div><div class="kpi-sub">Horas/día</div></div>
+    <div class="kpi-card kc-purple"><div class="kpi-header"><span class="kpi-label">Horas extras</span></div><div class="kpi-val" style="font-size:36px">${formatH(totalExtras)}</div><div class="kpi-sub">Este mes</div></div>`;
+
+  // ── Obras del mes ──
+  const obrasMes = [...obrasUsadas];
+  document.getElementById('ficha-obras-mes').innerHTML = obrasMes.length
+    ? obrasMes.map(o=>`<div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;"><span style="font-size:18px">🏗️</span><span style="font-size:12px;font-weight:600">${o}</span></div>`).join('')
+    : '<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px;">Sin obras registradas este mes</div>';
+
+  // ── Gráfico barras ──
+  const ctxEl = document.getElementById('ficha-chart');
+  if(ctxEl){
+    // Destruir gráfico anterior si existe
+    if(window._fichaChart) window._fichaChart.destroy();
+    const labels = [], dataHoras = [], colores = [];
+    fechas.forEach(fecha=>{
+      const dow = new Date(fecha+'T12:00:00').getDay();
+      if(dow===0||dow===6) return; // skip fines de semana
+      const fd = fichajesPorDia[fecha];
+      const dia = parseInt(fecha.split('-')[2]);
+      labels.push(dia);
+      const h = fd?.horas||0;
+      dataHoras.push(h);
+      colores.push(h>=8?'rgba(22,163,74,0.7)':h>0?'rgba(37,99,174,0.7)':'rgba(220,38,38,0.4)');
+    });
+    if(typeof Chart !== 'undefined'){
+      window._fichaChart = new Chart(ctxEl, {
+        type:'bar',
+        data:{labels,datasets:[{data:dataHoras,backgroundColor:colores,borderRadius:4}]},
+        options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:12,title:{display:true,text:'Horas'}}},responsive:true,maintainAspectRatio:false}
+      });
+    } else {
+      // Sin Chart.js — tabla alternativa
+      ctxEl.parentElement.innerHTML = `<div style="display:flex;gap:3px;align-items:flex-end;height:160px;padding:8px;">`+
+        dataHoras.map((h,i)=>`<div style="flex:1;background:${colores[i]};height:${Math.max(2,h/12*100)}%;border-radius:3px 3px 0 0;" title="${labels[i]}: ${h}h"></div>`).join('')+
+        `</div><div style="display:flex;gap:3px;padding:0 8px;">`+
+        labels.map(l=>`<div style="flex:1;text-align:center;font-size:8px;color:var(--text3)">${l}</div>`).join('')+`</div>`;
+    }
+  }
+
+  // ── Historial fichajes ──
+  const diasConFichaje = Object.entries(fichajesPorDia).sort((a,b)=>b[0].localeCompare(a[0]));
+  if(!diasConFichaje.length){
+    document.getElementById('ficha-historial').innerHTML = '<div style="padding:24px;text-align:center;color:var(--text3);">Sin fichajes en este período.</div>';
+    return;
+  }
+  document.getElementById('ficha-historial').innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+      <thead><tr style="background:var(--bg);">
+        <th style="padding:8px 12px;text-align:left;font-family:'Montserrat';font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">Fecha</th>
+        <th style="padding:8px 12px;text-align:left;font-family:'Montserrat';font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">Día</th>
+        <th style="padding:8px 12px;text-align:center;font-family:'Montserrat';font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">Entrada</th>
+        <th style="padding:8px 12px;text-align:center;font-family:'Montserrat';font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">Salida</th>
+        <th style="padding:8px 12px;text-align:center;font-family:'Montserrat';font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">Horas</th>
+        <th style="padding:8px 12px;text-align:left;font-family:'Montserrat';font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">Obra</th>
+        <th style="padding:8px 12px;text-align:center;font-family:'Montserrat';font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">Tipo</th>
+      </tr></thead>
+      <tbody>${diasConFichaje.map(([fecha,fd])=>{
+        const d = new Date(fecha+'T12:00:00');
+        const diaSem = d.toLocaleDateString('es-ES',{weekday:'long'});
+        const diaNum = d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
+        const esHoy = fecha===hoyStr;
+        const rowBg = esHoy?'background:#EBF0FA;':'';
+        const horasColor = fd.horas>=8?'color:var(--green)':fd.horas>0?'color:var(--blue2)':'color:var(--text3)';
+        return `<tr style="border-bottom:1px solid var(--border);${rowBg}">
+          <td style="padding:8px 12px;font-weight:${esHoy?700:400}">${diaNum}${esHoy?' <span style="font-size:9px;background:var(--blue2);color:#fff;padding:1px 5px;border-radius:3px;">HOY</span>':''}</td>
+          <td style="padding:8px 12px;color:var(--text2);text-transform:capitalize">${diaSem}</td>
+          <td style="padding:8px 12px;text-align:center;font-weight:700;color:var(--blue2)">${fd.entrada||'—'}</td>
+          <td style="padding:8px 12px;text-align:center;color:var(--red)">${fd.salida||(!fd.entrada?'—':'<span style="font-size:9px;background:#FEF3C7;color:#D97706;padding:1px 5px;border-radius:3px;">En curso</span>')}</td>
+          <td style="padding:8px 12px;text-align:center;font-family:'Montserrat';font-weight:800;font-size:13px;${horasColor}">${fd.horas>0?formatH(fd.horas)+'h':'—'}</td>
+          <td style="padding:8px 12px;font-size:10px;color:var(--text3)">${fd.obra||'—'}</td>
+          <td style="padding:8px 12px;text-align:center">${fd.manual?'<span style="background:#EDE9FE;color:#7C3AED;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;">Manual</span>':'<span style="background:#DCFCE7;color:#16A34A;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;">App</span>'}</td>
+        </tr>`;
+      }).join('')}</tbody>
+      <tfoot><tr style="background:var(--bg);font-weight:700;">
+        <td colspan="4" style="padding:10px 12px;text-align:right;font-family:'Montserrat';font-size:10px;color:var(--text2);">TOTAL MES:</td>
+        <td style="padding:10px 12px;text-align:center;font-family:'Montserrat';font-weight:900;font-size:14px;color:var(--blue2)">${formatH(totalHoras)}h</td>
+        <td colspan="2"></td>
+      </tr></tfoot>
+    </table>`;
+}
 
 // ══════════════════════════════════════════════════════════
 // MÓDULO CALENDARIO DE ASISTENCIA
