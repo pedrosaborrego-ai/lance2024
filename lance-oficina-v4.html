@@ -616,11 +616,7 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
             </div>
             <div class="form-row">
               <div class="form-g"><label class="form-lbl">📱 Teléfono WhatsApp</label><input class="form-ctrl" id="g-tel" type="tel" placeholder="+34 612 345 678"></div>
-            <div class="form-g" style="background:#E7F7E7;border:1px solid #86EFAC;border-radius:8px;padding:10px;margin-bottom:4px;">
-              <label class="form-lbl" style="color:#16A34A;">🤖 CallMeBot API Key (WhatsApp automático)</label>
-              <input class="form-ctrl" id="g-callmebot" type="text" placeholder="Ej: 123456" style="letter-spacing:2px;">
-              <div style="font-size:9px;color:#16A34A;margin-top:4px;">El operario activa su número enviando <strong>"I allow callmebot to send me messages"</strong> al +34 644 44 74 05 en WhatsApp. Recibirá su apikey.</div>
-            </div>
+
               <div class="form-g">
                 <label class="form-lbl">Obra asignada</label>
                 <select class="form-ctrl" id="g-obra-select" onchange="seleccionarObraEnAlta()">
@@ -848,7 +844,6 @@ const APP_URL = 'https://obracontrol-tech.github.io/lance2024/lance-operario-v3.
 const ENCARGADO_WA = '+34629108645';
 const TELEGRAM_TOKEN = '8423643316:AAH9QJu2TP5mTQP522zZz9wvZG_pUR6_RxA';
 const TELEGRAM_LUIS = '6113262220';
-const CALLMEBOT_URL = 'https://api.callmebot.com/whatsapp.php';
 const DAYS_CAP=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
 const JORNADA={
@@ -2271,34 +2266,14 @@ function enviarAlertaWA(w,tipo,horaEsperada){
   const nombre=`${w.nombre} ${w.apellidos}`;
   const icono=tipo==='entrada'?'⏰':'🔴';
   const ahora=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-
-  // ✅ 1. Telegram a Luis — siempre, sin necesidad de abrir navegador
-  const msgTelegram=`${icono} *ALERTA FICHAJE*
-
-👷 *${nombre}*
-${tipo==='entrada'?'NO HA FICHADO ENTRADA':'NO HA FICHADO SALIDA'}
-
-Hora esperada: ${horaEsperada}
-Hora actual: ${ahora}
-
-_ObraControl GPS · Lance 2024_`;
+  // ✅ Telegram a Luis — automático, sin abrir navegador
+  const msgTelegram=`${icono} *ALERTA FICHAJE*\n\n👷 *${nombre}*\n${tipo==='entrada'?'NO HA FICHADO ENTRADA':'NO HA FICHADO SALIDA'}\n\nHora esperada: ${horaEsperada}\nHora actual: ${ahora}\n\n_ObraControl GPS · Lance 2024_`;
   fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({chat_id:TELEGRAM_LUIS,text:msgTelegram,parse_mode:'Markdown'})
-  }).then(()=>showToast(`📱 Alerta Telegram enviada a Luis — ${nombre}`,'ok'))
-    .catch(()=>showToast('⚠️ Error enviando Telegram','err'));
-
-  // ✅ 2. CallMeBot WhatsApp al operario — si tiene apikey configurada
-  const telOp=(w.tel||'').replace(/[\s\-\(\)]/g,'').replace(/^\+/,'');
-  const numOp=telOp.startsWith('34')?telOp:'34'+telOp;
-  const callmebotKey=w.callmebotKey||'';
-  if(numOp&&callmebotKey){
-    const msgOp=encodeURIComponent(`${icono} ALERTA FICHAJE\n\nHola ${w.nombre}, son las ${ahora} y todavia no has fichado tu ${tipo==='entrada'?'ENTRADA':'SALIDA'}.\n\nTu horario: ${w.horaEntrada||'07:00'} a ${w.horaSalida||'18:00'}\n\nFicha cuanto antes desde la app.\n\nObraControl GPS - Lance 2024`);
-    fetch(`${CALLMEBOT_URL}?phone=${numOp}&text=${msgOp}&apikey=${callmebotKey}`)
-      .then(()=>showToast(`📱 WhatsApp enviado a ${w.nombre}`,'ok'))
-      .catch(()=>{});
-  }
+  }).then(()=>showToast(`📱 Alerta enviada a Luis — ${nombre}`,'ok'))
+    .catch(()=>showToast('⚠️ Error Telegram','err'));
 }
 
 function addHorarioAlerta(w, tipo, horaEsperada){
