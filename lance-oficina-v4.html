@@ -929,19 +929,19 @@ textarea.form-ctrl{resize:vertical;min-height:80px;}
             <div class="card-title">📊 Panel de Informes</div>
             <div style="font-size:10px;color:var(--text3);margin-top:2px;">RD Ley 8/2019 · Registro de jornada laboral</div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            <select class="form-ctrl" id="inf-periodo-global" style="font-size:11px;padding:5px 10px;width:auto;" onchange="onChangeInfPeriodo()">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;">
+            <select class="form-ctrl" id="inf-periodo-global" style="font-size:11px;padding:5px 10px;width:130px;" onchange="onChangeInfPeriodo()">
               <option value="diario">📅 Hoy</option>
               <option value="semanal">📆 Esta semana</option>
               <option value="mensual" selected>🗓️ Este mes</option>
             </select>
-            <div id="inf-ctrl-fecha"><input class="form-ctrl" type="date" id="inf-fecha" style="font-size:11px;padding:5px 10px;width:auto;"></div>
-            <div id="inf-ctrl-semana" style="display:none;"><input class="form-ctrl" type="date" id="inf-semana-ini" style="font-size:11px;padding:5px 10px;width:auto;"></div>
-            <div id="inf-ctrl-mes" style="display:none;"><input class="form-ctrl" type="month" id="inf-mes" style="font-size:11px;padding:5px 10px;width:auto;"></div>
-            <select class="form-ctrl" id="inf-operario" style="font-size:11px;padding:5px 10px;width:auto;">
+            <div id="inf-ctrl-fecha" style="display:none;"><input class="form-ctrl" type="date" id="inf-fecha" style="font-size:11px;padding:5px 10px;width:140px;"></div>
+            <div id="inf-ctrl-semana" style="display:none;"><input class="form-ctrl" type="date" id="inf-semana-ini" style="font-size:11px;padding:5px 10px;width:140px;"></div>
+            <div id="inf-ctrl-mes"><input class="form-ctrl" type="month" id="inf-mes" style="font-size:11px;padding:5px 10px;width:140px;"></div>
+            <select class="form-ctrl" id="inf-operario" style="font-size:11px;padding:5px 10px;width:180px;">
               <option value="todos">👷 Todos</option>
             </select>
-            <button onclick="cargarTodoInforme()" style="padding:6px 14px;background:var(--blue2);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">🔄 Actualizar</button>
+            <button onclick="cargarTodoInforme()" style="padding:7px 16px;background:var(--blue2);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">🔄 Actualizar</button>
           </div>
         </div>
         <!-- KPIs resumen período -->
@@ -1199,7 +1199,18 @@ function showPage(name){
       if(WORKERS.length>0||_calTry>10){clearInterval(_calWait);initCalendario();renderCalendario();}
     },500);
   }
-  if(name==='informes')initInformes();
+  if(name==='informes'){
+    initInformes();
+    // Esperar a que Firebase cargue WORKERS antes de cargar datos
+    let _infTry=0;
+    const _infWait=setInterval(()=>{
+      _infTry++;
+      if(WORKERS.length>0||_infTry>10){
+        clearInterval(_infWait);
+        cargarTodoInforme();
+      }
+    },400);
+  }
   if(name==='tareas')renderTaskLog();
   if(name==='gestion'){if(!OBRAS||!OBRAS.length)cargarObras();renderGestionList();renderPinTable();updateExtraSelect();updateObrasSelect();}
   if(name==='extras')updateExtraSelect();
@@ -3468,7 +3479,6 @@ function initInformes(){
   const periodoSel=document.getElementById('inf-periodo-global');
   if(periodoSel)periodoSel.value='mensual';
   onChangeInfPeriodo();
-  setTimeout(()=>cargarTodoInforme(),500);
 }
 
 function getLunes(d){
