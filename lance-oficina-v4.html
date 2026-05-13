@@ -2942,6 +2942,107 @@ async function cargarFichaOperario(){
 }
 
 
+// ── DETALLE COMPLETO DE OBRA PARA IMPRIMIR ──
+function abrirDetalleObraInforme(obraKeyEncoded){
+  const obraKey=decodeURIComponent(obraKeyEncoded);
+  const d=window._infPorObra?.[obraKey];
+  const porFecha=window._infPorFecha||{};
+  if(!d){showToast('⚠️ Sin datos para esta obra','err');return;}
+
+  // Recopilar todos los fichajes de esta obra
+  const operariosData={}; // {doc:{nombre,dias:[{fecha,entrada,salida,horas}],totalH}}
+  Object.entries(porFecha).forEach(([fecha,ops])=>{
+    Object.values(ops).forEach(op=>{
+      if(!d.operarios.has(op.doc))return;
+      if(!operariosData[op.doc])operariosData[op.doc]={nombre:op.nombre,dias:[],totalH:0};
+      if(op.horas>0||op.entrada){
+        operariosData[op.doc].dias.push({fecha,entrada:op.entrada,salida:op.salida,horas:op.horas,manual:op.manual});
+        operariosData[op.doc].totalH+=op.horas;
+      }
+    });
+  });
+
+  const genDate=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'long',year:'numeric'});
+  const opLista=Object.values(operariosData).sort((a,b)=>b.totalH-a.totalH);
+
+  const css=`*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:Arial,sans-serif;font-size:11px;color:#1a2840;padding:20px;}
+.cabecera{border-bottom:3px solid #1B4F8C;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;}
+.titulo-obra{font-family:'Arial Black',Arial;font-size:20px;font-weight:900;color:#1B4F8C;}
+.sub{font-size:10px;color:#666;margin-top:3px;}
+table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:10px;}
+th{background:#1B4F8C;color:#fff;padding:6px 10px;text-align:left;font-size:9px;text-transform:uppercase;}
+td{padding:5px 10px;border-bottom:1px solid #E8EDF5;}
+tr:nth-child(even) td{background:#F9FAFB;}
+.total-row td{font-weight:700;background:#EBF0FA;color:#1B4F8C;}
+.op-block{margin-bottom:20px;border:1px solid #D0DDF0;border-radius:6px;overflow:hidden;}
+.op-hdr{background:#EBF0FA;padding:8px 12px;display:flex;justify-content:space-between;}
+.op-nombre{font-weight:700;font-size:12px;color:#1B4F8C;}
+.op-total{font-family:'Arial Black';font-weight:900;color:#1B4F8C;}
+.kpi-row{display:flex;gap:16px;margin-bottom:16px;}
+.kpi{border:1px solid #D0DDF0;border-radius:6px;padding:8px 14px;background:#F4F7FC;}
+.kpi-val{font-size:20px;font-weight:900;color:#1B4F8C;}
+.kpi-lbl{font-size:9px;color:#666;text-transform:uppercase;}
+.pie{text-align:center;margin-top:20px;padding-top:10px;border-top:1px solid #eee;font-size:9px;color:#aaa;}
+.btn-print{padding:10px 24px;background:#1B4F8C;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;}
+@media print{.no-print{display:none!important;}body{padding:10px;}}`;
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>Informe Obra — ${obraKey}</title>
+<style>${css}</style></head><body>
+<div class="no-print" style="margin-bottom:16px;">
+  <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+  <button onclick="window.close()" style="padding:10px 16px;background:#f4f7fc;color:#1B4F8C;border:1px solid #1B4F8C;border-radius:8px;font-size:12px;cursor:pointer;margin-left:8px;">✕ Cerrar</button>
+</div>
+<div class="cabecera">
+  <div>
+    <div class="titulo-obra">🏗️ ${obraKey}</div>
+    <div class="sub">Construcciones Lance 2024 SL · Registro de jornada laboral · RD Ley 8/2019</div>
+  </div>
+  <div style="text-align:right;font-size:10px;color:#444;">
+    <strong style="display:block;color:#1B4F8C;font-size:13px;">INFORME DE OBRA</strong>
+    Generado: ${genDate}
+  </div>
+</div>
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-val">${formatH(d.horas)}h</div><div class="kpi-lbl">Total horas</div></div>
+  <div class="kpi"><div class="kpi-val">${d.operarios.size}</div><div class="kpi-lbl">Operarios</div></div>
+  <div class="kpi"><div class="kpi-val">${d.dias.size}</div><div class="kpi-lbl">Días activa</div></div>
+</div>
+<h2 style="font-size:12px;color:#1B4F8C;border-left:4px solid #1B4F8C;padding-left:8px;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;">Detalle por operario</h2>
+${opLista.map(op=>`
+<div class="op-block">
+  <div class="op-hdr">
+    <span class="op-nombre">👷 ${op.nombre}</span>
+    <span class="op-total">${formatH(op.totalH)}h total · ${op.dias.length} días</span>
+  </div>
+  <table>
+    <thead><tr><th>Fecha</th><th>Día</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Tipo</th></tr></thead>
+    <tbody>
+    ${op.dias.sort((a,b)=>b.fecha.localeCompare(a.fecha)).map(dia=>{
+      const d2=new Date(dia.fecha+'T12:00:00');
+      const diaSem=d2.toLocaleDateString('es-ES',{weekday:'short'});
+      const diaNum=d2.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
+      return `<tr>
+        <td>${diaNum}</td><td>${diaSem}</td>
+        <td style="font-weight:700;color:#1B4F8C">${dia.entrada||'—'}</td>
+        <td style="color:#DC2626">${dia.salida||'—'}</td>
+        <td style="font-weight:900;color:#1B4F8C">${dia.horas>0?formatH(dia.horas)+'h':'—'}</td>
+        <td>${dia.manual?'Manual':'App'}</td>
+      </tr>`;
+    }).join('')}
+    <tr class="total-row"><td colspan="4" style="text-align:right;">TOTAL:</td><td>${formatH(op.totalH)}h</td><td></td></tr>
+    </tbody>
+  </table>
+</div>`).join('')}
+<div class="pie">ObraControl GPS · Construcciones Lance 2024 SL · ${genDate} · RD Ley 8/2019 art. 34.9</div>
+</body></html>`;
+
+  const w=window.open('','_blank','width=900,height=800');
+  w.document.write(html);
+  w.document.close();
+}
+
 // Festivos nacionales España 2026
 const FESTIVOS_ES = new Set([
   '2026-01-01','2026-01-06','2026-04-02','2026-04-03',
@@ -3414,44 +3515,56 @@ async function cargarTodoInforme(){
     }).join('');
   }
 
-  // ── TAB 2: Por obra ──
+  // ── TAB 2: Por obra — CLICKEABLE ──
+  // Guardar datos completos por obra para poder acceder al pinchar
+  window._infPorObra = porObra;
+  window._infPorFecha = porFecha;
+  window._infTotalH = totalHorasGlobal;
   const obrasEl=document.getElementById('inf-obras-content');
   if(obrasEl){
     const obrasLista=Object.entries(porObra).sort((a,b)=>b[1].horas-a[1].horas);
-    if(!obrasLista.length){obrasEl.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);">Sin datos de obras.</div>';return;}
-    obrasEl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;">
-      <thead><tr style="background:var(--bg);">
-        <th style="padding:10px 16px;text-align:left;">Obra / Ubicación</th>
-        <th style="padding:10px 16px;text-align:center;">Días activa</th>
-        <th style="padding:10px 16px;text-align:center;">Operarios</th>
-        <th style="padding:10px 16px;text-align:center;">Total horas</th>
-        <th style="padding:10px 16px;text-align:center;">% del total</th>
-      </tr></thead>
-      <tbody>${obrasLista.map(([obra,d],i)=>{
-        const pct=totalHorasGlobal>0?Math.round(d.horas/totalHorasGlobal*100):0;
-        return `<tr style="border-bottom:1px solid var(--border);">
-          <td style="padding:10px 16px;font-weight:700;">🏗️ ${obra}</td>
-          <td style="padding:10px 16px;text-align:center;">${d.dias.size}</td>
-          <td style="padding:10px 16px;text-align:center;">${d.operarios.size}</td>
-          <td style="padding:10px 16px;text-align:center;font-family:'Montserrat';font-weight:900;color:var(--blue2);">${formatH(d.horas)}h</td>
-          <td style="padding:10px 16px;text-align:center;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
-                <div style="width:${pct}%;height:100%;background:var(--blue2);border-radius:3px;"></div>
+    if(!obrasLista.length){obrasEl.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);">Sin datos de obras en este período.</div>';}
+    else{
+      obrasEl.innerHTML=`<div style="padding:10px 16px;font-size:11px;color:var(--text3);">Haz clic en una obra para ver el detalle completo e imprimirlo.</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr style="background:var(--bg);">
+          <th style="padding:10px 16px;text-align:left;">Obra</th>
+          <th style="padding:10px 16px;text-align:center;">Días</th>
+          <th style="padding:10px 16px;text-align:center;">Operarios</th>
+          <th style="padding:10px 16px;text-align:center;">Total horas</th>
+          <th style="padding:10px 16px;text-align:center;">%</th>
+          <th style="padding:10px 16px;text-align:center;">Acción</th>
+        </tr></thead>
+        <tbody>${obrasLista.map(([obra,d])=>{
+          const pct=totalHorasGlobal>0?Math.round(d.horas/totalHorasGlobal*100):0;
+          const obraKey=encodeURIComponent(obra);
+          return `<tr style="border-bottom:1px solid var(--border);cursor:pointer;" onclick="abrirDetalleObraInforme('${obraKey}')" onmouseover="this.style.background='var(--blue-pale)'" onmouseout="this.style.background=''">
+            <td style="padding:10px 16px;font-weight:700;color:var(--blue2);">🏗️ ${obra} <span style="font-size:10px;font-weight:400;color:var(--text3);">→ ver detalle</span></td>
+            <td style="padding:10px 16px;text-align:center;">${d.dias.size}</td>
+            <td style="padding:10px 16px;text-align:center;">${d.operarios.size}</td>
+            <td style="padding:10px 16px;text-align:center;font-family:'Montserrat';font-weight:900;color:var(--blue2);">${formatH(d.horas)}h</td>
+            <td style="padding:10px 16px;text-align:center;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+                  <div style="width:${pct}%;height:100%;background:var(--blue2);border-radius:3px;"></div>
+                </div>
+                <span style="font-size:10px;font-weight:700;color:var(--blue2);width:30px;">${pct}%</span>
               </div>
-              <span style="font-size:10px;font-weight:700;color:var(--blue2);width:30px;">${pct}%</span>
-            </div>
-          </td>
-        </tr>`;
-      }).join('')}
-      <tr style="background:var(--bg);font-weight:700;">
-        <td style="padding:10px 16px;">TOTAL</td>
-        <td style="padding:10px 16px;text-align:center;">${diasConFichaje}</td>
-        <td style="padding:10px 16px;text-align:center;">${Object.keys(porOperario).length}</td>
-        <td style="padding:10px 16px;text-align:center;font-family:'Montserrat';font-weight:900;color:var(--blue2);">${formatH(totalHorasGlobal)}h</td>
-        <td style="padding:10px 16px;text-align:center;font-weight:700;">100%</td>
-      </tr></tbody>
-    </table>`;
+            </td>
+            <td style="padding:10px 16px;text-align:center;">
+              <button onclick="event.stopPropagation();abrirDetalleObraInforme('${obraKey}')" style="padding:4px 10px;background:var(--blue2);color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;">Ver e imprimir</button>
+            </td>
+          </tr>`;
+        }).join('')}
+        <tr style="background:var(--bg);font-weight:700;">
+          <td style="padding:10px 16px;">TOTAL PERÍODO</td>
+          <td style="padding:10px 16px;text-align:center;">${diasConFichaje}</td>
+          <td style="padding:10px 16px;text-align:center;">${Object.keys(porOperario).length}</td>
+          <td style="padding:10px 16px;text-align:center;font-family:'Montserrat';font-weight:900;color:var(--blue2);">${formatH(totalHorasGlobal)}h</td>
+          <td colspan="2"></td>
+        </tr></tbody>
+      </table>`;
+    }
   }
 
   // ── TAB 3: Horas resumen por operario ──
